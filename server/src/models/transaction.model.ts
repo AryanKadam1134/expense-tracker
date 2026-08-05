@@ -23,8 +23,8 @@ const transactionSchema = new Schema(
     },
     date: Date,
     category: {
-      type: String,
-      enum: ["food", "travel"],
+      type: Schema.Types.ObjectId,
+      ref: "Category",
     },
     amount: {
       type: Number,
