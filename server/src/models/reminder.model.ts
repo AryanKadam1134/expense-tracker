@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { REMINDERS } from "../contants";
 
 const reminderSchema = new Schema(
   {
@@ -20,7 +21,7 @@ const reminderSchema = new Schema(
     isPaid: Boolean,
     repeat: {
       type: String,
-      enum: ["daily", "weekly", "monthly", "yearly"],
+      enum: REMINDERS.map((r) => r.value),
     },
   },
   { timestamps: true },

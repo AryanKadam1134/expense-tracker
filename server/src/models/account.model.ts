@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+import { ACCOUNT_TYPES } from "../contants";
 
 const accountSchema = new Schema(
   {
@@ -20,7 +21,7 @@ const accountSchema = new Schema(
     accountNumber: String,
     accountType: {
       type: String,
-      enum: ["current", "salary", "savings", "other"],
+      enum: ACCOUNT_TYPES.map((a) => a.value),
     },
     openingBalance: {
       type: Number,

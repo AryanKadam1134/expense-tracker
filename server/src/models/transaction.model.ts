@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+import { TRANSACTION_TYPE } from "../contants";
 
 const transactionSchema = new Schema(
   {
@@ -19,7 +20,7 @@ const transactionSchema = new Schema(
     type: {
       type: String,
       required: true,
-      enum: ["credit", "debit"],
+      enum: TRANSACTION_TYPE.map((t) => t.value),
     },
     date: Date,
     category: {
