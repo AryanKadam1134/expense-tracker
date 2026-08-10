@@ -1,3 +1,5 @@
+const isProduction = process.env.NODE_ENV === "production";
+
 const ACCOUNT_TYPES = [
   { value: "current", label: "Current" },
   { value: "salary", label: "Salary" },
@@ -17,4 +19,4 @@ const REMINDERS = [
   { value: "yearly", label: "Yearly" },
 ];
 
-export { ACCOUNT_TYPES, TRANSACTION_TYPE, REMINDERS };
+export { isProduction, ACCOUNT_TYPES, TRANSACTION_TYPE, REMINDERS };
