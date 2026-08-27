@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
+
 import ApiRes from "./ApiRes";
 
 export const asynchandler = (func: RequestHandler): RequestHandler => {

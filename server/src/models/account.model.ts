@@ -1,4 +1,5 @@
 import { Schema, model } from "mongoose";
+
 import { ACCOUNT_TYPES } from "../contants";
 
 const accountSchema = new Schema(

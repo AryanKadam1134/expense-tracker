@@ -2,6 +2,7 @@ import { Schema, model, Model } from "mongoose";
 
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
+
 import { getEnv } from "../utils/getEnv";
 
 interface UserMethods {
@@ -23,7 +24,7 @@ interface User {
   googleId?: string;
   otp?: number;
   otpExpiryDate?: Date;
-  sessions: {
+  sessions?: {
     refreshToken: string;
     userAgent?: string;
     ip?: string;

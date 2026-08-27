@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+
 import { TRANSACTION_TYPE } from "../contants";
 
 const transactionSchema = new Schema(

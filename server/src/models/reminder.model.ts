@@ -1,4 +1,5 @@
 import { model, Schema } from "mongoose";
+
 import { REMINDERS } from "../contants";
 
 const reminderSchema = new Schema(

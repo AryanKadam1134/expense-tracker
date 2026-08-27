@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import { verifyUser } from "../middlewares/auth.middleware";
+
 import {
   loginUser,
   logoutUser,
@@ -12,6 +14,6 @@ authRouter.route("/register").post(registerUser);
 
 authRouter.route("/login").post(loginUser);
 
-authRouter.route("/logout").post(logoutUser);
+authRouter.route("/logout").post(verifyUser, logoutUser);
 
 export default authRouter;
