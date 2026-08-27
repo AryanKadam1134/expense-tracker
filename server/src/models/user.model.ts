@@ -2,6 +2,7 @@ import { Schema, model, Model } from "mongoose";
 
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
+import { getEnv } from "../utils/getEnv";
 
 interface UserMethods {
   isPasswordCorrect(password: string): Promise<boolean>;
@@ -91,16 +92,6 @@ userScheme.pre("save", async function () {
 
 userScheme.methods.isPasswordCorrect = async function (password: string) {
   return await bcrypt.compare(password, this.password ?? "");
-};
-
-const getEnv = (key: string): string => {
-  const value = process.env[key];
-
-  if (!value) {
-    throw new Error(`Missing environment variable: ${key}`);
-  }
-
-  return value;
 };
 
 const ACCESS_TOKEN_EXPIRY = getEnv(

@@ -82,7 +82,7 @@ const loginUser = asynchandler(async (req, res) => {
     );
 });
 
-const logoutUser = asynchandler(async (req: any, res) => {
+const logoutUser = asynchandler(async (req, res) => {
   const cookiesRefreshToken = req.cookies?.refreshToken;
 
   await User.findByIdAndUpdate(req.user?._id, {
