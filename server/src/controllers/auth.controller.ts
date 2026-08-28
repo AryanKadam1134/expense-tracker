@@ -1,11 +1,12 @@
-import { User } from "../models/user.model";
-
 import { Request } from "express";
 import { Types } from "mongoose";
+import jwt, { JwtPayload } from "jsonwebtoken";
+
+import { User } from "../models/user.model";
 
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
-
+import { getEnv } from "../utils/getEnv";
 import { asynchandler } from "../utils/asynchandler";
 import {
   ACCESS_TOKEN_OPTIONS,
@@ -23,13 +24,16 @@ const generateAccessAndRefreshToken = async (
   const deviceId = Array.isArray(rawDeviceId) ? rawDeviceId[0] : rawDeviceId;
 
   if (!deviceId) {
-    throw new ApiError(400, "deviceId is required!");
+    throw new ApiError(400, "Device ID missing");
   }
 
   const rawUserAgent = req.headers["user-agent"];
   const userAgent = Array.isArray(rawUserAgent)
     ? rawUserAgent[0]
     : rawUserAgent;
+
+  const ip = req.ip;
+  const createdAt = new Date();
 
   try {
     const user = await User.findById(userId);
@@ -49,20 +53,20 @@ const generateAccessAndRefreshToken = async (
       const session = sessions[existingSessionIndex];
       session.refreshToken = refreshToken;
       session.userAgent = userAgent;
-      session.ip = req.ip;
-      session.createdAt = new Date();
+      session.ip = ip;
+      session.createdAt = createdAt;
     } else {
-      const rememberMe = req.body.rememberMe ?? false;
+      const newSession = {
+        refreshToken,
+        userAgent,
+        ip,
+        deviceId,
+        rememberMe: req.body.rememberMe ?? false,
+        createdAt,
+      };
 
       if (sessions.length < 5) {
-        sessions.push({
-          refreshToken,
-          userAgent,
-          ip: req.ip,
-          deviceId,
-          rememberMe,
-          createdAt: new Date(),
-        });
+        sessions.push(newSession);
       } else {
         const replaceableSessionIndex = sessions.findIndex(
           (session) => session?.rememberMe === true,
@@ -72,14 +76,7 @@ const generateAccessAndRefreshToken = async (
           throw new ApiError(429, "Maximum devices limit reached (5)");
         }
 
-        sessions[replaceableSessionIndex] = {
-          refreshToken,
-          userAgent,
-          ip: req.ip,
-          deviceId,
-          rememberMe,
-          createdAt: new Date(),
-        };
+        sessions[replaceableSessionIndex] = newSession;
       }
     }
 
@@ -166,7 +163,7 @@ const loginUser = asynchandler(async (req, res) => {
   const { accessToken, refreshToken } = tokens;
 
   const loggedUser = await User.findById(userExists._id).select(
-    "-passowrd -sessions -otp -otpExpiryDate",
+    "-passowrd -sessions -googleId -otp -otpExpiryDate",
   );
 
   if (!loggedUser) {
@@ -196,4 +193,61 @@ const logoutUser = asynchandler(async (req, res) => {
     .json(new ApiRes(204, {}, "user logged out successfully!"));
 });
 
-export { registerUser, loginUser, logoutUser };
+const refreshAccessToken = asynchandler(async (req, res) => {
+  const cookieRefreshToken = req.cookies?.refreshToken;
+
+  const deviceId = req.headers["x-device-id"];
+
+  if (!deviceId) {
+    throw new ApiError(400, "Device ID missing");
+  }
+
+  const decodeToken = jwt.verify(
+    cookieRefreshToken,
+    getEnv("REFRESH_TOKEN_SECRET"),
+  ) as JwtPayload & { _id?: string };
+
+  if (!decodeToken?._id) {
+    throw new ApiError(401, "Invalid refresh token payload!");
+  }
+
+  const loggedUser = await User.findById(decodeToken._id);
+
+  if (!loggedUser) {
+    throw new ApiError(404, "User not found!");
+  }
+
+  const session = loggedUser?.sessions?.find(
+    (session) => session?.deviceId === deviceId,
+  );
+
+  if (!session) {
+    throw new ApiError(401, "Session expired!");
+  }
+
+  const rememberMe = session.rememberMe;
+
+  const tokens = await generateAccessAndRefreshToken(decodeToken._id, req);
+
+  if (!tokens) {
+    throw new ApiError(503, "Couldn't generate access or refresh token!");
+  }
+
+  const { accessToken, refreshToken } = tokens;
+
+  const user = await User.findById(decodeToken._id).select(
+    "-passowrd -sessions -googleId -otp -otpExpiryDate",
+  );
+
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, ACCESS_TOKEN_OPTIONS)
+    .cookie(
+      "refreshToken",
+      refreshToken,
+      rememberMe ? REFRESH_TOKEN_OPTIONS : TOKEN_OPTIONS,
+    )
+    .json(new ApiRes(200, { user }, "refreshed tokens successfully!"));
+});
+
+export { refreshAccessToken, registerUser, loginUser, logoutUser };
