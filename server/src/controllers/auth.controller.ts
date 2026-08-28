@@ -193,7 +193,7 @@ const logoutUser = asynchandler(async (req, res) => {
     .json(new ApiRes(204, {}, "user logged out successfully!"));
 });
 
-const refreshAccessToken = asynchandler(async (req, res) => {
+const refreshSession = asynchandler(async (req, res) => {
   const cookieRefreshToken = req.cookies?.refreshToken;
 
   const deviceId = req.headers["x-device-id"];
@@ -250,4 +250,4 @@ const refreshAccessToken = asynchandler(async (req, res) => {
     .json(new ApiRes(200, { user }, "refreshed tokens successfully!"));
 });
 
-export { refreshAccessToken, registerUser, loginUser, logoutUser };
+export { refreshSession, registerUser, loginUser, logoutUser };
