@@ -1,4 +1,5 @@
 import axios, { type AxiosResponse, type AxiosError } from "axios";
+import type { User } from "../types/types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 
@@ -9,6 +10,15 @@ export interface ApiResponse<T = unknown> {
   data: T;
   message?: string;
 }
+
+// Auth Response Types
+export interface AuthResponseData {
+  user: User;
+  accessToken?: string;
+  refreshToken?: string;
+}
+
+export type AuthResponse = ApiResponse<AuthResponseData>;
 
 const api = axios.create({
   baseURL: BASE_URL,

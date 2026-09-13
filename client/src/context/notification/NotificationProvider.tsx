@@ -1,7 +1,12 @@
 import { type ReactNode } from "react";
 import { message as antdMessage, notification } from "antd";
 
-import { NotificationContext } from "./useNotify";
+import {
+  NotificationContext,
+  type ToastMethod,
+  type MessageMethod,
+} from "./useNotify";
+import { NOTIFICATION_BASE_CONFIG } from "../../utils/notificationConfig";
 
 export function NotificationsProvider({ children }: { children: ReactNode }) {
   // Ant Design Notification
@@ -9,20 +14,17 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
 
   const [messageApi, messageContextHolder] = antdMessage.useMessage();
 
-  const baseConfig = {
-    placement: "bottomRight" as const,
-    duration: 3,
-    className: "custom-notification",
-    style: {
-      borderRadius: "12px",
-      boxShadow: "0px 4px 10px rgba(0,0,0,0.2)",
-    },
-    showProgress: false,
-    pauseOnHover: false,
-  };
-
-  const buildConfig = (message: string, description: string | undefined, icon: ReactNode | null, config: Record<string, unknown>) => {
-    const finalConfig: Record<string, unknown> = { ...baseConfig, ...config, message };
+  const buildConfig = (
+    message: string,
+    description: string | undefined,
+    icon: ReactNode | null,
+    config: Record<string, unknown>,
+  ) => {
+    const finalConfig: Record<string, unknown> = {
+      ...NOTIFICATION_BASE_CONFIG,
+      ...config,
+      message,
+    };
     if (description) finalConfig.description = description;
     if (icon) finalConfig.icon = icon;
     return finalConfig as Parameters<typeof api.success>[0];
@@ -38,58 +40,58 @@ export function NotificationsProvider({ children }: { children: ReactNode }) {
   // Enhanced notification methods with optional storage
   const notify = {
     // Toast notifications with optional storage
-    success: (message: string, description?: string, icon: ReactNode | null = null, config: Record<string, unknown> = {}) => {
+    success: ((message = "", description, icon = null, config = {}) => {
       api.success(buildConfig(message, description, icon, config));
-    },
+    }) as ToastMethod,
 
-    error: (message: string, description?: string, icon: ReactNode | null = null, config: Record<string, unknown> = {}) => {
+    error: ((message = "", description, icon = null, config = {}) => {
       api.error(buildConfig(message, description, icon, config));
-    },
+    }) as ToastMethod,
 
-    warning: (message: string, description?: string, icon: ReactNode | null = null, config: Record<string, unknown> = {}) => {
+    warning: ((message = "", description, icon = null, config = {}) => {
       api.warning(buildConfig(message, description, icon, config));
-    },
+    }) as ToastMethod,
 
-    info: (message: string, description?: string, icon: ReactNode | null = null, config: Record<string, unknown> = {}) => {
+    info: ((message = "", description, icon = null, config = {}) => {
       api.info(buildConfig(message, description, icon, config));
-    },
+    }) as ToastMethod,
 
-    open: (message: string, description?: string, icon: ReactNode | null = null, config: Record<string, unknown> = {}) => {
+    open: ((message = "", description, icon = null, config = {}) => {
       api.open(buildConfig(message, description, icon, config));
-    },
+    }) as ToastMethod,
 
     // Simple messages with optional storage
-    msgSuccess: (msg: string, icon: ReactNode | null = null, duration: number = 2) => {
+    msgSuccess: ((msg = "", icon = null, duration = 2) => {
       messageApi.open({
         type: "success",
         content: buildMessageContent(msg, icon),
         duration,
       });
-    },
+    }) as MessageMethod,
 
-    msgError: (msg: string, icon: ReactNode | null = null, duration: number = 2) => {
+    msgError: ((msg = "", icon = null, duration = 2) => {
       messageApi.open({
         type: "error",
         content: buildMessageContent(msg, icon),
         duration,
       });
-    },
+    }) as MessageMethod,
 
-    msgWarning: (msg: string, icon: ReactNode | null = null, duration: number = 2) => {
+    msgWarning: ((msg = "", icon = null, duration = 2) => {
       messageApi.open({
         type: "warning",
         content: buildMessageContent(msg, icon),
         duration,
       });
-    },
+    }) as MessageMethod,
 
-    msgInfo: (msg: string, icon: ReactNode | null = null, duration: number = 2) => {
+    msgInfo: ((msg = "", icon = null, duration = 2) => {
       messageApi.open({
         type: "info",
         content: buildMessageContent(msg, icon),
         duration,
       });
-    },
+    }) as MessageMethod,
   };
 
   return (

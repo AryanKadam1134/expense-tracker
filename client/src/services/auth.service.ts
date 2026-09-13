@@ -1,5 +1,6 @@
-import api from "./api.service";
 import type { AxiosRequestConfig } from "axios";
+
+import api from "./api.service";
 
 import type { Login, Register, GoogleAuth } from "../types/types";
 

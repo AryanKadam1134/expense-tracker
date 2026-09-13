@@ -3,11 +3,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 import { authEndpoints } from "../../services/auth.service";
+import type { Login, User } from "../../types/types";
 
 import { AuthContext } from "./useAuth";
-import { useNotify } from "../notification/useNotify";
-
-import type { Login, User } from "../../types/types";
+import { useNotify } from "../notification";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { notify } = useNotify();
