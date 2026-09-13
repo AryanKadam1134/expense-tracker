@@ -8,6 +8,7 @@ import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { getEnv } from "../utils/getEnv";
 import { asynchandler } from "../utils/asynchandler";
+
 import {
   ACCESS_TOKEN_OPTIONS,
   REFRESH_TOKEN_OPTIONS,
@@ -137,7 +138,7 @@ const loginUser = asynchandler(async (req, res) => {
   }
 
   if (!password) {
-    throw new ApiError(400, "passowrd is required!");
+    throw new ApiError(400, "password is required!");
   }
 
   const userExists = await User.findOne({
@@ -163,7 +164,7 @@ const loginUser = asynchandler(async (req, res) => {
   const { accessToken, refreshToken } = tokens;
 
   const loggedUser = await User.findById(userExists._id).select(
-    "-passowrd -sessions -googleId -otp -otpExpiryDate",
+    "-password -sessions -googleId -otp -otpExpiryDate",
   );
 
   if (!loggedUser) {
@@ -236,7 +237,7 @@ const refreshSession = asynchandler(async (req, res) => {
   const { accessToken, refreshToken } = tokens;
 
   const user = await User.findById(decodeToken._id).select(
-    "-passowrd -sessions -googleId -otp -otpExpiryDate",
+    "-password -sessions -googleId -otp -otpExpiryDate",
   );
 
   return res

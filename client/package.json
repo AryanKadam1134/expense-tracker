@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "antd": "^6.5.2",
     "axios": "^1.19.0",
     "dayjs": "^1.11.21",
     "lucide-react": "^1.28.0",
@@ -19,7 +20,8 @@
     "react-hook-form": "^7.84.0",
     "react-router-dom": "^7.18.2",
     "tailwind-merge": "^3.6.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.3",
+    "uuid": "^14.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

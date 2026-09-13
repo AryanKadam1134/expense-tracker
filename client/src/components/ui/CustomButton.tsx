@@ -11,10 +11,30 @@ const variants = {
 } as const;
 
 const sizes = {
-  "extra-small": { icon: 12, text: "text-xs" },
-  small: { icon: 14, text: "text-sm" },
-  mid: { icon: 16, text: "text-md" },
-  large: { icon: 18, text: "text-lg" },
+  "extra-small": {
+    icon: 12,
+    text: "text-xs",
+    padding: "px-2 py-1",
+    gap: "gap-1",
+  },
+  small: {
+    icon: 14,
+    text: "text-sm",
+    padding: "px-3 py-1.5",
+    gap: "gap-1.5",
+  },
+  mid: {
+    icon: 16,
+    text: "text-base",
+    padding: "px-4 py-1.5",
+    gap: "gap-1.5",
+  },
+  large: {
+    icon: 18,
+    text: "text-lg",
+    padding: "px-5 py-2",
+    gap: "gap-2",
+  },
 } as const;
 
 type CustomButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -39,12 +59,12 @@ export default function CustomButton({
     <button
       {...props}
       className={cn(
-        "px-4 py-1.5",
         "rounded-md transition-colors",
         "disabled:cursor-not-allowed disabled:opacity-60",
         variants[variant],
         sizes[size].text,
-        Icon && "flex items-center gap-1.5",
+        sizes[size].padding,
+        Icon && cn("flex items-center", sizes[size].gap),
         loading ? "cursor-progress" : "cursor-pointer",
       )}
     >

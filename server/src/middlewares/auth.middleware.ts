@@ -25,7 +25,7 @@ export const verifyUser = asynchandler(async (req, res, next) => {
   }
 
   const user = await User.findById(decodedToken._id).select(
-    "-passowrd -sessions -googleId -otp -otpExpiryDate",
+    "-password -sessions -googleId -otp -otpExpiryDate",
   );
 
   if (!user) {
