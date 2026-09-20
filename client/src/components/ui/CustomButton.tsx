@@ -45,14 +45,14 @@ type CustomButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   size?: keyof typeof sizes;
 };
 
-export default function CustomButton({
+const CustomButton = ({
   icon,
   loading,
   name,
   variant = "default",
   size = "mid",
   ...props
-}: CustomButtonProps) {
+}: CustomButtonProps) => {
   const Icon = (loading && Loader2) || icon;
 
   return (
@@ -77,4 +77,6 @@ export default function CustomButton({
       {name}
     </button>
   );
-}
+};
+
+export default CustomButton;

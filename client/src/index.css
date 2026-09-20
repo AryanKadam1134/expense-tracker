@@ -1,7 +1,14 @@
+@config "../tailwind.config.js";
 @import "tailwindcss";
+
+* {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: "Poppins", sans-serif;
 }
 
-
+.ant-message {
+  font-family: "Poppins", sans-serif;
+}
