@@ -175,9 +175,7 @@ const loginUser = asynchandler(async (req, res) => {
     .status(200)
     .cookie("accessToken", accessToken, ACCESS_TOKEN_OPTIONS)
     .cookie("refreshToken", refreshToken, REFRESH_TOKEN_OPTIONS)
-    .json(
-      new ApiRes(200, { user: loggedUser }, "user logged in successfully!"),
-    );
+    .json(new ApiRes(200, loggedUser, "user logged in successfully!"));
 });
 
 const logoutUser = asynchandler(async (req, res) => {
@@ -248,7 +246,7 @@ const refreshSession = asynchandler(async (req, res) => {
       refreshToken,
       rememberMe ? REFRESH_TOKEN_OPTIONS : TOKEN_OPTIONS,
     )
-    .json(new ApiRes(200, { user }, "refreshed tokens successfully!"));
+    .json(new ApiRes(200, user, "refreshed tokens successfully!"));
 });
 
 export { refreshSession, registerUser, loginUser, logoutUser };

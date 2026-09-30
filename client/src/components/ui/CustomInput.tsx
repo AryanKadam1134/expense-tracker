@@ -1,7 +1,21 @@
-import { inputClass } from "../../utils/getInputClass";
+import { type InputHTMLAttributes } from "react";
+
+import { type LucideIcon } from "lucide-react";
+
+import { inputClass } from "../../utils/inputClass";
+
+type CustomInputProps = InputHTMLAttributes<HTMLInputElement> & {
+  icon?: LucideIcon;
+  error?: string;
+};
 
 // Note: Use only for Text Based Inputs
-export default function CustomInput({ icon, error, className = "", ...props }) {
+const CustomInput = ({
+  icon,
+  error,
+  className = "",
+  ...props
+}: CustomInputProps) => {
   const Icon = icon;
 
   return (
@@ -19,4 +33,6 @@ export default function CustomInput({ icon, error, className = "", ...props }) {
       />
     </div>
   );
-}
+};
+
+export default CustomInput;

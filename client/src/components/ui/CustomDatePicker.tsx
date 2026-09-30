@@ -1,11 +1,20 @@
-import { inputClass } from "../../utils/getInputClass";
+import { type InputHTMLAttributes } from "react";
 
-export default function CustomDatePicker({
+import { type LucideIcon } from "lucide-react";
+
+import { inputClass } from "../../utils/inputClass";
+
+type CustomDatePickerProps = InputHTMLAttributes<HTMLInputElement> & {
+  icon?: LucideIcon;
+  error?: string;
+};
+
+const CustomDatePicker = ({
   icon,
   error,
   className = "",
   ...props
-}) {
+}: CustomDatePickerProps) => {
   const Icon = icon;
 
   return (
@@ -25,4 +34,6 @@ export default function CustomDatePicker({
       />
     </div>
   );
-}
+};
+
+export default CustomDatePicker;

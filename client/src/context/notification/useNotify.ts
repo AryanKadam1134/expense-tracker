@@ -1,8 +1,17 @@
 import { createContext, useContext, type ReactNode } from "react";
 
 // Notification method types - DRY approach
-export type ToastMethod = (message: string, description?: string, icon?: ReactNode | null, config?: Record<string, unknown>) => void;
-export type MessageMethod = (msg: string, icon?: ReactNode | null, duration?: number) => void;
+export type ToastMethod = (
+  message: string,
+  description?: string,
+  icon?: ReactNode | null,
+  config?: Record<string, unknown>,
+) => void;
+export type MessageMethod = (
+  msg: string,
+  icon?: ReactNode | null,
+  duration?: number,
+) => void;
 
 export interface NotifyContextType {
   notify: {
@@ -20,7 +29,9 @@ export interface NotifyContextType {
   };
 }
 
-export const NotificationContext = createContext<NotifyContextType | null>(null);
+export const NotificationContext = createContext<NotifyContextType | null>(
+  null,
+);
 
 export const useNotify = () => {
   const context = useContext(NotificationContext);

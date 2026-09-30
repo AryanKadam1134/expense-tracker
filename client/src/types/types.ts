@@ -8,6 +8,8 @@ export interface User {
   lastName?: string;
 }
 
+
+
 // Request Payload Types
 export type GoogleAuth = {
   credential: string;

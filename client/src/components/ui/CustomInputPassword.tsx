@@ -1,16 +1,21 @@
-import React, { useState } from "react";
+import { useState, type InputHTMLAttributes } from "react";
 
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, type LucideIcon } from "lucide-react";
 
-import { inputClass } from "../../utils/getInputClass";
+import { inputClass } from "../../utils/inputClass";
+
+type CustomInputPassowrdProps = InputHTMLAttributes<HTMLInputElement> & {
+  icon?: LucideIcon;
+  error?: string;
+};
 
 // Note: Use only for Text Based Inputs
-export default function CustomInputPassword({
+const CustomInputPassword = ({
   icon,
   error,
   className,
   ...props
-}) {
+}: CustomInputPassowrdProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const Icon = icon;
@@ -39,4 +44,6 @@ export default function CustomInputPassword({
       </button>
     </div>
   );
-}
+};
+
+export default CustomInputPassword;

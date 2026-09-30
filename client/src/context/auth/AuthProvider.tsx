@@ -7,14 +7,22 @@ import { authEndpoints } from "../../services/auth.service";
 import { AuthContext } from "./useAuth";
 import { useNotify } from "../notification";
 
+import useApi from "../../hooks/useApi";
+
 import type { Login, User } from "../../types/types";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { notify } = useNotify();
+  const { loading, callApi } = useApi({
+    googleAuth: false,
+    login: false,
+    logout: false,
+    refreshSession: true,
+  });
 
   const [error, setError] = useState<string | null>(null);
   const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
+  const authLoading = loading.refreshSession;
 
   const [deviceId] = useState(() => {
     let storedDeviceId = localStorage.getItem("deviceId");
@@ -27,90 +35,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return storedDeviceId;
   });
 
-  const googleAuth = async (
+  const googleAuth = (
     credentialResponse: { credential: string },
     rememberMe: boolean,
   ) => {
-    try {
-      const res = await authEndpoints.googleAuth(
-        { credential: credentialResponse.credential, rememberMe },
-        {
-          headers: {
-            "x-device-id": deviceId,
+    callApi(
+      "googleAuth",
+      () =>
+        authEndpoints.googleAuth(
+          { credential: credentialResponse.credential, rememberMe },
+          {
+            headers: {
+              "x-device-id": deviceId,
+            },
           },
+        ),
+      {
+        onSuccess: (res) => {
+          setUser(res.data);
         },
-      );
-
-      const apiResponse = res.data;
-      const data = apiResponse.data;
-
-      if (apiResponse.success) {
-        setUser(data?.user);
-      }
-
-      console.log("Login with Google succesfull:", data);
-    } catch (error) {
-      console.error("Error Login with Google: ", error);
-    }
+        onError: (error) => console.error("Error Login with Google: ", error),
+      },
+    );
   };
 
   const login = async (payload: Login) => {
-    try {
-      const res = await authEndpoints.login(payload);
-      const apiResponse = res.data;
-      const data = apiResponse.data;
-      const success = apiResponse.success;
+    const data = await callApi("login", () => authEndpoints.login(payload), {
+      onSuccess: (res) => {
+        setUser(res.data);
+        setError(null);
+      },
+      onError: (error) => {
+        const errorMessage =
+          error instanceof Error ? error.message : "Login failed!";
+        console.error("Error while login: ", error);
+        notify.msgError(errorMessage);
+        setError(errorMessage);
+      },
+    });
 
-      if (success) {
-        setUser(data?.user);
-      }
-
-      setError(null);
-      return success;
-
-      // console.log("Login succesfull:", data);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Login failed!";
-      console.error("Error while login: ", error);
-      notify.msgError(errorMessage);
-      setError(errorMessage);
-    } finally {
-      setAuthLoading(false);
-    }
+    return data?.success;
   };
 
-  const logout = async () => {
-    try {
-      await authEndpoints.logout();
-      setUser(null);
-    } catch (error) {
-      console.error("Error logging out: ", error);
-    }
+  const logout = () => {
+    callApi("logout", () => authEndpoints.logout(), {
+      onSuccess: () => setUser(null),
+      onError: (error) => console.error("Error logging out: ", error),
+    });
   };
 
   useEffect(() => {
-    const refreshSession = async () => {
-      try {
-        const res = await authEndpoints.refreshSession();
-
-        const apiResponse = res.data;
-        const data = apiResponse.data;
-
-        if (apiResponse.success) {
-          setUser(data?.user);
-        }
-
-        console.log("Session restored: ", data);
-      } catch (error) {
-        console.error("Error restoring session: ", error);
-      } finally {
-        setAuthLoading(false);
-      }
+    const refreshSession = () => {
+      callApi("refreshSession", () => authEndpoints.refreshSession(), {
+        onSuccess: (res) => {
+          setUser(res.data);
+        },
+        onError: (error) => console.error("Error restoring session: ", error),
+      });
     };
 
     refreshSession();
-  }, [deviceId]);
+  }, [callApi, deviceId]);
 
   const value = {
     error,

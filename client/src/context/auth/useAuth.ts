@@ -1,4 +1,9 @@
-import { createContext, useContext, type Dispatch, type SetStateAction } from "react";
+import {
+  createContext,
+  useContext,
+  type Dispatch,
+  type SetStateAction,
+} from "react";
 import type { User } from "../../types/types";
 
 export interface AuthContextType {
@@ -6,10 +11,16 @@ export interface AuthContextType {
   setError: Dispatch<SetStateAction<string | null>>;
   user: User | null;
   authLoading: boolean;
-  googleAuth: (credentialResponse: { credential: string }, rememberMe: boolean) => Promise<void>;
-  login: (payload: { userCredential: string; password: string }) => Promise<boolean | undefined>;
+  googleAuth: (
+    credentialResponse: { credential: string },
+    rememberMe: boolean,
+  ) => void;
+  login: (payload: {
+    userCredential: string;
+    password: string;
+  }) => Promise<boolean | undefined>;
   setUser: Dispatch<SetStateAction<User | null>>;
-  logout: () => Promise<void>;
+  logout: () => void;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
