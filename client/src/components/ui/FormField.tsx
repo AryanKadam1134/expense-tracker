@@ -13,7 +13,7 @@ type FormFieldProps = {
   type?: string;
   bold?: boolean;
   required?: boolean;
-  error?: string;
+  error?: string | undefined;
 };
 
 interface ChildWithAvailableErrorProps {

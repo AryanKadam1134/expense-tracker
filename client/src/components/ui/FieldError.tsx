@@ -1,5 +1,5 @@
 type FieldErrorProps = {
-  error?: string;
+  error?: string | undefined;
 };
 
 const FieldError = ({ error }: FieldErrorProps) => {

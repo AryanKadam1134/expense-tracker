@@ -1,4 +1,12 @@
-// User Types
+// Shared API types
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  statusCode: number;
+  data: T;
+  message?: string;
+}
+
+// User type
 export interface User {
   id: string;
   username: string;
@@ -7,8 +15,6 @@ export interface User {
   middleName?: string;
   lastName?: string;
 }
-
-
 
 // Request Payload Types
 export type GoogleAuth = {

@@ -4,7 +4,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
-import type { User } from "../../types/types";
+import type { GoogleAuth, Login, User } from "../../types/api.types";
 
 export interface AuthContextType {
   error: string | null;
@@ -12,13 +12,10 @@ export interface AuthContextType {
   user: User | null;
   authLoading: boolean;
   googleAuth: (
-    credentialResponse: { credential: string },
+    credentialResponse: Pick<GoogleAuth, "credential">,
     rememberMe: boolean,
   ) => void;
-  login: (payload: {
-    userCredential: string;
-    password: string;
-  }) => Promise<boolean | undefined>;
+  login: (payload: Login) => Promise<boolean | undefined>;
   setUser: Dispatch<SetStateAction<User | null>>;
   logout: () => void;
 }

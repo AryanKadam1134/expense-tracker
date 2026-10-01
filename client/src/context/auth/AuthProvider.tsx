@@ -9,7 +9,7 @@ import { useNotify } from "../notification";
 
 import useApi from "../../hooks/useApi";
 
-import type { Login, User } from "../../types/types";
+import type { Login, User } from "../../types/api.types";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { notify } = useNotify();

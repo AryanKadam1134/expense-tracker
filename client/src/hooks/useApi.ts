@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import type { AxiosResponse } from "axios";
-import type { ApiResponse } from "../services/api.service";
+import type { ApiResponse } from "../types/api.types";
 
 type UseApiOptions<T> = {
   loading?: boolean;

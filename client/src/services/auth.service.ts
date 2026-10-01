@@ -1,9 +1,14 @@
 import type { AxiosRequestConfig } from "axios";
 
 import api from "./api.service";
-import type { ApiResponse } from "./api.service";
 
-import type { Login, Register, GoogleAuth, User } from "../types/types";
+import type {
+  ApiResponse,
+  Login,
+  Register,
+  GoogleAuth,
+  User,
+} from "../types/api.types";
 
 export const authEndpoints = {
   googleAuth: (body: GoogleAuth, config?: AxiosRequestConfig) =>

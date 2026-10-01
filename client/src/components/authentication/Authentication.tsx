@@ -18,8 +18,8 @@ const Authentication = ({
   formSubContent,
 }: AuthenticationProps) => {
   return (
-    <div className="min-h-screen p-6 flex flex-col items-center justify-center gap-10 bg-light-bg-secondary dark:bg-dark-bg-secondary">
-      <div className="w-full max-w-md bg-light-bg-primary dark:bg-dark-bg-tertiary p-8 rounded-xl shadow-lg border border-light-border-primary dark:border-dark-border-primary">
+    <div className="min-h-screen p-6 flex flex-col items-center justify-center gap-10">
+      <div className="w-full max-w-md p-8 rounded-xl shadow-lg border">
         <PageHeader
           heading={heading}
           subHeading={subHeading}

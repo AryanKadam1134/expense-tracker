@@ -1,4 +1,4 @@
-import { type InputHTMLAttributes } from "react";
+import { forwardRef, type InputHTMLAttributes } from "react";
 
 import { type LucideIcon } from "lucide-react";
 
@@ -10,29 +10,27 @@ type CustomInputProps = InputHTMLAttributes<HTMLInputElement> & {
 };
 
 // Note: Use only for Text Based Inputs
-const CustomInput = ({
-  icon,
-  error,
-  className = "",
-  ...props
-}: CustomInputProps) => {
-  const Icon = icon;
+const CustomInput = forwardRef<HTMLInputElement, CustomInputProps>(
+  ({ icon, error, className = "", ...props }, ref) => {
+    const Icon = icon;
 
-  return (
-    <div className="relative">
-      {Icon && (
-        <Icon
-          size={18}
-          className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+    return (
+      <div className="relative">
+        {Icon && (
+          <Icon
+            size={18}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 cursor-pointer"
+          />
+        )}
+
+        <input
+          ref={ref}
+          {...props}
+          className={`${Icon && "pl-10"} ${inputClass(error)} ${className}`}
         />
-      )}
-
-      <input
-        {...props}
-        className={`${Icon && "pl-10"} ${inputClass(error)} ${className}`}
-      />
-    </div>
-  );
-};
+      </div>
+    );
+  },
+);
 
 export default CustomInput;

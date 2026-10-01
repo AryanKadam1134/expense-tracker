@@ -1,14 +1,7 @@
 import axios, { type AxiosResponse, type AxiosError } from "axios";
+import type { ApiResponse } from "../types/api.types";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
-
-// Generic API Response Type
-export interface ApiResponse<T = unknown> {
-  success: boolean;
-  statusCode: number;
-  data: T;
-  message?: string;
-}
 
 const api = axios.create({
   baseURL: BASE_URL,
