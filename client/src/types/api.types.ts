@@ -33,5 +33,14 @@ export type Register = {
 export type Login = {
   userCredential: string;
   password: string;
-  rememberMe?: boolean
+  rememberMe?: boolean;
+};
+
+export type AccountPayload = {
+  bankName: string;
+  accountName: string;
+  accountNumber?: string | null;
+  accountType?: string | null;
+  openingBalance: number;
+  currentBalance?: number | null;
 };

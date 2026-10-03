@@ -13,7 +13,6 @@ const addAccount = asynchandler(async (req, res) => {
     accountNumber,
     accountType,
     openingBalance,
-    currentBalance,
   } = req.body;
 
   if (!bankName) {
@@ -26,10 +25,6 @@ const addAccount = asynchandler(async (req, res) => {
 
   if (!openingBalance) {
     throw new ApiError(400, "Opening Balance is required!");
-  }
-
-  if (!currentBalance) {
-    throw new ApiError(400, "Current Balance is required!");
   }
 
   const accountNameExists = await Account.findOne({
@@ -52,7 +47,7 @@ const addAccount = asynchandler(async (req, res) => {
     bankName,
     accountName,
     openingBalance,
-    currentBalance,
+    currentBalance: openingBalance,
   };
 
   if (accountNumber) fields.accountNumber = accountNumber;
