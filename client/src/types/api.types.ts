@@ -33,4 +33,5 @@ export type Register = {
 export type Login = {
   userCredential: string;
   password: string;
+  rememberMe?: boolean
 };

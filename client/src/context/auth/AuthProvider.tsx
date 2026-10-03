@@ -1,4 +1,4 @@
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -35,6 +35,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return storedDeviceId;
   });
 
+  const config = useMemo(() => {
+    return {
+      headers: {
+        "x-device-id": deviceId,
+      },
+    };
+  }, [deviceId]);
+
   const googleAuth = (
     credentialResponse: { credential: string },
     rememberMe: boolean,
@@ -44,35 +52,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       () =>
         authEndpoints.googleAuth(
           { credential: credentialResponse.credential, rememberMe },
-          {
-            headers: {
-              "x-device-id": deviceId,
-            },
-          },
+          config,
         ),
       {
         onSuccess: (res) => {
           setUser(res.data);
         },
-        onError: (error) => console.error("Error Login with Google: ", error),
       },
     );
   };
 
   const login = async (payload: Login) => {
-    const data = await callApi("login", () => authEndpoints.login(payload), {
-      onSuccess: (res) => {
-        setUser(res.data);
-        setError(null);
+    const data = await callApi(
+      "login",
+      () => authEndpoints.login(payload, config),
+      {
+        onSuccess: (res) => {
+          setUser(res.data);
+          setError(null);
+        },
+        onError: (error) => {
+          const errorMessage =
+            error instanceof Error ? error?.message : "Login failed!";
+          notify.msgError(errorMessage);
+          setError(errorMessage);
+        },
       },
-      onError: (error) => {
-        const errorMessage =
-          error instanceof Error ? error.message : "Login failed!";
-        console.error("Error while login: ", error);
-        notify.msgError(errorMessage);
-        setError(errorMessage);
-      },
-    });
+    );
 
     return data?.success;
   };
@@ -80,22 +86,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = () => {
     callApi("logout", () => authEndpoints.logout(), {
       onSuccess: () => setUser(null),
-      onError: (error) => console.error("Error logging out: ", error),
     });
   };
 
   useEffect(() => {
     const refreshSession = () => {
-      callApi("refreshSession", () => authEndpoints.refreshSession(), {
+      callApi("refreshSession", () => authEndpoints.refreshSession(config), {
         onSuccess: (res) => {
           setUser(res.data);
         },
-        onError: (error) => console.error("Error restoring session: ", error),
       });
     };
 
     refreshSession();
-  }, [callApi, deviceId]);
+  }, [callApi, config, deviceId]);
 
   const value = {
     error,

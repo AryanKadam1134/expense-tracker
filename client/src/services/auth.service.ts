@@ -16,9 +16,11 @@ export const authEndpoints = {
 
   register: (body: Register) => api.post("/auth/register", body),
 
-  login: (body: Login) => api.post<ApiResponse<User>>("/auth/login", body),
+  login: (body: Login, config?: AxiosRequestConfig) =>
+    api.post<ApiResponse<User>>("/auth/login", body, config),
 
   logout: () => api.post("/auth/logout"),
 
-  refreshSession: () => api.post<ApiResponse<User>>("/auth/refresh-session"),
+  refreshSession: (config?: AxiosRequestConfig) =>
+    api.post<ApiResponse<User>>("/auth/refresh-session", {}, config),
 };
