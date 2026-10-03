@@ -11,6 +11,8 @@ export const verifyUser = asynchandler(async (req, res, next) => {
     req.cookies?.accessToken ||
     req.header("Authorization")?.replace("Bearer ", "");
 
+  const refreshToken = req.cookies?.refreshToken;
+
   if (!accessToken) {
     throw new ApiError(401, "Access token missing!");
   }
@@ -25,13 +27,22 @@ export const verifyUser = asynchandler(async (req, res, next) => {
   }
 
   const user = await User.findById(decodedToken._id).select(
-    "-password -sessions -googleId -otp -otpExpiryDate",
+    "-password -googleId -otp -otpExpiryDate",
   );
 
   if (!user) {
     throw new ApiError(404, "user not found!");
   }
 
+  const sessionExists = user?.sessions?.some(
+    (session) => session?.refreshToken === refreshToken,
+  );
+
+  if (!sessionExists) {
+    throw new ApiError(401, "Session Expired!");
+  }
+
+  user.sessions = undefined;
   req.user = user;
 
   next();
