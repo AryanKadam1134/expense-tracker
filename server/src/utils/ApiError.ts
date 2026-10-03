@@ -1,5 +1,6 @@
 class ApiError<T> extends Error {
   statusCode: number;
+  message: string;
   errors: unknown[];
   success: boolean;
 
@@ -13,6 +14,7 @@ class ApiError<T> extends Error {
     super(message);
 
     this.statusCode = statusCode;
+    this.message = message;
     this.errors = errors;
     this.success = statusCode < 400 || success;
 

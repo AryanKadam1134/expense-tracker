@@ -8,6 +8,19 @@ type UseApiOptions<T> = {
   onError?: (error: unknown) => void;
 };
 
+const normalizeError = (error: unknown): Error => {
+  if (error instanceof Error) return error;
+
+  if (typeof error === "object" && error !== null && "message" in error) {
+    const message = error.message;
+    if (typeof message === "string" && message.trim()) {
+      return new Error(message, { cause: error });
+    }
+  }
+
+  return new Error("Something went wrong!", { cause: error });
+};
+
 const useApi = <TLoading extends Record<string, boolean>>(
   defaults: TLoading,
 ) => {
@@ -38,7 +51,7 @@ const useApi = <TLoading extends Record<string, boolean>>(
         return res;
       } catch (error: unknown) {
         console.error("Error: ", error);
-        onError?.(error);
+        onError?.(normalizeError(error));
         return undefined;
       } finally {
         setLoadingKey(keyName, false);
