@@ -1,104 +1,166 @@
-import { type ReactNode } from "react";
-import { message as antdMessage, notification } from "antd";
+import { useCallback, useMemo, useRef, useState } from "react";
+import type { ReactNode } from "react";
 
-import {
-  NotificationContext,
-  type ToastMethod,
-  type MessageMethod,
-} from "./useNotify";
-import { NOTIFICATION_BASE_CONFIG } from "../../utils/notificationConfig";
+import ToastContainer from "../../components/common/ToastContainer";
+import type {
+  NotifyContextType,
+  ToastInput,
+  ToastItem,
+  ToastPosition,
+  ToastType,
+} from "../../types/notification.types";
+import { NotificationContext } from "./useNotify";
 
-export function NotificationsProvider({ children }: { children: ReactNode }) {
-  // Ant Design Notification
-  const [api, contextHolder] = notification.useNotification();
+const TOAST_EXIT_DURATION = 220;
+const positions: ToastPosition[] = [
+  "topLeft",
+  "topCenter",
+  "topRight",
+  "bottomLeft",
+  "bottomCenter",
+  "bottomRight",
+];
 
-  const [messageApi, messageContextHolder] = antdMessage.useMessage();
+export function NotificationProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
+  const nextId = useRef(0);
+  const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
+  const closingToasts = useRef(new Set<number>());
+  const remaining = useRef(new Map<number, number>());
+  const startedAt = useRef(new Map<number, number>());
+  const pausedToasts = useRef(new Set<number>());
 
-  const buildConfig = (
-    message: string,
-    description: string | undefined,
-    icon: ReactNode | null,
-    config: Record<string, unknown>,
-  ) => {
-    const finalConfig: Record<string, unknown> = {
-      ...NOTIFICATION_BASE_CONFIG,
-      ...config,
-      message,
-    };
-    if (description) finalConfig.description = description;
-    if (icon) finalConfig.icon = icon;
-    return finalConfig as Parameters<typeof api.success>[0];
-  };
+  const clearTimer = useCallback((id: number) => {
+    const timer = timers.current.get(id);
+    if (timer) {
+      clearTimeout(timer);
+      timers.current.delete(id);
+    }
+  }, []);
 
-  const buildMessageContent = (msg: string, icon: ReactNode | null) => (
-    <span className="flex items-center gap-2">
-      {icon && <span className="flex">{icon}</span>}
-      {msg}
-    </span>
+  const removeToast = useCallback(
+    (id: number) => {
+      setToasts((current) => current.filter((toast) => toast.id !== id));
+      closingToasts.current.delete(id);
+      pausedToasts.current.delete(id);
+      remaining.current.delete(id);
+      startedAt.current.delete(id);
+      clearTimer(id);
+    },
+    [clearTimer],
   );
 
-  // Enhanced notification methods with optional storage
-  const notify = {
-    // Toast notifications with optional storage
-    success: ((message = "", description, icon = null, config = {}) => {
-      api.success(buildConfig(message, description, icon, config));
-    }) as ToastMethod,
+  const closeToast = useCallback(
+    (id: number) => {
+      if (closingToasts.current.has(id)) return;
+      closingToasts.current.add(id);
+      pausedToasts.current.delete(id);
+      remaining.current.delete(id);
+      startedAt.current.delete(id);
+      clearTimer(id);
+      setToasts((current) =>
+        current.map((toast) =>
+          toast.id === id ? { ...toast, isClosing: true } : toast,
+        ),
+      );
+      timers.current.set(
+        id,
+        setTimeout(() => removeToast(id), TOAST_EXIT_DURATION),
+      );
+    },
+    [clearTimer, removeToast],
+  );
 
-    error: ((message = "", description, icon = null, config = {}) => {
-      api.error(buildConfig(message, description, icon, config));
-    }) as ToastMethod,
+  const pauseToast = useCallback(
+    (id: number) => {
+      if (closingToasts.current.has(id) || pausedToasts.current.has(id)) return;
+      if (!timers.current.has(id)) return;
+      const elapsed = Date.now() - (startedAt.current.get(id) ?? Date.now());
+      const timeLeft = Math.max((remaining.current.get(id) ?? 0) - elapsed, 0);
+      clearTimer(id);
+      remaining.current.set(id, timeLeft);
+      pausedToasts.current.add(id);
+    },
+    [clearTimer],
+  );
 
-    warning: ((message = "", description, icon = null, config = {}) => {
-      api.warning(buildConfig(message, description, icon, config));
-    }) as ToastMethod,
+  const resumeToast = useCallback(
+    (id: number) => {
+      if (!pausedToasts.current.has(id)) return;
+      pausedToasts.current.delete(id);
+      const timeLeft = remaining.current.get(id) ?? 0;
+      if (timeLeft <= 0) {
+        closeToast(id);
+        return;
+      }
+      startedAt.current.set(id, Date.now());
+      timers.current.set(id, setTimeout(() => closeToast(id), timeLeft));
+    },
+    [closeToast],
+  );
 
-    info: ((message = "", description, icon = null, config = {}) => {
-      api.info(buildConfig(message, description, icon, config));
-    }) as ToastMethod,
-
-    open: ((message = "", description, icon = null, config = {}) => {
-      api.open(buildConfig(message, description, icon, config));
-    }) as ToastMethod,
-
-    // Simple messages with optional storage
-    msgSuccess: ((msg = "", icon = null, duration = 2) => {
-      messageApi.open({
-        type: "success",
-        content: buildMessageContent(msg, icon),
+  const showToast = useCallback(
+    (input: ToastInput, defaultType: ToastType = "info") => {
+      const options = typeof input === "string" ? { title: input } : input;
+      const id = ++nextId.current;
+      const {
+        title,
+        description,
+        duration = 3000,
+        position = "topRight",
+        icon = null,
+      } = options;
+      const toast: ToastItem = {
+        id,
+        type: options.type ?? defaultType,
+        title,
+        description,
         duration,
-      });
-    }) as MessageMethod,
+        position,
+        icon,
+      };
 
-    msgError: ((msg = "", icon = null, duration = 2) => {
-      messageApi.open({
-        type: "error",
-        content: buildMessageContent(msg, icon),
-        duration,
-      });
-    }) as MessageMethod,
+      setToasts((current) => [...current, toast]);
+      if (duration > 0) {
+        remaining.current.set(id, duration);
+        startedAt.current.set(id, Date.now());
+        timers.current.set(id, setTimeout(() => closeToast(id), duration));
+      }
+      return id;
+    },
+    [closeToast],
+  );
 
-    msgWarning: ((msg = "", icon = null, duration = 2) => {
-      messageApi.open({
-        type: "warning",
-        content: buildMessageContent(msg, icon),
-        duration,
-      });
-    }) as MessageMethod,
-
-    msgInfo: ((msg = "", icon = null, duration = 2) => {
-      messageApi.open({
-        type: "info",
-        content: buildMessageContent(msg, icon),
-        duration,
-      });
-    }) as MessageMethod,
-  };
+  const notify = useMemo<NotifyContextType["notify"]>(
+    () => ({
+      show: (options) => showToast(options),
+      success: (options) => showToast(options, "success"),
+      error: (options) => showToast(options, "error"),
+      warning: (options) => showToast(options, "warning"),
+      info: (options) => showToast(options, "info"),
+    }),
+    [showToast],
+  );
 
   return (
     <NotificationContext.Provider value={{ notify }}>
-      {contextHolder}
-      {messageContextHolder}
       {children}
+      {positions.map((position) => (
+        <ToastContainer
+          key={position}
+          position={position}
+          toasts={toasts.filter((toast) => toast.position === position)}
+          onRemove={closeToast}
+          onPause={pauseToast}
+          onResume={resumeToast}
+        />
+      ))}
     </NotificationContext.Provider>
   );
 }
+
+export const NotificationsProvider = NotificationProvider;

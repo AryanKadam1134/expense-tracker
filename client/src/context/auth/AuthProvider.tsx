@@ -63,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         onError: (error) => {
           const errorMessage =
             error instanceof Error ? error?.message : "Login failed!";
-          notify.msgError(errorMessage);
+          notify.error(errorMessage);
           setError(errorMessage);
         },
       },

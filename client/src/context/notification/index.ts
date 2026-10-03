@@ -1,10 +1,22 @@
 import { NotificationsProvider } from "./NotificationProvider";
 import { useNotify } from "./useNotify";
 import type {
-  ToastMethod,
-  MessageMethod,
   NotifyContextType,
-} from "./useNotify";
+  ToastMethod,
+  ToastInput,
+  ToastItem,
+  ToastOptions,
+  ToastPosition,
+  ToastType,
+} from "../../types/notification.types";
 
 export { NotificationsProvider, useNotify };
-export type { NotifyContextType, ToastMethod, MessageMethod };
+export type {
+  NotifyContextType,
+  ToastInput,
+  ToastItem,
+  ToastMethod,
+  ToastOptions,
+  ToastPosition,
+  ToastType,
+};
