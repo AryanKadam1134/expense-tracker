@@ -1,13 +1,18 @@
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../context/auth";
-import { useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, useWatch, type SubmitHandler } from "react-hook-form";
+import { LockKeyhole } from "lucide-react";
+
 import Authentication from "../../components/authentication/Authentication";
+import GoogleAuthButton from "../../components/authentication/GoogleAuthButton";
+
 import FormField from "../../components/ui/FormField";
 import CustomInput from "../../components/ui/CustomInput";
-import { LockKeyhole } from "lucide-react";
-import CustomInputPassword from "../../components/ui/CustomInputPassword";
-import CustomCheckbox from "../../components/ui/CustomCheckbox";
 import CustomButton from "../../components/ui/CustomButton";
+import CustomCheckbox from "../../components/ui/CustomCheckbox";
+import CustomInputPassword from "../../components/ui/CustomInputPassword";
+
+import { useAuth } from "../../context/auth";
+
 import type { Login } from "../../types/api.types";
 
 const SignIn = () => {
@@ -18,13 +23,13 @@ const SignIn = () => {
   const {
     register,
     handleSubmit,
-    // control,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<Login>({
     mode: "onChange",
   });
 
-  // const rememberMe = useWatch({ control, name: "rememberMe" });
+  const rememberMe = useWatch({ control, name: "rememberMe" });
 
   const onSubmit: SubmitHandler<Login> = async (payload) => {
     const success = await login(payload);
@@ -116,7 +121,7 @@ const SignIn = () => {
             <p className="flex-1 border-b border-light-input-border dark:border-dark-input-border"></p>
           </div>
 
-          {/* <GoogleAuthButton rememberMe={rememberMe} /> */}
+          <GoogleAuthButton rememberMe={rememberMe} />
 
           <p className="mt-2 text-center text-xs text-light-text-primary dark:text-dark-text-primary">
             <span>Don't have an account yet? </span>

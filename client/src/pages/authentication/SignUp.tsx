@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { LockKeyholeOpen, Mail } from "lucide-react";
 
 import Authentication from "../../components/authentication/Authentication";
-// import GoogleAuthButton from "../../components/authentication/GoogleAuthButton";
+import GoogleAuthButton from "../../components/authentication/GoogleAuthButton";
 
 import FormField from "../../components/ui/FormField";
 import CustomInput from "../../components/ui/CustomInput";
@@ -14,16 +14,17 @@ import { authEndpoints } from "../../services/auth.service";
 
 import useApi from "../../hooks/useApi";
 
-import { useAuth } from "../../context/auth/useAuth";
 import { useNotify } from "../../context/notification/useNotify";
 
 import type { Register } from "../../types/api.types";
+import { useState } from "react";
 
 const SignUp = () => {
   const { notify } = useNotify();
-  const { error, setError } = useAuth();
 
   const { loading, callApi } = useApi({ registering: false });
+
+  const [error, setError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -173,7 +174,7 @@ const SignUp = () => {
             <p className="flex-1 border-b border-light-input-border dark:border-dark-input-border"></p>
           </div>
 
-          {/* <GoogleAuthButton /> */}
+          <GoogleAuthButton />
 
           <p className="mt-2 text-center text-xs text-light-text-primary dark:text-dark-text-primary">
             <span>Already have an account? </span>

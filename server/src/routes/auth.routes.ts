@@ -3,6 +3,7 @@ import { Router } from "express";
 import { verifyUser } from "../middlewares/auth.middleware";
 
 import {
+  googleAuth,
   loginUser,
   logoutUser,
   refreshSession,
@@ -10,6 +11,8 @@ import {
 } from "../controllers/auth.controller";
 
 const authRouter = Router();
+
+authRouter.route("/google").post(googleAuth);
 
 authRouter.route("/register").post(registerUser);
 

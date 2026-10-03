@@ -9,7 +9,7 @@ import { useNotify } from "../notification";
 
 import useApi from "../../hooks/useApi";
 
-import type { Login, User } from "../../types/api.types";
+import type { GoogleAuth, Login, User } from "../../types/api.types";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { notify } = useNotify();
@@ -43,23 +43,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [deviceId]);
 
-  const googleAuth = (
-    credentialResponse: { credential: string },
-    rememberMe: boolean,
-  ) => {
-    callApi(
-      "googleAuth",
-      () =>
-        authEndpoints.googleAuth(
-          { credential: credentialResponse.credential, rememberMe },
-          config,
-        ),
-      {
-        onSuccess: (res) => {
-          setUser(res.data);
-        },
+  const googleAuth = (body: GoogleAuth) => {
+    callApi("googleAuth", () => authEndpoints.googleAuth(body, config), {
+      onSuccess: (res) => {
+        setUser(res.data);
       },
-    );
+    });
   };
 
   const login = async (payload: Login) => {

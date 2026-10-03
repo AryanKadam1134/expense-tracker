@@ -18,8 +18,8 @@ export interface User {
 
 // Request Payload Types
 export type GoogleAuth = {
-  credential: string;
-  rememberMe: boolean;
+  code: string;
+  rememberMe?: boolean;
 };
 
 export type Register = {

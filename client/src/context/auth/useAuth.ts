@@ -11,10 +11,7 @@ export interface AuthContextType {
   setError: Dispatch<SetStateAction<string | null>>;
   user: User | null;
   authLoading: boolean;
-  googleAuth: (
-    credentialResponse: Pick<GoogleAuth, "credential">,
-    rememberMe: boolean,
-  ) => void;
+  googleAuth: (body: GoogleAuth) => void;
   login: (payload: Login) => Promise<boolean | undefined>;
   setUser: Dispatch<SetStateAction<User | null>>;
   logout: () => void;

@@ -1,6 +1,18 @@
+import { useAuth } from "../../context/auth";
+
 const Dashboard = () => {
-  console.log("Dashboard");
-  return <div>User Dashboard</div>;
+  const { logout } = useAuth();
+  return (
+    <div className="flex flex-col gap-1">
+      User Dashboard
+      <button
+        onClick={logout}
+        className="w-fit px-3 py-1 text-white text-sm bg-red-400 hover:bg-red-500 rounded-md transition-colors"
+      >
+        Logout
+      </button>
+    </div>
+  );
 };
 
 export default Dashboard;

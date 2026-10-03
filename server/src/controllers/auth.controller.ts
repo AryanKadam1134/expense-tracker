@@ -1,6 +1,7 @@
 import { Request } from "express";
 import { Types } from "mongoose";
 import jwt, { JwtPayload } from "jsonwebtoken";
+import { OAuth2Client } from "google-auth-library";
 
 import { User } from "../models/user.model";
 
@@ -100,6 +101,110 @@ const generateAccessAndRefreshToken = async (
   }
 };
 
+const googleAuth = asynchandler(async (req, res) => {
+  const client = new OAuth2Client(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    process.env.GOOGLE_REDIRECT_URI,
+  );
+
+  const { code, rememberMe } = req.body;
+
+  const deviceId = req.headers["x-device-id"];
+  if (!deviceId) {
+    throw new ApiError(400, "Device ID missing");
+  }
+
+  if (!code) {
+    throw new ApiError(400, "Google authorization code missing");
+  }
+
+  const { tokens } = await client.getToken(code);
+
+  if (!tokens.id_token) {
+    throw new ApiError(400, "Google ID token missing");
+  }
+
+  // ✅ Verify token from Google
+  const ticket = await client.verifyIdToken({
+    idToken: tokens.id_token,
+    audience: process.env.GOOGLE_CLIENT_ID,
+  });
+
+  const payload = ticket.getPayload();
+
+  if (!payload) {
+    throw new ApiError(401, "Invalid Google ID token payload");
+  }
+
+  const { email, given_name, family_name, sub } = payload;
+
+  if (!email) {
+    throw new ApiError(400, "Google account has no email");
+  }
+
+  // ✅ Check if user exists
+  let user = await User.findOne({ email });
+
+  // ✅ CASE 1: New user → Register
+  if (!user) {
+    user = await User.create({
+      firstName: given_name || "User",
+      lastName: family_name || "",
+      username: email.split("@")[0] + "_" + Date.now(), // unique username
+      email,
+      password: undefined, // IMPORTANT: no password
+      googleId: sub,
+    });
+
+    // Send email in background (don't await)
+    // shootEmail({
+    //   to: user.email,
+    //   subject: "Welcome to Portfolio SaaS",
+    //   html: welcomeUserTemplate(user),
+    // }).catch((error) => {
+    //   console.error(
+    //     "Background: Error sending mail in googleAuth:",
+    //     error.message,
+    //   );
+    // });
+  }
+
+  // ✅ CASE 2: Existing user but no googleId → link account
+  if (!user.googleId) {
+    user.googleId = sub;
+    await user.save({ validateBeforeSave: false });
+  }
+
+  // ✅ Generate tokens using YOUR system
+  const cookieTokens = await generateAccessAndRefreshToken(user._id, req);
+
+  if (!cookieTokens) {
+    throw new ApiError(503, "Couldn't generate access or refresh token!");
+  }
+
+  const { accessToken, refreshToken } = cookieTokens;
+
+  if (!accessToken || !refreshToken) {
+    throw new ApiError(500, "Couldn't generate tokens");
+  }
+
+  const loggedUser = await User.findById(user._id).select(
+    "-password -sessions -googleId -otp -otpExpiryDate",
+  );
+
+  // ✅ SAME cookie logic as your login
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, ACCESS_TOKEN_OPTIONS)
+    .cookie(
+      "refreshToken",
+      refreshToken,
+      rememberMe ? REFRESH_TOKEN_OPTIONS : TOKEN_OPTIONS,
+    )
+    .json(new ApiRes(200, loggedUser, "Google auth successful!"));
+});
+
 const registerUser = asynchandler(async (req, res) => {
   const { username, email, password, firstName, lastName } = req.body;
 
@@ -112,8 +217,6 @@ const registerUser = asynchandler(async (req, res) => {
   }
 
   const userExists = await User.findOne({ $or: [{ username }, { email }] });
-
-  console.log("Existing User: ", userExists);
 
   if (userExists) {
     throw new ApiError(409, "User already exists with same username or email!");
@@ -251,4 +354,4 @@ const refreshSession = asynchandler(async (req, res) => {
     .json(new ApiRes(200, user, "refreshed tokens successfully!"));
 });
 
-export { refreshSession, registerUser, loginUser, logoutUser };
+export { refreshSession, googleAuth, registerUser, loginUser, logoutUser };
