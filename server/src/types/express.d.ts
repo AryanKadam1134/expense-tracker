@@ -11,6 +11,16 @@ declare global {
         lastName?: string;
         middleName?: string;
       };
+      account?: {
+        _id: Types.ObjectId | string;
+        owner?: Types.ObjectId | string;
+        bankName?: string;
+        accountName?: string;
+        accountNumber?: string | null;
+        accountType?: string | null;
+        openingBalance?: number;
+        currentBalance?: number;
+      };
     }
   }
 }

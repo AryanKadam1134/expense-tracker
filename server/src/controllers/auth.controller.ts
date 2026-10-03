@@ -26,7 +26,7 @@ const generateAccessAndRefreshToken = async (
   const deviceId = Array.isArray(rawDeviceId) ? rawDeviceId[0] : rawDeviceId;
 
   if (!deviceId) {
-    throw new ApiError(400, "Device ID missing");
+    throw new ApiError(400, "Device ID missing!");
   }
 
   const rawUserAgent = req.headers["user-agent"];
@@ -75,7 +75,7 @@ const generateAccessAndRefreshToken = async (
         );
 
         if (replaceableSessionIndex === -1) {
-          throw new ApiError(429, "Maximum devices limit reached (5)");
+          throw new ApiError(429, "Maximum devices limit reached (5)!");
         }
 
         sessions[replaceableSessionIndex] = newSession;
@@ -112,17 +112,17 @@ const googleAuth = asynchandler(async (req, res) => {
 
   const deviceId = req.headers["x-device-id"];
   if (!deviceId) {
-    throw new ApiError(400, "Device ID missing");
+    throw new ApiError(400, "Device ID missing!");
   }
 
   if (!code) {
-    throw new ApiError(400, "Google authorization code missing");
+    throw new ApiError(400, "Google authorization code missing!");
   }
 
   const { tokens } = await client.getToken(code);
 
   if (!tokens.id_token) {
-    throw new ApiError(400, "Google ID token missing");
+    throw new ApiError(400, "Google ID token missing!");
   }
 
   // ✅ Verify token from Google
@@ -134,13 +134,13 @@ const googleAuth = asynchandler(async (req, res) => {
   const payload = ticket.getPayload();
 
   if (!payload) {
-    throw new ApiError(401, "Invalid Google ID token payload");
+    throw new ApiError(401, "Invalid Google ID token payload!");
   }
 
   const { email, given_name, family_name, sub } = payload;
 
   if (!email) {
-    throw new ApiError(400, "Google account has no email");
+    throw new ApiError(400, "Google account has no email!");
   }
 
   // ✅ Check if user exists
@@ -186,7 +186,7 @@ const googleAuth = asynchandler(async (req, res) => {
   const { accessToken, refreshToken } = cookieTokens;
 
   if (!accessToken || !refreshToken) {
-    throw new ApiError(500, "Couldn't generate tokens");
+    throw new ApiError(500, "Couldn't generate tokens!");
   }
 
   const loggedUser = await User.findById(user._id).select(
@@ -239,11 +239,11 @@ const loginUser = asynchandler(async (req, res) => {
   const { userCredential, password } = req.body;
 
   if (!userCredential) {
-    throw new ApiError(400, "username or email is required!");
+    throw new ApiError(400, "Username or Email is required!");
   }
 
   if (!password) {
-    throw new ApiError(400, "password is required!");
+    throw new ApiError(400, "Password is required!");
   }
 
   const userExists = await User.findOne({
@@ -251,13 +251,13 @@ const loginUser = asynchandler(async (req, res) => {
   });
 
   if (!userExists) {
-    throw new ApiError(404, "user not found!");
+    throw new ApiError(404, "User not found!");
   }
 
   const isPasswordCorrect = await userExists.isPasswordCorrect(password);
 
   if (!isPasswordCorrect) {
-    throw new ApiError(401, "invalid password!");
+    throw new ApiError(401, "Invalid password!");
   }
 
   const tokens = await generateAccessAndRefreshToken(userExists._id, req);
@@ -303,7 +303,7 @@ const refreshSession = asynchandler(async (req, res) => {
   const deviceId = req.headers["x-device-id"];
 
   if (!deviceId) {
-    throw new ApiError(400, "Device ID missing");
+    throw new ApiError(400, "Device ID missing!");
   }
 
   const decodeToken = jwt.verify(

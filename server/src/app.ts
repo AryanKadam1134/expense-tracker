@@ -15,7 +15,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 import authRouter from "./routes/auth.routes";
+import accountRouter from "./routes/account.routes";
 
 app.use("/api/auth", authRouter);
+app.use("/api/account", accountRouter);
 
 export default app;
