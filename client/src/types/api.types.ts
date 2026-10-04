@@ -1,4 +1,6 @@
 // Shared API types
+
+// Api Response
 export interface ApiResponse<T = unknown> {
   success: boolean;
   statusCode: number;
@@ -8,12 +10,24 @@ export interface ApiResponse<T = unknown> {
 
 // User type
 export interface User {
-  id: string;
+  _id: string;
   username: string;
   email: string;
   firstName: string;
   middleName?: string;
   lastName?: string;
+}
+
+// Account type
+export interface Account {
+  _id: string;
+  owner: string;
+  bankName: string;
+  accountName: string;
+  accountNumber?: string | null;
+  accountType?: string | null;
+  openingBalance: number;
+  currentBalance: number;
 }
 
 // Request Payload Types

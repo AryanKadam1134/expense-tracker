@@ -12,6 +12,8 @@ import SignUp from "./pages/authentication/SignUp";
 import ForgotPassword from "./pages/authentication/ForgotPassword";
 import ResetPassword from "./pages/authentication/ResetPassword";
 import Dashboard from "./pages/private/Dashboard";
+import AccountsPage from "./pages/private/accounts/AccountsPage";
+import AccountFormPage from "./pages/private/accounts/AccountFormPage";
 
 function PublicRoute() {
   const { user, authLoading } = useAuth();
@@ -20,8 +22,8 @@ function PublicRoute() {
     return <LoadingScreen />;
   }
 
-  // ❌ If logged in → redirect to details
-  return user ? <Navigate to="/details" replace /> : <Outlet />;
+  // ❌ If logged in → redirect to dashboard
+  return user ? <Navigate to="/dashboard" replace /> : <Outlet />;
 }
 
 function ProtectedRoute() {
@@ -38,7 +40,7 @@ const App = () => {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/details" />} />
+        <Route path="/" element={<Navigate to="/dashboard" />} />
 
         {/* 🔓 Public Route (only if NOT logged in) */}
         <Route element={<PublicRoute />}>
@@ -50,7 +52,13 @@ const App = () => {
 
         {/* 🔐 Protected Route */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/details" element={<Dashboard />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/accounts">
+            <Route index element={<AccountsPage />} />
+            <Route path="add" element={<AccountFormPage />} />
+            <Route path=":accountId/edit" element={<AccountFormPage />} />
+          </Route>
         </Route>
 
         <Route path="*" element={<Navigate to="/signin" />} />

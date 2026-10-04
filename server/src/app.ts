@@ -18,6 +18,6 @@ import authRouter from "./routes/auth.routes";
 import accountRouter from "./routes/account.routes";
 
 app.use("/api/auth", authRouter);
-app.use("/api/account", accountRouter);
+app.use("/api/accounts", accountRouter);
 
 export default app;
