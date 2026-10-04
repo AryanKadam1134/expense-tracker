@@ -1,8 +1,18 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types, type HydratedDocument } from "mongoose";
 
 import { ACCOUNT_TYPES } from "../contants";
 
-const accountSchema = new Schema(
+interface AccountFields {
+  owner: Types.ObjectId;
+  bankName: string;
+  accountName: string;
+  accountNumber?: string | null;
+  accountType?: string | null;
+  openingBalance: number;
+  currentBalance: number;
+}
+
+const accountSchema = new Schema<AccountFields>(
   {
     owner: {
       type: Schema.Types.ObjectId,
@@ -36,4 +46,6 @@ const accountSchema = new Schema(
   { timestamps: true },
 );
 
-export const Account = model("Account", accountSchema);
+export const Account = model<AccountFields>("Account", accountSchema);
+
+export type AccountDocument = HydratedDocument<AccountFields>;

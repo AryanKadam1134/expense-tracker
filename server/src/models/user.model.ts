@@ -1,4 +1,4 @@
-import { Schema, model, Model } from "mongoose";
+import { Schema, model, Model, HydratedDocument } from "mongoose";
 
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
@@ -14,7 +14,7 @@ interface UserMethods {
   };
 }
 
-interface User {
+interface UserFields {
   username: string;
   email: string;
   password?: string;
@@ -34,7 +34,11 @@ interface User {
   }[];
 }
 
-const userScheme = new Schema<User, Model<User, {}, UserMethods>, UserMethods>(
+const userScheme = new Schema<
+  UserFields,
+  Model<UserFields, {}, UserMethods>,
+  UserMethods
+>(
   {
     username: {
       type: String,
@@ -131,3 +135,5 @@ userScheme.methods.generateAccessAndRefreshToken = function () {
 };
 
 export const User = model("User", userScheme);
+
+export type UserDocument = HydratedDocument<UserFields>;
