@@ -1,5 +1,4 @@
-import { useEffect, useId, useRef, useState } from "react";
-import type { MouseEvent } from "react";
+import { useEffect, useId, useRef, useState, type MouseEvent } from "react";
 
 import {
   FloatingPortal,
@@ -18,9 +17,13 @@ import { ChevronDown, Search, X } from "lucide-react";
 import CustomInput from "./CustomInput";
 
 import { inputClass } from "../../utils/inputClass";
-import type { SelectDropdownProps, SelectOption } from "../../types/components.types";
 
-export default function SelectDropdown({
+import type {
+  SelectDropdownProps,
+  SelectOption,
+} from "../../types/components.types";
+
+const SelectDropdown = ({
   id,
   options,
   selectedOptions = [],
@@ -35,7 +38,7 @@ export default function SelectDropdown({
   required = false,
   className = "",
   onBlur,
-}: SelectDropdownProps) {
+}: SelectDropdownProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const searchInputRef = useRef<HTMLInputElement>(null);
@@ -262,4 +265,6 @@ export default function SelectDropdown({
       )}
     </>
   );
-}
+};
+
+export default SelectDropdown;

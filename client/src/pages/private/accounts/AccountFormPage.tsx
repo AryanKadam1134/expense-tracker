@@ -54,7 +54,8 @@ const AccountFormPage = () => {
         onSuccess: (res) => {
           reset();
           notify.success(
-            res?.message || accountId ? "Account Updated" : "Account created!",
+            res?.message ||
+              (accountId ? "Account updated!" : "Account created!"),
           );
         },
         onError: (error) => {
@@ -76,101 +77,96 @@ const AccountFormPage = () => {
   }, [fetchAccount, accountId]);
 
   return (
-    <div>
-      <form
-        onSubmit={handleSubmit(onSubmit)}
-        className="mt-10 grid grid-cols-2 gap-6"
+    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+      {/* Bank Name */}
+      <FormField
+        id="bankName"
+        label="Bank Name"
+        required
+        error={errors?.bankName?.message}
       >
-        {/* Bank Name */}
-        <FormField
+        <CustomInput
           id="bankName"
-          label="Bank Name"
-          required
-          error={errors?.bankName?.message}
-        >
-          <CustomInput
-            id="bankName"
-            type="text"
-            placeholder="RBI"
-            {...register("bankName", {
-              required: "Bank name is required!",
-            })}
-          />
-        </FormField>
-
-        {/* Account Name */}
-        <FormField
-          id="accountName"
-          label="Account Name"
-          required
-          error={errors?.accountName?.message}
-        >
-          <CustomInput
-            id="accountName"
-            type="text"
-            placeholder="Trading Account"
-            {...register("accountName", {
-              required: "Account name is required!",
-            })}
-          />
-        </FormField>
-
-        {/* Account Number */}
-        <FormField
-          id="accountNumber"
-          label="Account Number"
-          error={errors?.accountNumber?.message}
-        >
-          <CustomInput
-            id="accountNumber"
-            type="number"
-            placeholder="*****7887"
-            {...register("accountNumber")}
-          />
-        </FormField>
-
-        {/* Account Type */}
-        <FormField
-          id="accountType"
-          label="Account Type"
-          error={errors?.accountType?.message}
-        >
-          <CustomInput
-            id="accountType"
-            type="text"
-            placeholder="Select"
-            {...register("accountType")}
-          />
-        </FormField>
-
-        {/* Opening Balance */}
-        {!accountId && (
-          <FormField
-            id="openingBalance"
-            label="Opening Balance"
-            required
-            error={errors?.openingBalance?.message}
-          >
-            <CustomInput
-              id="openingBalance"
-              type="text"
-              placeholder="******"
-              {...register("openingBalance", {
-                required: "Opening balance is required!",
-              })}
-            />
-          </FormField>
-        )}
-
-        {/* Submit */}
-        <CustomButton
-          type="submit"
-          name={loading.creating ? "Saving..." : "Save"}
-          className="w-fit"
-          loading={loading.creating}
+          type="text"
+          placeholder="RBI"
+          {...register("bankName", {
+            required: "Bank name is required!",
+          })}
         />
-      </form>
-    </div>
+      </FormField>
+
+      {/* Account Name */}
+      <FormField
+        id="accountName"
+        label="Account Name"
+        required
+        error={errors?.accountName?.message}
+      >
+        <CustomInput
+          id="accountName"
+          type="text"
+          placeholder="Trading Account"
+          {...register("accountName", {
+            required: "Account name is required!",
+          })}
+        />
+      </FormField>
+
+      {/* Account Number */}
+      <FormField
+        id="accountNumber"
+        label="Account Number"
+        error={errors?.accountNumber?.message}
+      >
+        <CustomInput
+          id="accountNumber"
+          type="number"
+          placeholder="*****7887"
+          {...register("accountNumber")}
+        />
+      </FormField>
+
+      {/* Account Type */}
+      <FormField
+        id="accountType"
+        label="Account Type"
+        error={errors?.accountType?.message}
+      >
+        <CustomInput
+          id="accountType"
+          type="text"
+          placeholder="Select"
+          {...register("accountType")}
+        />
+      </FormField>
+
+      {/* Opening Balance */}
+      {!accountId && (
+        <FormField
+          id="openingBalance"
+          label="Opening Balance"
+          required
+          error={errors?.openingBalance?.message}
+        >
+          <CustomInput
+            id="openingBalance"
+            type="number"
+            placeholder="******"
+            {...register("openingBalance", {
+              required: "Opening balance is required!",
+            })}
+          />
+        </FormField>
+      )}
+
+      {/* Submit */}
+      <CustomButton
+        type="submit"
+        name={loading.creating ? "Saving..." : "Save"}
+        className="w-fit"
+        loading={loading.creating}
+      />
+    </form>
   );
 };
 

@@ -11,12 +11,12 @@ type CustomRadioButtonsProps = Omit<
   className?: string;
 };
 
-export default function CustomRadioButtons({
+const CustomRadioButtons = ({
   options = [],
   error,
   className = "",
   ...props
-}: CustomRadioButtonsProps) {
+}: CustomRadioButtonsProps) => {
   return (
     <div className={`flex items-center gap-4 mt-2 ${className}`}>
       {options.map((option) => (
@@ -40,4 +40,6 @@ export default function CustomRadioButtons({
       ))}
     </div>
   );
-}
+};
+
+export default CustomRadioButtons;

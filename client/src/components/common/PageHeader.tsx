@@ -7,12 +7,12 @@ type PageHeaderProps = {
   children?: React.ReactNode;
 };
 
-export default function PageHeader({
+const PageHeader = ({
   heading,
   subHeading,
   className = "",
   children,
-}: PageHeaderProps) {
+}: PageHeaderProps) => {
   return (
     <div
       className={`${className} flex flex-col sm:flex-row sm:items-center justify-between gap-4`}
@@ -36,4 +36,6 @@ export default function PageHeader({
       )}
     </div>
   );
-}
+};
+
+export default PageHeader;

@@ -20,7 +20,7 @@ type CustomMultiSelectProps = Omit<
   onBlur?: FocusEventHandler<HTMLDivElement>;
 };
 
-export default function CustomMultiSelect({
+const CustomMultiSelect = ({
   options = [],
   error,
   value = [],
@@ -33,7 +33,7 @@ export default function CustomMultiSelect({
   required = false,
   onBlur,
   ...props
-}: CustomMultiSelectProps) {
+}: CustomMultiSelectProps) => {
   const selectedValues = Array.isArray(value) ? value : [];
   const selectedValueKeys = new Set(selectedValues.map(String));
   const selectedOptions = options.filter((option) =>
@@ -105,4 +105,6 @@ export default function CustomMultiSelect({
       </select>
     </div>
   );
-}
+};
+
+export default CustomMultiSelect;

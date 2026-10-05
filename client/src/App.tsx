@@ -5,17 +5,23 @@ import {
   Outlet,
   Navigate,
 } from "react-router-dom";
+
 import LoadingScreen from "./components/common/LoadingScreen";
-import { useAuth } from "./context/auth";
+
+import DashboardLayout from "./layouts/DashboardLayout";
+
 import SignIn from "./pages/authentication/SignIn";
 import SignUp from "./pages/authentication/SignUp";
-import ForgotPassword from "./pages/authentication/ForgotPassword";
 import ResetPassword from "./pages/authentication/ResetPassword";
+import ForgotPassword from "./pages/authentication/ForgotPassword";
+
 import Dashboard from "./pages/private/Dashboard";
 import AccountsPage from "./pages/private/accounts/AccountsPage";
 import AccountFormPage from "./pages/private/accounts/AccountFormPage";
 
-function PublicRoute() {
+import { useAuth } from "./context/auth";
+
+const PublicRoute = () => {
   const { user, authLoading } = useAuth();
 
   if (authLoading) {
@@ -24,9 +30,9 @@ function PublicRoute() {
 
   // ❌ If logged in → redirect to dashboard
   return user ? <Navigate to="/dashboard" replace /> : <Outlet />;
-}
+};
 
-function ProtectedRoute() {
+const ProtectedRoute = () => {
   const { user, authLoading } = useAuth();
 
   if (authLoading) {
@@ -34,7 +40,7 @@ function ProtectedRoute() {
   }
 
   return user ? <Outlet /> : <Navigate to="/signin" replace />;
-}
+};
 
 const App = () => {
   return (
@@ -52,12 +58,14 @@ const App = () => {
 
         {/* 🔐 Protected Route */}
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard" element={<Dashboard />} />
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
 
-          <Route path="/accounts">
-            <Route index element={<AccountsPage />} />
-            <Route path="add" element={<AccountFormPage />} />
-            <Route path=":accountId/edit" element={<AccountFormPage />} />
+            <Route path="/accounts">
+              <Route index element={<AccountsPage />} />
+              <Route path="add" element={<AccountFormPage />} />
+              <Route path=":accountId/edit" element={<AccountFormPage />} />
+            </Route>
           </Route>
         </Route>
 

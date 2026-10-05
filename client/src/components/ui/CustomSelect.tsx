@@ -19,7 +19,7 @@ type CustomSelectProps = Omit<
   onBlur?: FocusEventHandler<HTMLDivElement>;
 };
 
-export default function CustomSelect({
+const CustomSelect = ({
   options = [],
   error,
   value,
@@ -32,7 +32,7 @@ export default function CustomSelect({
   required = false,
   onBlur,
   ...props
-}: CustomSelectProps) {
+}: CustomSelectProps) => {
   const selectedItem =
     options.find((option) => String(option.value) === String(value)) || null;
 
@@ -102,4 +102,6 @@ export default function CustomSelect({
       </select>
     </div>
   );
-}
+};
+
+export default CustomSelect;

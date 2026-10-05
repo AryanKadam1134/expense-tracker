@@ -5,11 +5,11 @@ import { useNotify } from "../../context/notification/useNotify";
 
 import googleLogo from "../../assets/google.svg";
 
-export default function GoogleAuthButton({
+const GoogleAuthButton = ({
   rememberMe,
 }: {
   rememberMe?: boolean | undefined;
-}) {
+}) => {
   const { notify } = useNotify();
   const { googleAuth } = useAuth();
 
@@ -36,4 +36,6 @@ export default function GoogleAuthButton({
       <span className="w-full text-center">Continue with Google</span>
     </div>
   );
-}
+};
+
+export default GoogleAuthButton;

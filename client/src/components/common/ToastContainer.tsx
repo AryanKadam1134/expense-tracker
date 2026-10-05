@@ -1,5 +1,6 @@
 import { useCallback, useRef, useState } from "react";
 import type { CSSProperties, PointerEvent, TransitionEvent } from "react";
+
 import {
   X,
   Info,
@@ -8,6 +9,7 @@ import {
   TriangleAlert,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+
 import type {
   ToastContainerProps,
   ToastItem,
@@ -73,7 +75,8 @@ function Toast({ toast, onRemove, onPause, onResume }: ToastProps) {
 
   const Icon = toastIcons[type] ?? Info;
   const styles = toastStyles[type] ?? toastStyles.info;
-  const positionClass = toastPositionClasses[position] ?? toastPositionClasses.topRight;
+  const positionClass =
+    toastPositionClasses[position] ?? toastPositionClasses.topRight;
 
   const toastRef = useRef<HTMLDivElement>(null);
   const dragState = useRef({ startX: 0, startTime: 0, dragging: false });
@@ -144,15 +147,18 @@ function Toast({ toast, onRemove, onPause, onResume }: ToastProps) {
   const handlePointerUp = useCallback(() => finishDrag(), [finishDrag]);
   const handlePointerCancel = useCallback(() => finishDrag(), [finishDrag]);
 
-  const handleTransitionEnd = useCallback((e: TransitionEvent<HTMLDivElement>) => {
-    if (e.target !== e.currentTarget || e.propertyName !== "transform") {
-      return;
-    }
+  const handleTransitionEnd = useCallback(
+    (e: TransitionEvent<HTMLDivElement>) => {
+      if (e.target !== e.currentTarget || e.propertyName !== "transform") {
+        return;
+      }
 
-    if (!dragState.current.dragging) {
-      setIsOverriding(false);
-    }
-  }, []);
+      if (!dragState.current.dragging) {
+        setIsOverriding(false);
+      }
+    },
+    [],
+  );
 
   const translateX = isSwipedOut ? swipeDir * exitDistance : dragX;
   const dragOpacity = isSwipedOut
@@ -179,10 +185,10 @@ function Toast({ toast, onRemove, onPause, onResume }: ToastProps) {
       onMouseLeave={onResume}
       style={
         isOverriding
-          ? {
+          ? ({
               "--notification-toast-drag-x": `${translateX}px`,
               "--notification-toast-drag-opacity": dragOpacity,
-            } as CSSProperties
+            } as CSSProperties)
           : undefined
       }
       className={`notification-toast ${positionClass} ${isClosing ? "notification-toast--closing" : ""} ${swipeClasses}
@@ -235,13 +241,13 @@ const positionClasses: Record<ToastPosition, string> = {
   bottomRight: "bottom-4 right-4 items-end",
 };
 
-export default function ToastContainer({
+const ToastContainer = ({
   position,
   toasts,
   onRemove,
   onPause,
   onResume,
-}: ToastContainerProps) {
+}: ToastContainerProps) => {
   if (!toasts.length) return null;
 
   return (
@@ -265,4 +271,6 @@ export default function ToastContainer({
       ))}
     </div>
   );
-}
+};
+
+export default ToastContainer;

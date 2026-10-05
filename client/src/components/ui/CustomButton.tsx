@@ -51,6 +51,7 @@ const CustomButton = ({
   name,
   variant = "default",
   size = "mid",
+  className = "",
   ...props
 }: CustomButtonProps) => {
   const Icon = (loading && Loader2) || icon;
@@ -59,12 +60,13 @@ const CustomButton = ({
     <button
       {...props}
       className={cn(
+        className,
         "rounded-md transition-colors",
         "disabled:cursor-not-allowed disabled:opacity-60",
         variants[variant],
         sizes[size].text,
         sizes[size].padding,
-        Icon && cn("flex items-center", sizes[size].gap),
+        Icon && cn("flex items-center justify-center", sizes[size].gap),
         loading ? "cursor-progress" : "cursor-pointer",
       )}
     >

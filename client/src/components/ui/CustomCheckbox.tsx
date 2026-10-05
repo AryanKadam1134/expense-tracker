@@ -1,9 +1,9 @@
 import type { InputHTMLAttributes } from "react";
 
-export default function CustomCheckbox({
+const CustomCheckbox = ({
   className = "",
   ...props
-}: InputHTMLAttributes<HTMLInputElement>) {
+}: InputHTMLAttributes<HTMLInputElement>) => {
   return (
     <input
       {...props}
@@ -11,4 +11,6 @@ export default function CustomCheckbox({
       className={`accent-blue-500 dark:accent-blue-400 cursor-pointer ${className}`}
     />
   );
-}
+};
+
+export default CustomCheckbox;
