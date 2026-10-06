@@ -42,7 +42,7 @@ const AccountsPage = () => {
         name="Add Account"
         icon={SquareUserRound}
         onClick={() => navigate("add")}
-        className="w-fit"
+        className="self-end w-fit"
       />
 
       {accounts?.map((account) => (

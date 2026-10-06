@@ -16,7 +16,9 @@ app.use(cookieParser());
 
 import authRouter from "./routes/auth.routes";
 import accountRouter from "./routes/account.routes";
+import filtersRoutes from "./routes/filter.routes";
 
+app.use("/api/filters", filtersRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", accountRouter);
 

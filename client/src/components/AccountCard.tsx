@@ -20,8 +20,15 @@ const AccountCard = ({ account, onDelete }: AccountCardsProps) => {
 
   const { loading, callApi } = useApi({ deleting: false });
 
-  const { _id, bankName, accountName, openingBalance, currentBalance } =
-    account;
+  const {
+    _id,
+    bankName,
+    accountName,
+    accountType,
+    accountNumber,
+    openingBalance,
+    currentBalance,
+  } = account;
 
   const navigate = useNavigate();
 
@@ -43,6 +50,8 @@ const AccountCard = ({ account, onDelete }: AccountCardsProps) => {
     <div className="p-3 flex flex-col gap-1 border rounded-md">
       <span>{bankName}</span>
       <span>{accountName}</span>
+      <span>{accountType}</span>
+      <span>{accountNumber}</span>
       <span>{openingBalance}</span>
       <span>{currentBalance}</span>
 
@@ -51,6 +60,7 @@ const AccountCard = ({ account, onDelete }: AccountCardsProps) => {
         onClick={() => navigate(`${_id}/edit`)}
         disabled={loading?.deleting}
       />
+
       <CustomButton
         name="Delete"
         variant="red"

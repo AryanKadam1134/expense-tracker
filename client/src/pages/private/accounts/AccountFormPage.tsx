@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { useParams } from "react-router-dom";
+import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useNavigate, useParams } from "react-router-dom";
 
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
@@ -14,21 +14,26 @@ import useApi from "../../../hooks/useApi";
 import { useNotify } from "../../../context/notification";
 
 import type { AccountPayload } from "../../../types/api.types";
+import useAccountTypes from "../../../hooks/useAccountTypes";
+import CustomSelect from "../../../components/ui/CustomSelect";
 
 const AccountFormPage = () => {
   const { notify } = useNotify();
 
   const { accountId } = useParams();
+  const navigate = useNavigate();
 
   const { loading, callApi } = useApi({
     accountLoading: true,
     creating: false,
   });
+  const { loadingAccountTypes, accountTypes } = useAccountTypes();
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
     formState: { errors },
   } = useForm<AccountPayload>({
     mode: "onChange",
@@ -52,7 +57,12 @@ const AccountFormPage = () => {
           : accountEndpoints.addAccount(payload),
       {
         onSuccess: (res) => {
-          reset();
+          if (accountId) {
+            fetchAccount();
+          } else {
+            navigate(-1);
+          }
+
           notify.success(
             res?.message ||
               (accountId ? "Account updated!" : "Account created!"),
@@ -132,11 +142,19 @@ const AccountFormPage = () => {
         label="Account Type"
         error={errors?.accountType?.message}
       >
-        <CustomInput
-          id="accountType"
-          type="text"
-          placeholder="Select"
-          {...register("accountType")}
+        <Controller
+          name="accountType"
+          control={control}
+          render={({ field }) => (
+            <CustomSelect
+              id="accountType"
+              placeholder="Select"
+              options={accountTypes}
+              value={field?.value}
+              onChange={field?.onChange}
+              disabled={loadingAccountTypes}
+            />
+          )}
         />
       </FormField>
 

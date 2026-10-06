@@ -9,7 +9,7 @@ const ACCOUNT_TYPES = [
   { value: "other", label: "Other" },
 ];
 
-const TRANSACTION_TYPE = [
+const TRANSACTION_TYPES = [
   { value: "credit", label: "Credit" },
   { value: "debit", label: "Debit" },
 ];
@@ -43,7 +43,7 @@ const REFRESH_TOKEN_OPTIONS: CookieOptions = {
 export {
   isProduction,
   ACCOUNT_TYPES,
-  TRANSACTION_TYPE,
+  TRANSACTION_TYPES,
   REMINDERS,
   TOKEN_OPTIONS,
   ACCESS_TOKEN_OPTIONS,
