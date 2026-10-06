@@ -10,4 +10,10 @@ export const filterEndpoints = {
     api.get<ApiResponse<Filter[]>>(`/filters/transaction-types`),
 
   getReminders: () => api.get<ApiResponse<Filter[]>>(`/filters/reminders`),
+
+  getAccountOptions: () =>
+    api.get<ApiResponse<Filter[]>>(`/filters/account-options`),
+
+  getCategoryOptions: () =>
+    api.get<ApiResponse<Filter[]>>(`/filters/category-options`),
 };
