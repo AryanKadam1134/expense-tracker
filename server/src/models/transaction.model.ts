@@ -12,6 +12,7 @@ const transactionSchema = new Schema(
     account: {
       type: Schema.Types.ObjectId,
       ref: "Account",
+      required: true,
     },
     title: {
       type: String,
@@ -23,7 +24,10 @@ const transactionSchema = new Schema(
       required: true,
       enum: TRANSACTION_TYPES.map((t) => t.value),
     },
-    date: Date,
+    date: {
+      type: Date,
+      required: true,
+    },
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
