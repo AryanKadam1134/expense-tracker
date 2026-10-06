@@ -1,8 +1,21 @@
-import { model, Schema } from "mongoose";
+import { Schema, model, Types, type HydratedDocument } from "mongoose";
 
 import { TRANSACTION_TYPES } from "../contants";
 
-const transactionSchema = new Schema(
+interface TransactionFields {
+  owner: Types.ObjectId;
+  account: Types.ObjectId;
+  title: string;
+  description?: string | null;
+  type?: string | null;
+  date: Date;
+  category: Types.ObjectId;
+  amount: number;
+  transferId?: number | null;
+  note?: string | null;
+}
+
+const transactionSchema = new Schema<TransactionFields>(
   {
     owner: {
       type: Schema.Types.ObjectId,
@@ -42,4 +55,9 @@ const transactionSchema = new Schema(
   { timestamps: true },
 );
 
-export const Transaction = model("Transaction", transactionSchema);
+export const Transaction = model<TransactionFields>(
+  "Transaction",
+  transactionSchema,
+);
+
+export type TransactionDocument = HydratedDocument<TransactionFields>;

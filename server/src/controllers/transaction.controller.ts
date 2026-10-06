@@ -257,4 +257,88 @@ const addTransaction = asynchandler(async (req, res) => {
 //     .json(new ApiRes(200, createTransaction, "Transaction added!"));
 // });
 
-export { addTransaction };
+const updateTransaction = asynchandler(async (req, res) => {
+  const transaction = req.transaction;
+
+  if (!transaction) {
+    throw new ApiError(404, "Transaction not found!");
+  }
+
+  const { title, description, date, category, note } = req.body;
+
+  const fields: Partial<
+    Pick<
+      typeof transaction,
+      "title" | "date" | "category" | "description" | "note"
+    >
+  > = {};
+
+  if (title) fields.title = title;
+  if (date) fields.date = date;
+
+  if (category !== undefined) fields.category = category;
+  if (description !== undefined) fields.description = description;
+  if (note !== undefined) fields.note = note;
+
+  Object.assign(transaction, fields);
+
+  const updatedTransaction = await transaction.save();
+
+  return res
+    .status(200)
+    .json(new ApiRes(200, updatedTransaction, "Transaction updated!"));
+});
+
+const deleteTransaction = asynchandler(async (req, res) => {
+  const transaction = req.transaction;
+
+  const account = await Account.findById(transaction?.account);
+
+  if (!account || !transaction) {
+    throw new ApiError(200, "Couldn't delete account!");
+  }
+
+  const type = transaction?.type;
+
+  if (type === "credit") {
+    account.currentBalance -= transaction.amount;
+  } else if (type === "debit") {
+    account.currentBalance += transaction.amount;
+  }
+
+  await account.save();
+
+  await transaction.deleteOne();
+
+  return res.status(200).json(new ApiRes(200, {}, "Transaction deleted!"));
+});
+
+const getTransaction = asynchandler(async (req, res) => {
+  return res
+    .status(200)
+    .json(new ApiRes(200, req.transaction, "Transaction fetched!"));
+});
+
+const getTransactions = asynchandler(async (req, res) => {
+  const transactions = await Transaction.find({
+    owner: req.user?._id,
+  });
+
+  if (transactions?.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiRes(200, transactions, "No transactions found!"));
+  }
+
+  return res
+    .status(200)
+    .json(new ApiRes(200, transactions, "Transactions fetched!"));
+});
+
+export {
+  addTransaction,
+  updateTransaction,
+  deleteTransaction,
+  getTransaction,
+  getTransactions,
+};
