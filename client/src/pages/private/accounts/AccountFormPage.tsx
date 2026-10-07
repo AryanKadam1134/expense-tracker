@@ -6,16 +6,16 @@ import { useNavigate, useParams } from "react-router-dom";
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
+import CustomSelect from "../../../components/ui/CustomSelect";
 
 import { accountEndpoints } from "../../../services/account.service";
 
 import useApi from "../../../hooks/useApi";
+import useAccountTypes from "../../../hooks/useAccountTypes";
 
 import { useNotify } from "../../../context/notification";
 
 import type { AccountPayload } from "../../../types/api.types";
-import useAccountTypes from "../../../hooks/useAccountTypes";
-import CustomSelect from "../../../components/ui/CustomSelect";
 
 const AccountFormPage = () => {
   const { notify } = useNotify();

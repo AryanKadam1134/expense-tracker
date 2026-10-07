@@ -32,7 +32,7 @@ const transactionSchema = new Schema<TransactionFields>(
       required: true,
     },
     description: String,
-    type: {
+    type: { 
       type: String,
       required: true,
       enum: TRANSACTION_TYPES.map((t) => t.value),

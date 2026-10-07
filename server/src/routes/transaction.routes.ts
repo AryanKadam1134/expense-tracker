@@ -18,7 +18,7 @@ transactionRouter.use(verifyUser);
 transactionRouter.route("/").post(addTransaction).get(getTransactions);
 
 transactionRouter
-  .route("/transactionId")
+  .route("/:transactionId")
   .put(getTransactionById, updateTransaction)
   .delete(getTransactionById, deleteTransaction)
   .get(getTransactionById, getTransaction);

@@ -6,6 +6,7 @@ import {
   LogOut,
   Settings,
   LayoutDashboard,
+  ArrowLeftRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -32,6 +33,7 @@ type SideBarProps = {
 const menus: MenuItem[] = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Accounts", path: "/accounts", icon: SquareUserRound },
+  { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
 ];
 
 const menuStyle =

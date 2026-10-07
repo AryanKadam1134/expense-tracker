@@ -30,6 +30,21 @@ export interface Account {
   currentBalance: number;
 }
 
+// Transaction Interface
+export interface Transaction {
+  _id: string;
+  owner: string;
+  account: string;
+  title: string;
+  description?: string | null;
+  type?: string | null;
+  date: Date;
+  category?: string | null;
+  amount: number;
+  transferId?: number | null;
+  note?: string | null;
+}
+
 // Filter Interface
 export interface Filter {
   value: string;
@@ -62,5 +77,15 @@ export type AccountPayload = {
   accountNumber?: string | null;
   accountType?: string | null;
   openingBalance: number;
-  currentBalance?: number | null;
+};
+
+export type TransactionPayload = {
+  account: string;
+  title: string;
+  description?: string | null;
+  type?: string | null;
+  date: Date;
+  category?: string | null;
+  amount: number;
+  note?: string | null;
 };

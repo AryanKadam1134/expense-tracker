@@ -18,6 +18,8 @@ import ForgotPassword from "./pages/authentication/ForgotPassword";
 import Dashboard from "./pages/private/Dashboard";
 import AccountsPage from "./pages/private/accounts/AccountsPage";
 import AccountFormPage from "./pages/private/accounts/AccountFormPage";
+import TransactionsPage from "./pages/private/transactions/TransactionsPage";
+import TransactionFormPage from "./pages/private/transactions/TransactionFormPage";
 
 import { useAuth } from "./context/auth";
 
@@ -65,6 +67,15 @@ const App = () => {
               <Route index element={<AccountsPage />} />
               <Route path="add" element={<AccountFormPage />} />
               <Route path=":accountId/edit" element={<AccountFormPage />} />
+            </Route>
+
+            <Route path="/transactions">
+              <Route index element={<TransactionsPage />} />
+              <Route path="add" element={<TransactionFormPage />} />
+              <Route
+                path=":transactionId/edit"
+                element={<TransactionFormPage />}
+              />
             </Route>
           </Route>
         </Route>
