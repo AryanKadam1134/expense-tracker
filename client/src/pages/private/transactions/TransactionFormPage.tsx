@@ -20,6 +20,7 @@ import useTransactionTypes from "../../../hooks/useTransactionTypes";
 import { useNotify } from "../../../context/notification";
 
 import type { TransactionPayload } from "../../../types/api.types";
+import { formatDateInISO } from "../../../utils/formatDate";
 
 const TransactionFormPage = () => {
   const { notify } = useNotify();
@@ -53,7 +54,8 @@ const TransactionFormPage = () => {
       () => transactionEndpoints.getTransaction(transactionId),
       {
         onSuccess: (res) => {
-          reset(res.data);
+          const data = res.data;
+          reset({ ...data, date: formatDateInISO(data.date) });
         },
         onError: () => {},
       },

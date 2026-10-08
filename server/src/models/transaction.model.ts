@@ -9,7 +9,7 @@ interface TransactionFields {
   description?: string | null;
   type?: string | null;
   date: Date;
-  category: Types.ObjectId;
+  category: Types.ObjectId | string;
   amount: number;
   transferId?: number | null;
   note?: string | null;
@@ -32,7 +32,7 @@ const transactionSchema = new Schema<TransactionFields>(
       required: true,
     },
     description: String,
-    type: { 
+    type: {
       type: String,
       required: true,
       enum: TRANSACTION_TYPES.map((t) => t.value),

@@ -38,7 +38,7 @@ export interface Transaction {
   title: string;
   description?: string | null;
   type?: string | null;
-  date: Date;
+  date: string;
   category?: string | null;
   amount: number;
   transferId?: number | null;
@@ -84,7 +84,7 @@ export type TransactionPayload = {
   title: string;
   description?: string | null;
   type?: string | null;
-  date: Date;
+  date: string;
   category?: string | null;
   amount: number;
   note?: string | null;
