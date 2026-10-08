@@ -1,4 +1,4 @@
-import mongoose, { Types } from "mongoose";
+import mongoose, { ClientSession, Types } from "mongoose";
 
 import { Account } from "../models/account.model";
 import { Category } from "../models/category.model";
@@ -9,6 +9,53 @@ import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
 
 import { TRANSACTION_TYPES } from "../contants";
+
+const addCategory = async (
+  category: Types.ObjectId | string,
+  loggedUserId: Types.ObjectId,
+  session: ClientSession,
+) => {
+  if (!category) return null;
+
+  try {
+    if (typeof category !== "string") {
+      throw new ApiError(400, "Enter a valid category!");
+    }
+
+    const categoryValue = category.trim();
+    const categoryFilter = Types.ObjectId.isValid(categoryValue)
+      ? { _id: new Types.ObjectId(categoryValue) }
+      : { name: categoryValue };
+
+    let categoryExists = await Category.findOne({
+      ...categoryFilter,
+      owner: loggedUserId,
+    }).session(session);
+
+    if (!categoryExists && !("_id" in categoryFilter)) {
+      [categoryExists] = await Category.create(
+        [{ owner: loggedUserId, name: categoryValue }],
+        { session },
+      );
+    }
+
+    if (!categoryExists) {
+      throw new ApiError(404, "Category not found!");
+    }
+
+    return categoryExists._id;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    if (error instanceof Error) {
+      throw new ApiError(500, error.message);
+    }
+
+    throw new ApiError(500, "Error creating category!");
+  }
+};
 
 const addTransaction = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
@@ -59,7 +106,7 @@ const addTransaction = asynchandler(async (req, res) => {
     date: Date;
     amount: number;
     description?: string;
-    category?: Types.ObjectId | string;
+    category?: Types.ObjectId | null;
     note?: string;
   } = {
     title,
@@ -96,32 +143,8 @@ const addTransaction = asynchandler(async (req, res) => {
       }
 
       if (category) {
-        if (typeof category !== "string") {
-          throw new ApiError(400, "Enter a valid category!");
-        }
-
-        const categoryValue = category.trim();
-        const categoryFilter = Types.ObjectId.isValid(categoryValue)
-          ? { _id: new Types.ObjectId(categoryValue) }
-          : { name: categoryValue };
-
-        let categoryExists = await Category.findOne({
-          ...categoryFilter,
-          owner: loggedUserId,
-        }).session(session);
-
-        if (!categoryExists && !("_id" in categoryFilter)) {
-          [categoryExists] = await Category.create(
-            [{ owner: loggedUserId, name: categoryValue }],
-            { session },
-          );
-        }
-
-        if (!categoryExists) {
-          throw new ApiError(404, "Category not found!");
-        }
-
-        fields.category = categoryExists._id;
+        const categoryId = await addCategory(category, loggedUserId, session);
+        fields.category = categoryId;
       }
 
       const [created] = await Transaction.create(
@@ -156,6 +179,12 @@ const addTransaction = asynchandler(async (req, res) => {
 });
 
 const updateTransaction = asynchandler(async (req, res) => {
+  const loggedUserId = req.user?._id;
+
+  if (!loggedUserId) {
+    throw new ApiError(401, "Authentication required!");
+  }
+
   const transaction = req.transaction;
 
   if (!transaction) {
@@ -174,9 +203,19 @@ const updateTransaction = asynchandler(async (req, res) => {
   if (title) fields.title = title;
   if (date) fields.date = date;
 
-  if (category !== undefined) fields.category = category;
   if (description !== undefined) fields.description = description;
   if (note !== undefined) fields.note = note;
+
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      const categoryId = await addCategory(category, loggedUserId, session);
+      fields.category = categoryId;
+    });
+  } finally {
+    await session.endSession();
+  }
 
   Object.assign(transaction, fields);
 

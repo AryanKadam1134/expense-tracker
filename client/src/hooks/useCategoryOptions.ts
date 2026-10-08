@@ -29,6 +29,7 @@ const useCategoryOptions = () => {
   return {
     loadingCategoryOptions: loading.loadingCategoryOptions,
     categoryOptions,
+    fetchCategoryOptions,
   };
 };
 

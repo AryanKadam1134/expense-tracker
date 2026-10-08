@@ -159,29 +159,28 @@ const AccountFormPage = () => {
       </FormField>
 
       {/* Opening Balance */}
-      {!accountId && (
-        <FormField
+      <FormField
+        id="openingBalance"
+        label="Opening Balance"
+        required
+        error={errors?.openingBalance?.message}
+      >
+        <CustomInput
           id="openingBalance"
-          label="Opening Balance"
-          required
-          error={errors?.openingBalance?.message}
-        >
-          <CustomInput
-            id="openingBalance"
-            type="number"
-            placeholder="******"
-            {...register("openingBalance", {
-              required: "Opening balance is required!",
-            })}
-          />
-        </FormField>
-      )}
+          type="number"
+          placeholder="******"
+          {...register("openingBalance", {
+            required: "Opening balance is required!",
+          })}
+          disabled={Boolean(accountId)}
+        />
+      </FormField>
 
       {/* Submit */}
       <CustomButton
         type="submit"
         name={loading.creating ? "Saving..." : "Save"}
-        className="w-fit"
+        className="w-fit col-span-2 justify-self-end"
         loading={loading.creating}
       />
     </form>

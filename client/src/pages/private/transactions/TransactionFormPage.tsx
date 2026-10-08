@@ -10,6 +10,8 @@ import CustomSelect from "../../../components/ui/CustomSelect";
 import CustomTextArea from "../../../components/ui/CustomTextArea";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
+import { formatDateInISO } from "../../../utils/formatDate";
+
 import { transactionEndpoints } from "../../../services/transaction.service";
 
 import useApi from "../../../hooks/useApi";
@@ -20,7 +22,6 @@ import useTransactionTypes from "../../../hooks/useTransactionTypes";
 import { useNotify } from "../../../context/notification";
 
 import type { TransactionPayload } from "../../../types/api.types";
-import { formatDateInISO } from "../../../utils/formatDate";
 
 const TransactionFormPage = () => {
   const { notify } = useNotify();
@@ -33,7 +34,8 @@ const TransactionFormPage = () => {
     creating: false,
   });
   const { loadingAccountOptions, accountOptions } = useAccountOptions();
-  const { loadingCategoryOptions, categoryOptions } = useCategoryOptions();
+  const { loadingCategoryOptions, categoryOptions, fetchCategoryOptions } =
+    useCategoryOptions();
   const { loadingTransactionTypes, transactionTypes } = useTransactionTypes();
 
   const {
@@ -72,6 +74,8 @@ const TransactionFormPage = () => {
       {
         onSuccess: (res) => {
           if (transactionId) {
+            setCustomCategory(false);
+            fetchCategoryOptions();
             fetchTransaction();
           } else {
             navigate(-1);
@@ -120,7 +124,7 @@ const TransactionFormPage = () => {
               options={accountOptions}
               value={field?.value}
               onChange={field?.onChange}
-              disabled={loadingAccountOptions}
+              disabled={Boolean(transactionId) || loadingAccountOptions}
             />
           )}
         />
@@ -175,30 +179,28 @@ const TransactionFormPage = () => {
       </FormField>
 
       {/* Transaction Type */}
-      {!transactionId && (
-        <FormField
-          id="type"
-          label="Transaction Type"
-          required
-          error={errors?.type?.message}
-        >
-          <Controller
-            name="type"
-            control={control}
-            rules={{ required: "Transaction type is required!" }}
-            render={({ field }) => (
-              <CustomSelect
-                id="type"
-                placeholder="Select"
-                options={transactionTypes}
-                value={field?.value}
-                onChange={field?.onChange}
-                disabled={loadingTransactionTypes}
-              />
-            )}
-          />
-        </FormField>
-      )}
+      <FormField
+        id="type"
+        label="Transaction Type"
+        required
+        error={errors?.type?.message}
+      >
+        <Controller
+          name="type"
+          control={control}
+          rules={{ required: "Transaction type is required!" }}
+          render={({ field }) => (
+            <CustomSelect
+              id="type"
+              placeholder="Select"
+              options={transactionTypes}
+              value={field?.value}
+              onChange={field?.onChange}
+              disabled={Boolean(transactionId) || loadingTransactionTypes}
+            />
+          )}
+        />
+      </FormField>
 
       {/* Custom Category Checkbox */}
       <button type="button" onClick={() => setCustomCategory((prev) => !prev)}>
@@ -243,24 +245,23 @@ const TransactionFormPage = () => {
       )}
 
       {/* Amount */}
-      {!transactionId && (
-        <FormField
+      <FormField
+        id="amount"
+        label="Amount"
+        required
+        error={errors?.amount?.message}
+      >
+        <CustomInput
           id="amount"
-          label="Amount"
-          required
-          error={errors?.amount?.message}
-        >
-          <CustomInput
-            id="amount"
-            type="number"
-            placeholder="3000"
-            {...register("amount", {
-              required: "Amount is required!",
-              valueAsNumber: true,
-            })}
-          />
-        </FormField>
-      )}
+          type="number"
+          placeholder="3000"
+          {...register("amount", {
+            required: "Amount is required!",
+            valueAsNumber: true,
+          })}
+          disabled={Boolean(transactionId)}
+        />
+      </FormField>
 
       {/* Note */}
       <FormField id="note" label="Note" error={errors?.note?.message}>
@@ -276,7 +277,7 @@ const TransactionFormPage = () => {
       <CustomButton
         type="submit"
         name={loading.creating ? "Saving..." : "Save"}
-        className="w-fit"
+        className="w-fit col-span-2 justify-self-end"
         loading={loading.creating}
       />
     </form>

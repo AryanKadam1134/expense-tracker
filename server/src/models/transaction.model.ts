@@ -9,7 +9,7 @@ interface TransactionFields {
   description?: string | null;
   type?: string | null;
   date: Date;
-  category: Types.ObjectId | string;
+  category: Types.ObjectId | null;
   amount: number;
   transferId?: number | null;
   note?: string | null;
