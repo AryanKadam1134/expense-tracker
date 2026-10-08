@@ -7,11 +7,11 @@ interface TransactionFields {
   account: Types.ObjectId;
   title: string;
   description?: string | null;
-  type?: string | null;
+  type: string;
   date: Date;
-  category: Types.ObjectId | null;
+  category?: Types.ObjectId | null;
   amount: number;
-  transferId?: number | null;
+  transferId?: string | null;
   note?: string | null;
 }
 

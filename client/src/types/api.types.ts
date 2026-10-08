@@ -37,11 +37,11 @@ export interface Transaction {
   account: string;
   title: string;
   description?: string | null;
-  type?: string | null;
+  type: string;
   date: string;
   category?: string | null;
   amount: number;
-  transferId?: number | null;
+  transferId?: string | null;
   note?: string | null;
 }
 
@@ -83,7 +83,7 @@ export type TransactionPayload = {
   account: string;
   title: string;
   description?: string | null;
-  type?: string | null;
+  type: string;
   date: string;
   category?: string | null;
   amount: number;

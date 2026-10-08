@@ -207,19 +207,24 @@ const updateTransaction = asynchandler(async (req, res) => {
   if (note !== undefined) fields.note = note;
 
   const session = await mongoose.startSession();
+  let updatedTransaction: InstanceType<typeof Transaction> | undefined;
 
   try {
     await session.withTransaction(async () => {
-      const categoryId = await addCategory(category, loggedUserId, session);
-      fields.category = categoryId;
+      if (category && category !== "") {
+        const categoryId = await addCategory(category, loggedUserId, session);
+        fields.category = categoryId;
+      } else if (category === "") {
+        fields.category = null;
+      }
+
+      Object.assign(transaction, fields);
+
+      updatedTransaction = await transaction.save({ session });
     });
   } finally {
     await session.endSession();
   }
-
-  Object.assign(transaction, fields);
-
-  const updatedTransaction = await transaction.save();
 
   return res
     .status(200)
