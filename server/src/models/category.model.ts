@@ -1,6 +1,11 @@
-import { model, Schema } from "mongoose";
+import { HydratedDocument, model, Schema, Types } from "mongoose";
 
-const categorySchema = new Schema(
+interface CategoryFields {
+  owner: Types.ObjectId;
+  name: string;
+}
+
+const categorySchema = new Schema<CategoryFields>(
   {
     owner: {
       type: Schema.Types.ObjectId,
@@ -14,4 +19,6 @@ const categorySchema = new Schema(
   { timestamps: true },
 );
 
-export const Category = model("Category", categorySchema);
+export const Category = model<CategoryFields>("Category", categorySchema);
+
+export type CategoryDocument = HydratedDocument<CategoryFields>;

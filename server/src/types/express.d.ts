@@ -3,6 +3,7 @@ import type { Types } from "mongoose";
 import type { UserDocument } from "../models/user.model";
 import type { AccountDocument } from "../models/account.model";
 import type { TransactionDocument } from "../models/transaction.model";
+import type { CategoryDocument } from "../models/category.model";
 
 declare global {
   namespace Express {
@@ -10,6 +11,7 @@ declare global {
       user?: UserDocument;
       account?: AccountDocument;
       transaction?: TransactionDocument;
+      category?: CategoryDocument;
     }
   }
 }
