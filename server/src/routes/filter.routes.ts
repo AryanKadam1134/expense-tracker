@@ -8,6 +8,7 @@ import {
   getTransactionTypes,
   getUserAccountsAsOptions,
   getUserCatigoriesAsOptions,
+  getUserRemindersAsOptions,
 } from "../controllers/filter.controller";
 
 const filtersRoutes = Router();
@@ -25,5 +26,7 @@ filtersRoutes
 filtersRoutes
   .route("/category-options")
   .get(verifyUser, getUserCatigoriesAsOptions);
+
+filtersRoutes.route("/reminder-options").get(getUserRemindersAsOptions);
 
 export default filtersRoutes;

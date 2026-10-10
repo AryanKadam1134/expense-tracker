@@ -1,4 +1,4 @@
-import { Schema, model, Types, type HydratedDocument } from "mongoose";
+import { Schema, model, Types, HydratedDocument } from "mongoose";
 
 import { TRANSACTION_TYPES } from "../contants";
 
@@ -11,6 +11,7 @@ interface TransactionFields {
   date: Date;
   category?: Types.ObjectId | null;
   amount: number;
+  reminder?: Types.ObjectId | null;
   transferId?: string | null;
   note?: string | null;
 }
@@ -18,12 +19,12 @@ interface TransactionFields {
 const transactionSchema = new Schema<TransactionFields>(
   {
     owner: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "User",
       required: true,
     },
     account: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Account",
       required: true,
     },
@@ -42,12 +43,16 @@ const transactionSchema = new Schema<TransactionFields>(
       required: true,
     },
     category: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "Category",
     },
     amount: {
       type: Number,
       required: true,
+    },
+    reminder: {
+      type: Types.ObjectId,
+      ref: "Reminder",
     },
     transferId: String,
     note: String,

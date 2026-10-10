@@ -1,4 +1,4 @@
-import { HydratedDocument, model, Schema, Types } from "mongoose";
+import { Schema, model, Types, HydratedDocument } from "mongoose";
 
 interface CategoryFields {
   owner: Types.ObjectId;
@@ -8,7 +8,7 @@ interface CategoryFields {
 const categorySchema = new Schema<CategoryFields>(
   {
     owner: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "User",
     },
     name: {

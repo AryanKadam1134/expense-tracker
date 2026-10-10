@@ -2,7 +2,7 @@ import mongoose, { ClientSession, Types } from "mongoose";
 
 import { Account } from "../models/account.model";
 import { Category } from "../models/category.model";
-import { Transaction } from "../models/transaction.model";
+import { Transaction, TransactionDocument } from "../models/transaction.model";
 
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
@@ -44,6 +44,51 @@ const addCategory = async (
     }
 
     return categoryExists._id;
+  } catch (error) {
+    if (error instanceof ApiError) {
+      throw error;
+    }
+
+    if (error instanceof Error) {
+      throw new ApiError(500, error.message);
+    }
+
+    throw new ApiError(500, "Error creating category!");
+  }
+};
+
+const revertAccountChangesAndDeleteTransaction = async (
+  transaction: TransactionDocument,
+  session: ClientSession,
+) => {
+  try {
+    const account = await Account.findById(transaction?.account).session(
+      session,
+    );
+
+    if (!account) {
+      throw new ApiError(404, "Account not found!");
+    }
+
+    const type = transaction.type;
+    const amount = transaction.amount;
+
+    if (type === "credit" && account?.currentBalance < amount) {
+      throw new ApiError(
+        400,
+        "Not sufficient balance available to delete a credited transaction!",
+      );
+    }
+
+    if (type === "credit") {
+      account.currentBalance -= amount;
+    } else if (type === "debit") {
+      account.currentBalance += amount;
+    }
+
+    await account.save({ session });
+
+    await transaction.deleteOne({ session });
   } catch (error) {
     if (error instanceof ApiError) {
       throw error;
@@ -242,33 +287,7 @@ const deleteTransaction = asynchandler(async (req, res) => {
 
   try {
     await session.withTransaction(async () => {
-      const account = await Account.findById(transaction?.account).session(
-        session,
-      );
-
-      if (!account) {
-        throw new ApiError(404, "Account not found!");
-      }
-
-      const type = transaction.type;
-      const amount = transaction.amount;
-
-      if (type === "credit" && account?.currentBalance < amount) {
-        throw new ApiError(
-          400,
-          "Not sufficient balance available to delete a credited transaction!",
-        );
-      }
-
-      if (type === "credit") {
-        account.currentBalance -= amount;
-      } else if (type === "debit") {
-        account.currentBalance += amount;
-      }
-
-      await account.save({ session });
-
-      await transaction.deleteOne({ session });
+      await revertAccountChangesAndDeleteTransaction(transaction, session);
     });
   } finally {
     await session.endSession();
@@ -305,4 +324,5 @@ export {
   deleteTransaction,
   getTransaction,
   getTransactions,
+  revertAccountChangesAndDeleteTransaction,
 };

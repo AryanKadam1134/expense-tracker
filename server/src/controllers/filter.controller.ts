@@ -1,5 +1,6 @@
 import { Account } from "../models/account.model";
 import { Category } from "../models/category.model";
+import { Reminder } from "../models/reminder.model";
 
 import ApiRes from "../utils/ApiRes";
 import { asynchandler } from "../utils/asynchandler";
@@ -64,10 +65,32 @@ const getUserCatigoriesAsOptions = asynchandler(async (req, res) => {
     .json(new ApiRes(200, categoriesAsOptions, "User categories fetched!"));
 });
 
+const getUserRemindersAsOptions = asynchandler(async (req, res) => {
+  const reminders = await Reminder.find({
+    owner: req.user?._id,
+  });
+
+  if (reminders?.length === 0) {
+    return res
+      .status(200)
+      .json(new ApiRes(200, reminders, "No user reminders found!"));
+  }
+
+  const remindersAsOptions = reminders.map((account) => ({
+    value: account?._id,
+    label: account?.title,
+  }));
+
+  return res
+    .status(200)
+    .json(new ApiRes(200, remindersAsOptions, "User reminders fetched!"));
+});
+
 export {
   getTransactionTypes,
   getAccountTypes,
   getReminders,
   getUserAccountsAsOptions,
   getUserCatigoriesAsOptions,
+  getUserRemindersAsOptions,
 };

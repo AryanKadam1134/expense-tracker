@@ -1,4 +1,4 @@
-import { Schema, model, Types, type HydratedDocument } from "mongoose";
+import { Schema, model, Types, HydratedDocument } from "mongoose";
 
 import { ACCOUNT_TYPES } from "../contants";
 
@@ -15,7 +15,7 @@ interface AccountFields {
 const accountSchema = new Schema<AccountFields>(
   {
     owner: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "User",
       required: true,
     },

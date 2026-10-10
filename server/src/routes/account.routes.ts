@@ -1,5 +1,8 @@
 import { Router } from "express";
 
+import { verifyUser } from "../middlewares/auth.middleware";
+import { getAccountById } from "../middlewares/account.middleware";
+
 import {
   addAccount,
   deleteAccount,
@@ -7,9 +10,6 @@ import {
   getAccounts,
   updateAccount,
 } from "../controllers/account.controller";
-
-import { verifyUser } from "../middlewares/auth.middleware";
-import { getAccountById } from "../middlewares/account.middleware";
 
 const accountRouter = Router();
 

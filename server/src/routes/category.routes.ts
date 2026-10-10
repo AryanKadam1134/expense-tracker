@@ -1,5 +1,8 @@
 import { Router } from "express";
+
 import { verifyUser } from "../middlewares/auth.middleware";
+import { getCategoryById } from "../middlewares/category.middleware";
+
 import {
   addCategory,
   deleteCategory,
@@ -7,7 +10,6 @@ import {
   getCategory,
   updateCategory,
 } from "../controllers/category.controller";
-import { getCategoryById } from "../middlewares/category.middleware";
 
 const categoryRouter = Router();
 

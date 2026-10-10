@@ -1,11 +1,22 @@
-import { model, Schema } from "mongoose";
+import { Schema, model, Types, HydratedDocument } from "mongoose";
 
 import { REMINDERS } from "../contants";
 
-const reminderSchema = new Schema(
+interface ReminderFields {
+  owner: Types.ObjectId;
+  title: string;
+  description?: string | null;
+  openingDue: number;
+  currentDue: number;
+  dueDate: Date;
+  isPaid?: boolean | null;
+  repeat?: string | null;
+}
+
+const reminderSchema = new Schema<ReminderFields>(
   {
     owner: {
-      type: Schema.Types.ObjectId,
+      type: Types.ObjectId,
       ref: "User",
     },
     title: {
@@ -19,7 +30,10 @@ const reminderSchema = new Schema(
     },
     currentDue: Number,
     dueDate: Date,
-    isPaid: Boolean,
+    isPaid: {
+      typr: Boolean,
+      default: false,
+    },
     repeat: {
       type: String,
       enum: REMINDERS.map((r) => r.value),
@@ -28,4 +42,6 @@ const reminderSchema = new Schema(
   { timestamps: true },
 );
 
-export const Reminder = model("Reminder", reminderSchema);
+export const Reminder = model<ReminderFields>("Reminder", reminderSchema);
+
+export type ReminderDocument = HydratedDocument<ReminderFields>;

@@ -19,11 +19,13 @@ import accountRouter from "./routes/account.routes";
 import filtersRoutes from "./routes/filter.routes";
 import transactionRouter from "./routes/transaction.routes";
 import categoryRouter from "./routes/category.routes";
+import reminderRouter from "./routes/reminder.routes";
 
 app.use("/api/filters", filtersRoutes);
 app.use("/api/auth", authRouter);
 app.use("/api/accounts", accountRouter);
 app.use("/api/transactions", transactionRouter);
 app.use("/api/categories", categoryRouter);
+app.use("/api/reminders", reminderRouter);
 
 export default app;

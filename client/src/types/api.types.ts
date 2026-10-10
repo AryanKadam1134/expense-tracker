@@ -42,6 +42,7 @@ export interface Transaction {
   category?: string | null;
   amount: number;
   transferId?: string | null;
+  reminder?: string | null;
   note?: string | null;
 }
 
@@ -94,6 +95,7 @@ export type TransactionPayload = {
   date: string;
   category?: string | null;
   amount: number;
+  reminder: string | null;
   note?: string | null;
 };
 
