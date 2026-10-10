@@ -7,6 +7,7 @@ import {
   Settings,
   LayoutDashboard,
   ArrowLeftRight,
+  Tags,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -34,6 +35,7 @@ const menus: MenuItem[] = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
   { name: "Accounts", path: "/accounts", icon: SquareUserRound },
   { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
+  { name: "Categories", path: "/categories", icon: Tags },
 ];
 
 const menuStyle =

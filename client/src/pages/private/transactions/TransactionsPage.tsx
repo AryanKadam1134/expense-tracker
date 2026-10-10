@@ -32,10 +32,6 @@ const TransactionsPage = () => {
     fetchTransactions();
   }, [fetchTransactions]);
 
-  if (loading.transactionsLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <CustomButton
@@ -45,17 +41,23 @@ const TransactionsPage = () => {
         className="self-end w-fit"
       />
 
-      {transactions?.map((transaction) => (
-        <TransactionCard
-          key={transaction?._id}
-          transaction={transaction}
-          onDelete={() =>
-            setTransactions((prev) =>
-              prev.filter((item) => item._id !== transaction?._id),
-            )
-          }
-        />
-      ))}
+      {loading.transactionsLoading ? (
+        <div>Loading transactions...</div>
+      ) : transactions?.length ? (
+        transactions?.map((transaction) => (
+          <TransactionCard
+            key={transaction?._id}
+            transaction={transaction}
+            onDelete={() =>
+              setTransactions((prev) =>
+                prev.filter((item) => item._id !== transaction?._id),
+              )
+            }
+          />
+        ))
+      ) : (
+        <div>No transactions yet.</div>
+      )}
     </div>
   );
 };

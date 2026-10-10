@@ -20,6 +20,8 @@ import AccountsPage from "./pages/private/accounts/AccountsPage";
 import AccountFormPage from "./pages/private/accounts/AccountFormPage";
 import TransactionsPage from "./pages/private/transactions/TransactionsPage";
 import TransactionFormPage from "./pages/private/transactions/TransactionFormPage";
+import CategoriesPage from "./pages/private/categories/CategoriesPage";
+import CategoryFormPage from "./pages/private/categories/CategoryFormPage";
 
 import { useAuth } from "./context/auth";
 
@@ -76,6 +78,12 @@ const App = () => {
                 path=":transactionId/edit"
                 element={<TransactionFormPage />}
               />
+            </Route>
+
+            <Route path="/categories">
+              <Route index element={<CategoriesPage />} />
+              <Route path="add" element={<CategoryFormPage />} />
+              <Route path=":categoryId/edit" element={<CategoryFormPage />} />
             </Route>
           </Route>
         </Route>

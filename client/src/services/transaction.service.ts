@@ -7,15 +7,17 @@ import type {
 } from "../types/api.types";
 
 export const transactionEndpoints = {
-  addTransaction: (body: TransactionPayload) => api.post(`/transactions`, body),
+  addTransaction: (body: TransactionPayload) =>
+    api.post<ApiResponse<Transaction>>(`/transactions`, body),
 
   updateTransaction: (
     body: TransactionPayload,
     transactionId: string | undefined,
-  ) => api.put(`/transactions/${transactionId}`, body),
+  ) =>
+    api.put<ApiResponse<Transaction>>(`/transactions/${transactionId}`, body),
 
   deleteTransaction: (transactionId: string | undefined) =>
-    api.delete(`/transactions/${transactionId}`),
+    api.delete<ApiResponse<unknown>>(`/transactions/${transactionId}`),
 
   getTransaction: (transactionId: string | undefined) =>
     api.get<ApiResponse<Transaction>>(`transactions/${transactionId}`),

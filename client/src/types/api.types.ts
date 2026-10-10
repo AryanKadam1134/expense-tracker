@@ -45,6 +45,13 @@ export interface Transaction {
   note?: string | null;
 }
 
+// Category Interface
+export interface Category {
+  _id: string;
+  owner: string;
+  name: string;
+}
+
 // Filter Interface
 export interface Filter {
   value: string;
@@ -88,4 +95,8 @@ export type TransactionPayload = {
   category?: string | null;
   amount: number;
   note?: string | null;
+};
+
+export type CategoryPayload = {
+  name: string;
 };

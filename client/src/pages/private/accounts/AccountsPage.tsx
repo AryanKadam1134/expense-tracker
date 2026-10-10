@@ -32,10 +32,6 @@ const AccountsPage = () => {
     fetchAccounts();
   }, [fetchAccounts]);
 
-  if (loading.accountsLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <CustomButton
@@ -45,17 +41,23 @@ const AccountsPage = () => {
         className="self-end w-fit"
       />
 
-      {accounts?.map((account) => (
-        <AccountCard
-          key={account?._id}
-          account={account}
-          onDelete={() =>
-            setAccounts((prev) =>
-              prev.filter((item) => item._id !== account?._id),
-            )
-          }
-        />
-      ))}
+      {loading.accountsLoading ? (
+        <div>Loading accounts...</div>
+      ) : accounts?.length ? (
+        accounts?.map((account) => (
+          <AccountCard
+            key={account?._id}
+            account={account}
+            onDelete={() =>
+              setAccounts((prev) =>
+                prev.filter((item) => item._id !== account?._id),
+              )
+            }
+          />
+        ))
+      ) : (
+        <div>No accounts yet.</div>
+      )}
     </div>
   );
 };
