@@ -22,6 +22,8 @@ import TransactionsPage from "./pages/private/transactions/TransactionsPage";
 import TransactionFormPage from "./pages/private/transactions/TransactionFormPage";
 import CategoriesPage from "./pages/private/categories/CategoriesPage";
 import CategoryFormPage from "./pages/private/categories/CategoryFormPage";
+import RemindersPage from "./pages/private/reminders/RemindersPage";
+import ReminderFormPage from "./pages/private/reminders/ReminderFormPage";
 
 import { useAuth } from "./context/auth";
 
@@ -84,6 +86,12 @@ const App = () => {
               <Route index element={<CategoriesPage />} />
               <Route path="add" element={<CategoryFormPage />} />
               <Route path=":categoryId/edit" element={<CategoryFormPage />} />
+            </Route>
+
+            <Route path="/reminders">
+              <Route index element={<RemindersPage />} />
+              <Route path="add" element={<ReminderFormPage />} />
+              <Route path=":reminderId/edit" element={<ReminderFormPage />} />
             </Route>
           </Route>
         </Route>

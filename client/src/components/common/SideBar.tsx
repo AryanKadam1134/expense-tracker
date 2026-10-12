@@ -8,6 +8,7 @@ import {
   LayoutDashboard,
   ArrowLeftRight,
   Tags,
+  BellRing,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -36,6 +37,7 @@ const menus: MenuItem[] = [
   { name: "Accounts", path: "/accounts", icon: SquareUserRound },
   { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
   { name: "Categories", path: "/categories", icon: Tags },
+  { name: "Reminders", path: "/reminders", icon: BellRing },
 ];
 
 const menuStyle =

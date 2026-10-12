@@ -53,6 +53,19 @@ export interface Category {
   name: string;
 }
 
+// Reminder Interface
+export interface Reminder {
+  _id: string;
+  owner: string;
+  title: string;
+  description?: string | null;
+  openingDue: number;
+  currentDue: number;
+  dueDate: string;
+  isPaid?: boolean | null;
+  repeat?: string | null;
+}
+
 // Filter Interface
 export interface Filter {
   value: string;
@@ -101,4 +114,12 @@ export type TransactionPayload = {
 
 export type CategoryPayload = {
   name: string;
+};
+
+export type ReminderPayload = {
+  title: string;
+  description?: string | null;
+  openingDue: number;
+  dueDate: string;
+  repeat?: string | null;
 };

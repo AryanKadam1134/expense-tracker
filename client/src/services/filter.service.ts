@@ -9,7 +9,8 @@ export const filterEndpoints = {
   getTransactionTypes: () =>
     api.get<ApiResponse<Filter[]>>(`/filters/transaction-types`),
 
-  getReminders: () => api.get<ApiResponse<Filter[]>>(`/filters/reminders`),
+  getReminderRepeats: () =>
+    api.get<ApiResponse<Filter[]>>(`/filters/reminders`),
 
   getAccountOptions: () =>
     api.get<ApiResponse<Filter[]>>(`/filters/account-options`),

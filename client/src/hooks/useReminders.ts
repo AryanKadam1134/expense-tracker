@@ -1,20 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { filterEndpoints } from "../services/filter.service";
+import { reminderEndpoints } from "../services/reminder.service";
 
 import useApi from "./useApi";
 
-import type { Filter } from "../types/api.types";
+import type { Reminder } from "../types/api.types";
 
 const useReminders = () => {
   const { loading, callApi } = useApi({
     loadingReminders: false,
   });
 
-  const [reminders, setReminders] = useState<Filter[]>();
+  const [reminders, setReminders] = useState<Reminder[]>([]);
 
   const fetchReminders = useCallback(() => {
-    callApi("loadingReminders", filterEndpoints.getReminders, {
+    callApi("loadingReminders", reminderEndpoints.getReminders, {
       onSuccess: (res) => {
         setReminders(res.data);
       },
@@ -29,6 +29,8 @@ const useReminders = () => {
   return {
     loadingReminders: loading.loadingReminders,
     reminders,
+    setReminders,
+    fetchReminders,
   };
 };
 
