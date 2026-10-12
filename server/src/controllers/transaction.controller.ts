@@ -9,6 +9,7 @@ import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
 
 import { TRANSACTION_TYPES } from "../contants";
+import { Reminder } from "../models/reminder.model";
 
 const addCategory = async (
   category: Types.ObjectId | string,
@@ -109,8 +110,17 @@ const addTransaction = asynchandler(async (req, res) => {
     throw new ApiError(401, "Authentication required!");
   }
 
-  const { account, title, description, type, date, category, amount, note } =
-    req.body;
+  const {
+    account,
+    title,
+    description,
+    type,
+    date,
+    category,
+    amount,
+    reminder,
+    note,
+  } = req.body;
 
   // --- check if account exists --- //
   if (!account) {
@@ -152,6 +162,7 @@ const addTransaction = asynchandler(async (req, res) => {
     amount: number;
     description?: string;
     category?: Types.ObjectId | null;
+    reminder?: Types.ObjectId | null;
     note?: string;
   } = {
     title,
@@ -178,6 +189,36 @@ const addTransaction = asynchandler(async (req, res) => {
 
       if (!accountExists) {
         throw new ApiError(404, "Account not found!");
+      }
+
+      if (type === "debit" && reminder) {
+        const reminderExists = await Reminder.findOne({
+          owner: loggedUserId,
+          _id: reminder,
+        }).session(session);
+
+        if (!reminderExists) {
+          throw new ApiError(404, "Reminder not found!");
+        }
+
+        if (reminderExists.currentDue < amount) {
+          throw new ApiError(400, "Amount is greater than the due amount!");
+        }
+
+        await Reminder.updateOne(
+          { _id: reminderExists._id },
+          {
+            $inc: { currentDue: -amount },
+            $set: {
+              isPaid: reminderExists.currentDue === amount ? true : false,
+            },
+          },
+          { session },
+        );
+
+        fields.reminder = reminderExists._id;
+      } else if (type === "credit" && reminder) {
+        throw new ApiError(409, "Due cannot be paid on a credit!");
       }
 
       if (type === "debit" && accountExists?.currentBalance < amount) {
@@ -288,6 +329,37 @@ const deleteTransaction = asynchandler(async (req, res) => {
   try {
     await session.withTransaction(async () => {
       await revertAccountChangesAndDeleteTransaction(transaction, session);
+
+      const { owner, type, reminder, amount } = transaction;
+
+      if (type === "debit" && reminder) {
+        const reminderExists = await Reminder.findOne({
+          owner,
+          _id: reminder,
+        }).session(session);
+
+        if (!reminderExists) {
+          throw new ApiError(404, "Reminder not found!");
+        }
+
+        if (
+          reminderExists.openingDue < amount ||
+          reminderExists.openingDue < reminderExists.currentDue + amount
+        ) {
+          throw new ApiError(400, "Amount is greater than the due amount!");
+        }
+
+        await Reminder.updateOne(
+          { _id: reminderExists._id },
+          {
+            $inc: { currentDue: amount },
+            $set: {
+              isPaid: false,
+            },
+          },
+          { session },
+        );
+      }
     });
   } finally {
     await session.endSession();

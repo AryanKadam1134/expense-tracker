@@ -31,7 +31,7 @@ const reminderSchema = new Schema<ReminderFields>(
     currentDue: Number,
     dueDate: Date,
     isPaid: {
-      typr: Boolean,
+      type: Boolean,
       default: false,
     },
     repeat: {

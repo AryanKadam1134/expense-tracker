@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { useNavigate } from "react-router-dom";
-import { SquareUserRound } from "lucide-react";
+import { ArrowLeftRight } from "lucide-react";
 
 import TransactionCard from "../../../components/TransactionCard";
 
@@ -36,7 +36,7 @@ const TransactionsPage = () => {
     <div className="flex flex-col gap-4">
       <CustomButton
         name="Add Transaction"
-        icon={SquareUserRound}
+        icon={ArrowLeftRight}
         onClick={() => navigate("add")}
         className="self-end w-fit"
       />
