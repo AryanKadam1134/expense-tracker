@@ -18,6 +18,7 @@ import useApi from "../../../hooks/useApi";
 import useAccountOptions from "../../../hooks/useAccountOptions";
 import useCategoryOptions from "../../../hooks/useCategoryOptions";
 import useTransactionTypes from "../../../hooks/useTransactionTypes";
+import useReminderOptions from "../../../hooks/useReminderOptions";
 
 import { useNotify } from "../../../context/notification";
 
@@ -37,16 +38,23 @@ const TransactionFormPage = () => {
   const { loadingCategoryOptions, categoryOptions, fetchCategoryOptions } =
     useCategoryOptions();
   const { loadingTransactionTypes, transactionTypes } = useTransactionTypes();
+  const { loadingReminderOptions, reminderOptions } = useReminderOptions();
 
   const {
     register,
     handleSubmit,
     reset,
     control,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<TransactionPayload>({
     mode: "onChange",
+    defaultValues: { reminder: null },
   });
+
+  const selectedType = watch("type");
+  const isCredit = selectedType === "credit";
 
   const [customCategory, setCustomCategory] = useState<boolean>(false);
 
@@ -65,12 +73,17 @@ const TransactionFormPage = () => {
   }, [callApi, transactionId, reset]);
 
   const onSubmit: SubmitHandler<TransactionPayload> = (payload) => {
+    const requestPayload = {
+      ...payload,
+      reminder: payload.type === "debit" ? payload.reminder || null : null,
+    };
+
     callApi(
       "creating",
       () =>
         transactionId
-          ? transactionEndpoints.updateTransaction(payload, transactionId)
-          : transactionEndpoints.addTransaction(payload),
+          ? transactionEndpoints.updateTransaction(requestPayload, transactionId)
+          : transactionEndpoints.addTransaction(requestPayload),
       {
         onSuccess: (res) => {
           if (transactionId) {
@@ -195,8 +208,31 @@ const TransactionFormPage = () => {
               placeholder="Select"
               options={transactionTypes}
               value={field?.value}
-              onChange={field?.onChange}
+              onChange={(value) => {
+                field.onChange(value);
+                if (value === "credit") setValue("reminder", null);
+              }}
               disabled={Boolean(transactionId) || loadingTransactionTypes}
+            />
+          )}
+        />
+      </FormField>
+
+      {/* Reminder payment (debit only) */}
+      <FormField id="reminder" label="Pay reminder">
+        <Controller
+          name="reminder"
+          control={control}
+          render={({ field }) => (
+            <CustomSelect
+              id="reminder"
+              placeholder="No reminder"
+              options={reminderOptions}
+              value={field.value}
+              onChange={(value) => field.onChange(value || null)}
+              disabled={
+                Boolean(transactionId) || isCredit || loadingReminderOptions
+              }
             />
           )}
         />

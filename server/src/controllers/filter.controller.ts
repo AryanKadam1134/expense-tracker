@@ -19,7 +19,7 @@ const getTransactionTypes = asynchandler(async (req, res) => {
     .json(new ApiRes(200, TRANSACTION_TYPES, "Transaction types fetched!"));
 });
 
-const getReminders = asynchandler(async (req, res) => {
+const getReminderRepeats = asynchandler(async (req, res) => {
   return res.status(200).json(new ApiRes(200, REMINDERS, "Reminders fetched!"));
 });
 
@@ -65,7 +65,7 @@ const getUserCatigoriesAsOptions = asynchandler(async (req, res) => {
     .json(new ApiRes(200, categoriesAsOptions, "User categories fetched!"));
 });
 
-const getUserRemindersAsOptions = asynchandler(async (req, res) => {
+const getReminderOptions = asynchandler(async (req, res) => {
   const reminders = await Reminder.find({
     owner: req.user?._id,
   });
@@ -89,8 +89,8 @@ const getUserRemindersAsOptions = asynchandler(async (req, res) => {
 export {
   getTransactionTypes,
   getAccountTypes,
-  getReminders,
+  getReminderRepeats,
   getUserAccountsAsOptions,
   getUserCatigoriesAsOptions,
-  getUserRemindersAsOptions,
+  getReminderOptions,
 };

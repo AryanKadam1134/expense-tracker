@@ -75,7 +75,7 @@ const updateReminder = asynchandler(async (req, res) => {
 
   if (title) {
     const reminderTitleExists = await Reminder.findOne({
-      _id: { $nc: reminder?._id },
+      _id: { $ne: reminder?._id },
       owner: loggedUserId,
       title,
     });

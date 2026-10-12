@@ -22,7 +22,10 @@ const ReminderFormPage = () => {
   const { notify } = useNotify();
   const { reminderId } = useParams();
   const navigate = useNavigate();
-  const { loading, callApi } = useApi({ loadingReminder: false, saving: false });
+  const { loading, callApi } = useApi({
+    loadingReminder: false,
+    saving: false,
+  });
   const { loadingReminderRepeats, reminderRepeats } = useReminderRepeats();
 
   const {
@@ -36,23 +39,24 @@ const ReminderFormPage = () => {
   const fetchReminder = useCallback(() => {
     if (!reminderId) return;
 
-    callApi("loadingReminder", () => reminderEndpoints.getReminder(reminderId), {
-      onSuccess: (response) => {
-        const { data } = response;
-        reset({
-          title: data.title,
-          description: data.description ?? "",
-          openingDue: data.openingDue,
-          dueDate: formatDateInISO(data.dueDate),
-          repeat: data.repeat ?? "",
-        });
+    callApi(
+      "loadingReminder",
+      () => reminderEndpoints.getReminder(reminderId),
+      {
+        onSuccess: (res) => {
+          const { data } = res;
+          reset({
+            ...data,
+            dueDate: formatDateInISO(data.dueDate),
+          });
+        },
+        onError: (error) => {
+          notify.error(
+            error instanceof Error ? error.message : "Couldn't load reminder!",
+          );
+        },
       },
-      onError: (error) => {
-        notify.error(
-          error instanceof Error ? error.message : "Couldn't load reminder!",
-        );
-      },
-    });
+    );
   }, [callApi, reminderId, notify, reset]);
 
   const onSubmit: SubmitHandler<ReminderPayload> = (payload) => {
@@ -62,6 +66,8 @@ const ReminderFormPage = () => {
       description: payload.description?.trim() || "",
       repeat: payload.repeat || null,
     };
+
+    if (reminderId) delete (body as Partial<ReminderPayload>).openingDue;
 
     callApi(
       "saving",
@@ -97,7 +103,12 @@ const ReminderFormPage = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
-      <FormField id="title" label="Title" required error={errors.title?.message}>
+      <FormField
+        id="title"
+        label="Title"
+        required
+        error={errors.title?.message}
+      >
         <CustomInput
           id="title"
           type="text"
@@ -118,16 +129,26 @@ const ReminderFormPage = () => {
           min="0.01"
           step="any"
           {...register("openingDue", {
-            required: reminderId ? false : "Opening due is required!",
-            valueAsNumber: true,
-            validate: (value) =>
-              reminderId || value > 0 || "Opening due must be greater than 0!",
+            ...(reminderId
+              ? {}
+              : {
+                  required: "Opening due is required!",
+                  valueAsNumber: true,
+                  validate: (value) =>
+                    (Number.isFinite(value) && value > 0) ||
+                    "Opening due must be greater than 0!",
+                }),
           })}
           disabled={Boolean(reminderId)}
         />
       </FormField>
 
-      <FormField id="dueDate" label="Due date" required error={errors.dueDate?.message}>
+      <FormField
+        id="dueDate"
+        label="Due date"
+        required
+        error={errors.dueDate?.message}
+      >
         <CustomDatePicker
           id="dueDate"
           {...register("dueDate", { required: "Due date is required!" })}

@@ -4,11 +4,11 @@ import { verifyUser } from "../middlewares/auth.middleware";
 
 import {
   getAccountTypes,
-  getReminders,
+  getReminderRepeats,
   getTransactionTypes,
   getUserAccountsAsOptions,
   getUserCatigoriesAsOptions,
-  getUserRemindersAsOptions,
+  getReminderOptions,
 } from "../controllers/filter.controller";
 
 const filtersRoutes = Router();
@@ -17,7 +17,7 @@ filtersRoutes.route("/account-types").get(getAccountTypes);
 
 filtersRoutes.route("/transaction-types").get(getTransactionTypes);
 
-filtersRoutes.route("/reminders").get(getReminders);
+filtersRoutes.route("/reminder-repeats").get(getReminderRepeats);
 
 filtersRoutes
   .route("/account-options")
@@ -27,6 +27,8 @@ filtersRoutes
   .route("/category-options")
   .get(verifyUser, getUserCatigoriesAsOptions);
 
-filtersRoutes.route("/reminder-options").get(getUserRemindersAsOptions);
+filtersRoutes
+  .route("/reminder-options")
+  .get(verifyUser, getReminderOptions);
 
 export default filtersRoutes;
