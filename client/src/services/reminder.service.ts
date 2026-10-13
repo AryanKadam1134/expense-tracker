@@ -1,6 +1,10 @@
 import api from "./api.service";
 
-import type { ApiResponse, Reminder, ReminderPayload } from "../types/api.types";
+import type {
+  ApiResponse,
+  Reminder,
+  ReminderPayload,
+} from "../types/api.types";
 
 export const reminderEndpoints = {
   addReminder: (body: ReminderPayload) =>

@@ -10,13 +10,13 @@ export const categoryEndpoints = {
   addCategory: (body: CategoryPayload) =>
     api.post<ApiResponse<Category>>("/categories", body),
 
-  updateCategory: (body: CategoryPayload, categoryId: string | undefined) =>
+  updateCategory: (body: CategoryPayload, categoryId: string) =>
     api.put<ApiResponse<Category>>(`/categories/${categoryId}`, body),
 
-  deleteCategory: (categoryId: string | undefined) =>
+  deleteCategory: (categoryId: string) =>
     api.delete<ApiResponse<unknown>>(`/categories/${categoryId}`),
 
-  getCategory: (categoryId: string | undefined) =>
+  getCategory: (categoryId: string) =>
     api.get<ApiResponse<Category>>(`/categories/${categoryId}`),
 
   getCategories: () => api.get<ApiResponse<Category[]>>("/categories"),

@@ -10,16 +10,13 @@ export const transactionEndpoints = {
   addTransaction: (body: TransactionPayload) =>
     api.post<ApiResponse<Transaction>>(`/transactions`, body),
 
-  updateTransaction: (
-    body: TransactionPayload,
-    transactionId: string | undefined,
-  ) =>
+  updateTransaction: (body: TransactionPayload, transactionId: string) =>
     api.put<ApiResponse<Transaction>>(`/transactions/${transactionId}`, body),
 
-  deleteTransaction: (transactionId: string | undefined) =>
+  deleteTransaction: (transactionId: string) =>
     api.delete<ApiResponse<unknown>>(`/transactions/${transactionId}`),
 
-  getTransaction: (transactionId: string | undefined) =>
+  getTransaction: (transactionId: string) =>
     api.get<ApiResponse<Transaction>>(`transactions/${transactionId}`),
 
   getTransactions: () => api.get<ApiResponse<Transaction[]>>(`/transactions`),

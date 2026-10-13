@@ -15,7 +15,9 @@ type ReminderCardProps = {
 
 const ReminderCard = ({ reminder, onDelete }: ReminderCardProps) => {
   const { notify } = useNotify();
+
   const { loading, callApi } = useApi({ deleting: false });
+
   const navigate = useNavigate();
 
   const deleteReminder = () => {
@@ -42,10 +44,12 @@ const ReminderCard = ({ reminder, onDelete }: ReminderCardProps) => {
           </span>
         )}
         <span className="text-sm">
-          Due {formatDateInAlphaNumeric(reminder.dueDate)} · Remaining: {reminder.currentDue}
+          Due {formatDateInAlphaNumeric(reminder.dueDate)} · Remaining:{" "}
+          {reminder.currentDue}
           {reminder.repeat ? ` · ${reminder.repeat}` : ""}
         </span>
       </div>
+
       <div className="flex shrink-0 gap-2">
         <CustomButton
           name="Edit"

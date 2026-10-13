@@ -40,15 +40,10 @@ const CategoryFormPage = () => {
       "categoryLoading",
       () => categoryEndpoints.getCategory(categoryId),
       {
-        onSuccess: (response) => reset({ name: response.data.name }),
-        onError: (error) => {
-          notify.error(
-            error instanceof Error ? error.message : "Couldn't load category!",
-          );
-        },
+        onSuccess: (res) => reset({ name: res.data.name }),
       },
     );
-  }, [callApi, categoryId, notify, reset]);
+  }, [callApi, categoryId, reset]);
 
   const onSubmit: SubmitHandler<CategoryPayload> = (payload) => {
     const body = { name: payload.name.trim() };
@@ -65,6 +60,7 @@ const CategoryFormPage = () => {
             response.message ||
               (categoryId ? "Category updated!" : "Category created!"),
           );
+
           navigate("/categories");
         },
         onError: (error) => {

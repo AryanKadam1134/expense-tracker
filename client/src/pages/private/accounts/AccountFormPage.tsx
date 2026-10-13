@@ -40,11 +40,12 @@ const AccountFormPage = () => {
   });
 
   const fetchAccount = useCallback(() => {
+    if (!accountId) return;
+
     callApi("accountLoading", () => accountEndpoints.getAccount(accountId), {
       onSuccess: (res) => {
         reset(res.data);
       },
-      onError: () => {},
     });
   }, [callApi, accountId, reset]);
 
@@ -57,16 +58,12 @@ const AccountFormPage = () => {
           : accountEndpoints.addAccount(payload),
       {
         onSuccess: (res) => {
-          if (accountId) {
-            fetchAccount();
-          } else {
-            navigate(-1);
-          }
-
           notify.success(
             res?.message ||
               (accountId ? "Account updated!" : "Account created!"),
           );
+
+          navigate("/accounts");
         },
         onError: (error) => {
           const errorMessage =

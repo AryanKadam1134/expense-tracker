@@ -13,7 +13,9 @@ type CategoryCardProps = {
 
 const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
   const { notify } = useNotify();
+
   const { loading, callApi } = useApi({ deleting: false });
+
   const navigate = useNavigate();
 
   const deleteCategory = () => {
@@ -33,6 +35,7 @@ const CategoryCard = ({ category, onDelete }: CategoryCardProps) => {
   return (
     <div className="flex items-center justify-between gap-4 rounded-md border border-light-border-primary p-3">
       <span className="min-w-0 truncate">{category.name}</span>
+
       <div className="flex shrink-0 gap-2">
         <CustomButton
           name="Edit"

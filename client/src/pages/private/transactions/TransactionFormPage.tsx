@@ -17,8 +17,8 @@ import { transactionEndpoints } from "../../../services/transaction.service";
 import useApi from "../../../hooks/useApi";
 import useAccountOptions from "../../../hooks/useAccountOptions";
 import useCategoryOptions from "../../../hooks/useCategoryOptions";
-import useTransactionTypes from "../../../hooks/useTransactionTypes";
 import useReminderOptions from "../../../hooks/useReminderOptions";
+import useTransactionTypes from "../../../hooks/useTransactionTypes";
 
 import { useNotify } from "../../../context/notification";
 
@@ -35,10 +35,9 @@ const TransactionFormPage = () => {
     creating: false,
   });
   const { loadingAccountOptions, accountOptions } = useAccountOptions();
-  const { loadingCategoryOptions, categoryOptions, fetchCategoryOptions } =
-    useCategoryOptions();
-  const { loadingTransactionTypes, transactionTypes } = useTransactionTypes();
+  const { loadingCategoryOptions, categoryOptions } = useCategoryOptions();
   const { loadingReminderOptions, reminderOptions } = useReminderOptions();
+  const { loadingTransactionTypes, transactionTypes } = useTransactionTypes();
 
   const {
     register,
@@ -59,6 +58,8 @@ const TransactionFormPage = () => {
   const [customCategory, setCustomCategory] = useState<boolean>(false);
 
   const fetchTransaction = useCallback(() => {
+    if (!transactionId) return;
+
     callApi(
       "transactionLoading",
       () => transactionEndpoints.getTransaction(transactionId),
@@ -67,7 +68,6 @@ const TransactionFormPage = () => {
           const data = res.data;
           reset({ ...data, date: formatDateInISO(data.date) });
         },
-        onError: () => {},
       },
     );
   }, [callApi, transactionId, reset]);
@@ -82,22 +82,19 @@ const TransactionFormPage = () => {
       "creating",
       () =>
         transactionId
-          ? transactionEndpoints.updateTransaction(requestPayload, transactionId)
+          ? transactionEndpoints.updateTransaction(
+              requestPayload,
+              transactionId,
+            )
           : transactionEndpoints.addTransaction(requestPayload),
       {
         onSuccess: (res) => {
-          if (transactionId) {
-            setCustomCategory(false);
-            fetchCategoryOptions();
-            fetchTransaction();
-          } else {
-            navigate(-1);
-          }
-
           notify.success(
             res?.message ||
               (transactionId ? "Transaction updated!" : "Transaction created!"),
           );
+
+          navigate("/transactions");
         },
         onError: (error) => {
           const errorMessage =

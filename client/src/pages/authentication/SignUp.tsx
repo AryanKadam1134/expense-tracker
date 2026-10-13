@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { LockKeyholeOpen, Mail } from "lucide-react";
@@ -17,7 +19,6 @@ import useApi from "../../hooks/useApi";
 import { useNotify } from "../../context/notification/useNotify";
 
 import type { Register } from "../../types/api.types";
-import { useState } from "react";
 
 const SignUp = () => {
   const { notify } = useNotify();

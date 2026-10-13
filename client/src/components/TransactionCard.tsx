@@ -26,7 +26,6 @@ const TransactionCard = ({ transaction, onDelete }: transactionCardsProps) => {
     title,
     description,
     type,
-    // date,
     category,
     amount,
     transferId,

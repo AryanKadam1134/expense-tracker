@@ -22,7 +22,7 @@ const CategoriesPage = () => {
 
   const fetchCategories = useCallback(() => {
     callApi("categoriesLoading", categoryEndpoints.getCategories, {
-      onSuccess: (response) => setCategories(response.data),
+      onSuccess: (res) => setCategories(res.data),
     });
   }, [callApi]);
 

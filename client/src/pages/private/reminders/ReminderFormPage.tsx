@@ -10,18 +10,23 @@ import CustomSelect from "../../../components/ui/CustomSelect";
 import CustomTextArea from "../../../components/ui/CustomTextArea";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
+import { formatDateInISO } from "../../../utils/formatDate";
+
 import { reminderEndpoints } from "../../../services/reminder.service";
+
 import useApi from "../../../hooks/useApi";
 import useReminderRepeats from "../../../hooks/useReminderRepeats";
+
 import { useNotify } from "../../../context/notification";
-import { formatDateInISO } from "../../../utils/formatDate";
 
 import type { ReminderPayload } from "../../../types/api.types";
 
 const ReminderFormPage = () => {
   const { notify } = useNotify();
+
   const { reminderId } = useParams();
   const navigate = useNavigate();
+
   const { loading, callApi } = useApi({
     loadingReminder: false,
     saving: false,
@@ -50,39 +55,25 @@ const ReminderFormPage = () => {
             dueDate: formatDateInISO(data.dueDate),
           });
         },
-        onError: (error) => {
-          notify.error(
-            error instanceof Error ? error.message : "Couldn't load reminder!",
-          );
-        },
       },
     );
-  }, [callApi, reminderId, notify, reset]);
+  }, [callApi, reminderId, reset]);
 
   const onSubmit: SubmitHandler<ReminderPayload> = (payload) => {
-    const body = {
-      ...payload,
-      title: payload.title.trim(),
-      description: payload.description?.trim() || "",
-      repeat: payload.repeat || null,
-    };
-
-    if (reminderId) delete (body as Partial<ReminderPayload>).openingDue;
-
     callApi(
       "saving",
       () =>
         reminderId
-          ? reminderEndpoints.updateReminder(body, reminderId)
-          : reminderEndpoints.addReminder(body),
+          ? reminderEndpoints.updateReminder(payload, reminderId)
+          : reminderEndpoints.addReminder(payload),
       {
         onSuccess: (response) => {
           notify.success(
             response.message ||
               (reminderId ? "Reminder updated!" : "Reminder created!"),
           );
-          if (reminderId) fetchReminder();
-          else navigate("/reminders");
+
+          navigate("/reminders");
         },
         onError: (error) => {
           notify.error(
@@ -194,6 +185,7 @@ const ReminderFormPage = () => {
           onClick={() => navigate(-1)}
           disabled={loading.saving}
         />
+
         <CustomButton
           type="submit"
           name={loading.saving ? "Saving..." : "Save"}
