@@ -1,17 +1,21 @@
+import mongoose, { Types } from "mongoose";
+
 import { Account } from "../models/account.model";
 
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
+import { Transaction } from "../models/transaction.model";
+import { revertAccountChangesAndDeleteTransaction } from "./transaction.controller";
 
 const addAccount = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
 
-  const { bankName, accountName, accountNumber, accountType, openingBalance } =
+  const { bank, accountName, accountNumber, accountType, openingBalance } =
     req.body;
 
-  if (!bankName) {
-    throw new ApiError(400, "Bank name is required!");
+  if (!bank) {
+    throw new ApiError(400, "Bank is required!");
   }
 
   if (!accountName) {
@@ -24,22 +28,23 @@ const addAccount = asynchandler(async (req, res) => {
 
   const accountNameExists = await Account.findOne({
     owner: loggedUserId,
+    bank,
     accountName,
   });
 
   if (accountNameExists) {
-    throw new ApiError(400, "Account name already exists!");
+    throw new ApiError(400, "Account name already for this bank!");
   }
 
   const fields: {
-    bankName: string;
+    bank: Types.ObjectId;
     accountName: string;
     openingBalance: number;
     currentBalance: number;
     accountNumber?: string;
     accountType?: string;
   } = {
-    bankName,
+    bank,
     accountName,
     openingBalance,
     currentBalance: openingBalance,
@@ -63,28 +68,29 @@ const updateAccount = asynchandler(async (req, res) => {
     throw new ApiError(404, "Account not found!");
   }
 
-  const { bankName, accountName, accountNumber, accountType } = req.body;
+  const { bank, accountName, accountNumber, accountType } = req.body;
 
   if (accountName) {
     const accountNameExists = await Account.findOne({
       _id: { $ne: account?._id },
       owner: account?.owner,
+      bank,
       accountName,
     });
 
     if (accountNameExists) {
-      throw new ApiError(400, "Account name already exists!");
+      throw new ApiError(400, "Account name already exists for this bank!");
     }
   }
 
   const fields: Partial<
     Pick<
       typeof account,
-      "bankName" | "accountName" | "accountNumber" | "accountType"
+      "bank" | "accountName" | "accountNumber" | "accountType"
     >
   > = {};
 
-  if (bankName) fields.bankName = bankName;
+  if (bank) fields.bank = bank;
   if (accountName) fields.accountName = accountName;
 
   if (accountNumber !== undefined) fields.accountNumber = accountNumber;
@@ -100,7 +106,32 @@ const updateAccount = asynchandler(async (req, res) => {
 });
 
 const deleteAccount = asynchandler(async (req, res) => {
-  await req.account?.deleteOne();
+  const account = req.account;
+
+  if (!account) {
+    throw new ApiError(404, "Account not found!");
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      const transactions = await Transaction.find({
+        account: account._id,
+      }).session(session);
+
+      for (const transaction of transactions) {
+        await revertAccountChangesAndDeleteTransaction(transaction, session, {
+          restoreAccountBalance: false,
+          restoreReminderDue: true,
+        });
+      }
+
+      await account.deleteOne({ session });
+    });
+  } finally {
+    await session.endSession();
+  }
 
   return res.status(200).json(new ApiRes(200, {}, "Account deleted!"));
 });

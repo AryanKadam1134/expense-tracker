@@ -6,6 +6,7 @@ import ApiRes from "../utils/ApiRes";
 import { asynchandler } from "../utils/asynchandler";
 
 import { ACCOUNT_TYPES, REMINDERS, TRANSACTION_TYPES } from "../contants";
+import { Bank } from "../models/bank.model";
 
 const getAccountTypes = asynchandler(async (req, res) => {
   return res
@@ -21,6 +22,18 @@ const getTransactionTypes = asynchandler(async (req, res) => {
 
 const getReminderRepeats = asynchandler(async (req, res) => {
   return res.status(200).json(new ApiRes(200, REMINDERS, "Reminders fetched!"));
+});
+
+const getUserBanksAsOptions = asynchandler(async (req, res) => {
+  const banks = await Bank.find({
+    owner: req.user?._id,
+  });
+
+  if (banks?.length === 0) {
+    return res.status(200).json(new ApiRes(200, banks, "No banks found!"));
+  }
+
+  return res.status(200).json(new ApiRes(200, banks, "User banks fetched!"));
 });
 
 const getUserAccountsAsOptions = asynchandler(async (req, res) => {
@@ -90,6 +103,7 @@ export {
   getTransactionTypes,
   getAccountTypes,
   getReminderRepeats,
+  getUserBanksAsOptions,
   getUserAccountsAsOptions,
   getUserCatigoriesAsOptions,
   getReminderOptions,

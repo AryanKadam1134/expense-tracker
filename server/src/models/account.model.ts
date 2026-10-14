@@ -4,7 +4,7 @@ import { ACCOUNT_TYPES } from "../contants";
 
 interface AccountFields {
   owner: Types.ObjectId;
-  bankName: string;
+  bank: Types.ObjectId;
   accountName: string;
   accountNumber?: string | null;
   accountType?: string | null;
@@ -19,10 +19,9 @@ const accountSchema = new Schema<AccountFields>(
       ref: "User",
       required: true,
     },
-    bankName: {
-      type: String,
+    bank: {
+      type: Types.ObjectId,
       required: true,
-      index: true,
     },
     accountName: {
       type: String,

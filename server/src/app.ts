@@ -20,9 +20,11 @@ import filtersRoutes from "./routes/filter.routes";
 import transactionRouter from "./routes/transaction.routes";
 import categoryRouter from "./routes/category.routes";
 import reminderRouter from "./routes/reminder.routes";
+import bankRouter from "./routes/bank.routes";
 
 app.use("/api/filters", filtersRoutes);
 app.use("/api/auth", authRouter);
+app.use("/api/banks", bankRouter);
 app.use("/api/accounts", accountRouter);
 app.use("/api/transactions", transactionRouter);
 app.use("/api/categories", categoryRouter);

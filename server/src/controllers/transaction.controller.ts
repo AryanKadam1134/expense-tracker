@@ -2,6 +2,7 @@ import mongoose, { ClientSession, Types } from "mongoose";
 
 import { Account } from "../models/account.model";
 import { Category } from "../models/category.model";
+import { Reminder } from "../models/reminder.model";
 import { Transaction, TransactionDocument } from "../models/transaction.model";
 
 import ApiRes from "../utils/ApiRes";
@@ -9,7 +10,6 @@ import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
 
 import { TRANSACTION_TYPES } from "../contants";
-import { Reminder } from "../models/reminder.model";
 
 const addCategory = async (
   category: Types.ObjectId | string,
@@ -61,33 +61,64 @@ const addCategory = async (
 const revertAccountChangesAndDeleteTransaction = async (
   transaction: TransactionDocument,
   session: ClientSession,
+  {
+    restoreAccountBalance = true,
+    restoreReminderDue = false,
+  }: { restoreAccountBalance?: boolean; restoreReminderDue?: boolean } = {},
 ) => {
   try {
-    const account = await Account.findById(transaction?.account).session(
-      session,
-    );
+    const { type, amount } = transaction;
 
-    if (!account) {
-      throw new ApiError(404, "Account not found!");
+    if (restoreAccountBalance) {
+      const account = await Account.findById(transaction.account).session(
+        session,
+      );
+
+      if (!account) {
+        throw new ApiError(404, "Account not found!");
+      }
+
+      if (type === "credit" && account.currentBalance < amount) {
+        throw new ApiError(
+          400,
+          "Not sufficient balance available to delete a credited transaction!",
+        );
+      }
+
+      if (type === "credit") {
+        account.currentBalance -= amount;
+      } else if (type === "debit") {
+        account.currentBalance += amount;
+      }
+
+      await account.save({ session });
     }
 
-    const type = transaction.type;
-    const amount = transaction.amount;
+    if (restoreReminderDue && type === "debit" && transaction.reminder) {
+      const reminder = await Reminder.findById(transaction.reminder).session(
+        session,
+      );
 
-    if (type === "credit" && account?.currentBalance < amount) {
-      throw new ApiError(
-        400,
-        "Not sufficient balance available to delete a credited transaction!",
+      if (!reminder) {
+        throw new ApiError(404, "Reminder not found!");
+      }
+
+      if (
+        reminder.openingDue < amount ||
+        reminder.openingDue < reminder.currentDue + amount
+      ) {
+        throw new ApiError(400, "Restored due exceeds the opening due amount!");
+      }
+
+      await Reminder.updateOne(
+        { _id: reminder._id },
+        {
+          $inc: { currentDue: amount },
+          $set: { isPaid: false },
+        },
+        { session },
       );
     }
-
-    if (type === "credit") {
-      account.currentBalance -= amount;
-    } else if (type === "debit") {
-      account.currentBalance += amount;
-    }
-
-    await account.save({ session });
 
     await transaction.deleteOne({ session });
   } catch (error) {
@@ -99,7 +130,7 @@ const revertAccountChangesAndDeleteTransaction = async (
       throw new ApiError(500, error.message);
     }
 
-    throw new ApiError(500, "Error creating category!");
+    throw new ApiError(500, "Error deleting transaction!");
   }
 };
 
@@ -328,38 +359,9 @@ const deleteTransaction = asynchandler(async (req, res) => {
 
   try {
     await session.withTransaction(async () => {
-      await revertAccountChangesAndDeleteTransaction(transaction, session);
-
-      const { owner, type, reminder, amount } = transaction;
-
-      if (type === "debit" && reminder) {
-        const reminderExists = await Reminder.findOne({
-          owner,
-          _id: reminder,
-        }).session(session);
-
-        if (!reminderExists) {
-          throw new ApiError(404, "Reminder not found!");
-        }
-
-        if (
-          reminderExists.openingDue < amount ||
-          reminderExists.openingDue < reminderExists.currentDue + amount
-        ) {
-          throw new ApiError(400, "Amount is greater than the due amount!");
-        }
-
-        await Reminder.updateOne(
-          { _id: reminderExists._id },
-          {
-            $inc: { currentDue: amount },
-            $set: {
-              isPaid: false,
-            },
-          },
-          { session },
-        );
-      }
+      await revertAccountChangesAndDeleteTransaction(transaction, session, {
+        restoreReminderDue: true,
+      });
     });
   } finally {
     await session.endSession();
