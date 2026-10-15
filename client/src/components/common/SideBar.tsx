@@ -9,6 +9,7 @@ import {
   ArrowLeftRight,
   Tags,
   BellRing,
+  Landmark,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -34,6 +35,7 @@ type SideBarProps = {
 
 const menus: MenuItem[] = [
   { name: "Dashboard", path: "/dashboard", icon: LayoutDashboard },
+  { name: "Banks", path: "/banks", icon: Landmark },
   { name: "Accounts", path: "/accounts", icon: SquareUserRound },
   { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
   { name: "Categories", path: "/categories", icon: Tags },

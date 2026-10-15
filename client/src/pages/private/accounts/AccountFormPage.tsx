@@ -16,6 +16,7 @@ import useAccountTypes from "../../../hooks/useAccountTypes";
 import { useNotify } from "../../../context/notification";
 
 import type { AccountPayload } from "../../../types/api.types";
+import useBankOptions from "../../../hooks/useBankOptions";
 
 const AccountFormPage = () => {
   const { notify } = useNotify();
@@ -28,6 +29,7 @@ const AccountFormPage = () => {
     creating: false,
   });
   const { loadingAccountTypes, accountTypes } = useAccountTypes();
+  const { loadingBankOptions, bankOptions } = useBankOptions();
 
   const {
     register,
@@ -87,18 +89,24 @@ const AccountFormPage = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
       {/* Bank Name */}
       <FormField
-        id="bankName"
+        id="bank"
         label="Bank Name"
         required
-        error={errors?.bankName?.message}
+        error={errors?.bank?.message}
       >
-        <CustomInput
-          id="bankName"
-          type="text"
-          placeholder="RBI"
-          {...register("bankName", {
-            required: "Bank name is required!",
-          })}
+        <Controller
+          name="bank"
+          control={control}
+          render={({ field }) => (
+            <CustomSelect
+              id="bank"
+              placeholder="Select"
+              options={bankOptions}
+              value={field?.value}
+              onChange={field?.onChange}
+              disabled={loadingBankOptions}
+            />
+          )}
         />
       </FormField>
 

@@ -1,3 +1,4 @@
+import { Bank } from "../models/bank.model";
 import { Account } from "../models/account.model";
 import { Category } from "../models/category.model";
 import { Reminder } from "../models/reminder.model";
@@ -6,7 +7,6 @@ import ApiRes from "../utils/ApiRes";
 import { asynchandler } from "../utils/asynchandler";
 
 import { ACCOUNT_TYPES, REMINDERS, TRANSACTION_TYPES } from "../contants";
-import { Bank } from "../models/bank.model";
 
 const getAccountTypes = asynchandler(async (req, res) => {
   return res
@@ -33,7 +33,14 @@ const getUserBanksAsOptions = asynchandler(async (req, res) => {
     return res.status(200).json(new ApiRes(200, banks, "No banks found!"));
   }
 
-  return res.status(200).json(new ApiRes(200, banks, "User banks fetched!"));
+  const banksAsOptions = banks.map((bank) => ({
+    label: bank?.name,
+    value: bank?._id,
+  }));
+
+  return res
+    .status(200)
+    .json(new ApiRes(200, banksAsOptions, "User banks fetched!"));
 });
 
 const getUserAccountsAsOptions = asynchandler(async (req, res) => {
@@ -57,7 +64,7 @@ const getUserAccountsAsOptions = asynchandler(async (req, res) => {
     .json(new ApiRes(200, accountsAsOptions, "User accounts fetched!"));
 });
 
-const getUserCatigoriesAsOptions = asynchandler(async (req, res) => {
+const getUserCategoriesAsOptions = asynchandler(async (req, res) => {
   const categories = await Category.find({
     owner: req.user?._id,
   });
@@ -68,9 +75,9 @@ const getUserCatigoriesAsOptions = asynchandler(async (req, res) => {
       .json(new ApiRes(200, categories, "No user categories found!"));
   }
 
-  const categoriesAsOptions = categories.map((account) => ({
-    value: account?._id,
-    label: account?.name,
+  const categoriesAsOptions = categories.map((category) => ({
+    value: category?._id,
+    label: category?.name,
   }));
 
   return res
@@ -89,9 +96,9 @@ const getReminderOptions = asynchandler(async (req, res) => {
       .json(new ApiRes(200, reminders, "No user reminders found!"));
   }
 
-  const remindersAsOptions = reminders.map((account) => ({
-    value: account?._id,
-    label: account?.title,
+  const remindersAsOptions = reminders.map((reminder) => ({
+    value: reminder?._id,
+    label: reminder?.title,
   }));
 
   return res
@@ -105,6 +112,6 @@ export {
   getReminderRepeats,
   getUserBanksAsOptions,
   getUserAccountsAsOptions,
-  getUserCatigoriesAsOptions,
+  getUserCategoriesAsOptions,
   getReminderOptions,
 };

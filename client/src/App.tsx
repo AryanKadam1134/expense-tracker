@@ -26,6 +26,8 @@ import RemindersPage from "./pages/private/reminders/RemindersPage";
 import ReminderFormPage from "./pages/private/reminders/ReminderFormPage";
 
 import { useAuth } from "./context/auth";
+import BanksPage from "./pages/private/banks/BanksPage";
+import BankFormPage from "./pages/private/banks/BankFormPage";
 
 const PublicRoute = () => {
   const { user, authLoading } = useAuth();
@@ -66,6 +68,12 @@ const App = () => {
         <Route element={<ProtectedRoute />}>
           <Route element={<DashboardLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
+
+            <Route path="/banks">
+              <Route index element={<BanksPage />} />
+              <Route path="add" element={<BankFormPage />} />
+              <Route path=":bankId/edit" element={<BankFormPage />} />
+            </Route>
 
             <Route path="/accounts">
               <Route index element={<AccountsPage />} />

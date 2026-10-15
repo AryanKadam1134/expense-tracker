@@ -32,6 +32,9 @@ const TransactionCard = ({ transaction, onDelete }: transactionCardsProps) => {
     note,
   } = transaction;
 
+  const { accountName } = account || {};
+  const { name } = category || {};
+
   const navigate = useNavigate();
 
   const deleteTransaction = () => {
@@ -52,11 +55,11 @@ const TransactionCard = ({ transaction, onDelete }: transactionCardsProps) => {
 
   return (
     <div className="p-3 flex flex-col gap-1 border rounded-md">
-      <span>{account}</span>
+      <span>{accountName}</span>
       <span>{title}</span>
       <span>{description}</span>
       <span>{type}</span>
-      <span>{category}</span>
+      <span>{name}</span>
       <span>{amount}</span>
       <span>{transferId}</span>
       <span>{note}</span>

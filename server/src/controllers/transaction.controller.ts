@@ -377,9 +377,41 @@ const getTransaction = asynchandler(async (req, res) => {
 });
 
 const getTransactions = asynchandler(async (req, res) => {
-  const transactions = await Transaction.find({
-    owner: req.user?._id,
-  });
+  const transactions = await Transaction.aggregate([
+    {
+      $match: { owner: new Types.ObjectId(req.user?._id) },
+    },
+    {
+      $lookup: {
+        from: "accounts",
+        localField: "account",
+        foreignField: "_id",
+        as: "account",
+      },
+    },
+    {
+      $addFields: {
+        account: {
+          $first: "$account",
+        },
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "category",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $addFields: {
+        category: {
+          $first: "$category",
+        },
+      },
+    },
+  ]);
 
   if (transactions?.length === 0) {
     return res

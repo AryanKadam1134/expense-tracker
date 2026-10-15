@@ -18,11 +18,18 @@ export interface User {
   lastName?: string;
 }
 
+// Bank Interface
+export interface Bank {
+  _id: string;
+  owner: string;
+  name: string;
+}
+
 // Account Interface
 export interface Account {
   _id: string;
   owner: string;
-  bankName: string;
+  bank: Bank;
   accountName: string;
   accountNumber?: string | null;
   accountType?: string | null;
@@ -34,12 +41,12 @@ export interface Account {
 export interface Transaction {
   _id: string;
   owner: string;
-  account: string;
+  account: Account;
   title: string;
   description?: string | null;
   type: string;
   date: string;
-  category?: string | null;
+  category?: Category | null;
   amount: number;
   transferId?: string | null;
   reminder?: string | null;
@@ -92,8 +99,12 @@ export type Login = {
   rememberMe?: boolean;
 };
 
+export type BankPayload = {
+  name: string;
+};
+
 export type AccountPayload = {
-  bankName: string;
+  bank: string;
   accountName: string;
   accountNumber?: string | null;
   accountType?: string | null;

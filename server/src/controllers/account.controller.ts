@@ -142,9 +142,26 @@ const getAccount = asynchandler(async (req, res) => {
 });
 
 const getAccounts = asynchandler(async (req, res) => {
-  const accounts = await Account.find({
-    owner: req.user?._id,
-  });
+  const accounts = await Account.aggregate([
+    {
+      $match: { owner: new Types.ObjectId(req.user?._id) },
+    },
+    {
+      $lookup: {
+        from: "banks",
+        localField: "bank",
+        foreignField: "_id",
+        as: "bank",
+      },
+    },
+    {
+      $addFields: {
+        bank: {
+          $first: "$bank",
+        },
+      },
+    },
+  ]);
 
   if (accounts?.length === 0) {
     return res

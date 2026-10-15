@@ -22,13 +22,15 @@ const AccountCard = ({ account, onDelete }: AccountCardsProps) => {
 
   const {
     _id,
-    bankName,
+    bank,
     accountName,
     accountType,
     accountNumber,
     openingBalance,
     currentBalance,
   } = account;
+
+  const { name } = bank || {};
 
   const navigate = useNavigate();
 
@@ -48,7 +50,7 @@ const AccountCard = ({ account, onDelete }: AccountCardsProps) => {
 
   return (
     <div className="p-3 flex flex-col gap-1 border rounded-md">
-      <span>{bankName}</span>
+      <span>{name}</span>
       <span>{accountName}</span>
       <span>{accountType}</span>
       <span>{accountNumber}</span>

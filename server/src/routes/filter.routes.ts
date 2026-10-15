@@ -7,7 +7,7 @@ import {
   getReminderRepeats,
   getTransactionTypes,
   getUserAccountsAsOptions,
-  getUserCatigoriesAsOptions,
+  getUserCategoriesAsOptions,
   getReminderOptions,
   getUserBanksAsOptions,
 } from "../controllers/filter.controller";
@@ -28,7 +28,7 @@ filtersRoutes
 
 filtersRoutes
   .route("/category-options")
-  .get(verifyUser, getUserCatigoriesAsOptions);
+  .get(verifyUser, getUserCategoriesAsOptions);
 
 filtersRoutes.route("/reminder-options").get(verifyUser, getReminderOptions);
 

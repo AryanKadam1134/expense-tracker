@@ -3,6 +3,9 @@ import api from "./api.service";
 import type { ApiResponse, Filter } from "../types/api.types";
 
 export const filterEndpoints = {
+  getBanksOptions: () =>
+    api.get<ApiResponse<Filter[]>>(`/filters/bank-options`),
+
   getAccountTypes: () =>
     api.get<ApiResponse<Filter[]>>(`/filters/account-types`),
 
