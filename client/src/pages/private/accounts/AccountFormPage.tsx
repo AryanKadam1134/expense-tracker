@@ -89,17 +89,17 @@ const AccountFormPage = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
       {/* Bank Name */}
       <FormField
-        id="bank"
+        id="bankId"
         label="Bank Name"
         required
-        error={errors?.bank?.message}
+        error={errors?.bankId?.message}
       >
         <Controller
-          name="bank"
+          name="bankId"
           control={control}
           render={({ field }) => (
             <CustomSelect
-              id="bank"
+              id="bankId"
               placeholder="Select"
               options={bankOptions}
               value={field?.value}
@@ -112,16 +112,16 @@ const AccountFormPage = () => {
 
       {/* Account Name */}
       <FormField
-        id="accountName"
+        id="name"
         label="Account Name"
         required
-        error={errors?.accountName?.message}
+        error={errors?.name?.message}
       >
         <CustomInput
-          id="accountName"
+          id="name"
           type="text"
           placeholder="Trading Account"
-          {...register("accountName", {
+          {...register("name", {
             required: "Account name is required!",
           })}
         />

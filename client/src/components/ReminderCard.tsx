@@ -49,8 +49,8 @@ const ReminderCard = ({ reminder, onDelete }: ReminderCardProps) => {
         )}
         <span className="text-sm">
           Due {formatDateInAlphaNumeric(reminder.dueDate)} · Remaining:{" "}
-          {reminder.currentDue}
-          {reminder.repeat ? ` · ${reminder.repeat}` : ""}
+          {reminder.remainingDue}
+          {reminder.frequency ? ` · ${reminder.frequency}` : ""}
         </span>
       </div>
 

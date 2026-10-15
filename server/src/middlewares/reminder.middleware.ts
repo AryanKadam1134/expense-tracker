@@ -16,7 +16,7 @@ export const getReminderById = asynchandler(async (req, res, next) => {
     throw new ApiError(404, "Reminder not found!");
   }
 
-  if (reminderExists.owner.toString() !== req.user?._id.toString()) {
+  if (reminderExists.ownerId.toString() !== req.user?._id.toString()) {
     throw new ApiError(403, "Unauthorized!");
   }
 

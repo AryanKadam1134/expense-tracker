@@ -49,7 +49,7 @@ const TransactionFormPage = () => {
     formState: { errors },
   } = useForm<TransactionPayload>({
     mode: "onChange",
-    defaultValues: { reminder: null },
+    defaultValues: { reminderId: null },
   });
 
   const selectedType = watch("type");
@@ -75,7 +75,8 @@ const TransactionFormPage = () => {
   const onSubmit: SubmitHandler<TransactionPayload> = (payload) => {
     const requestPayload = {
       ...payload,
-      reminder: payload.type === "debit" ? payload.reminder || null : null,
+      reminderId:
+        payload.type === "debit" ? payload.reminderId || null : null,
     };
 
     callApi(
@@ -118,18 +119,18 @@ const TransactionFormPage = () => {
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
       {/* Transaction Account */}
       <FormField
-        id="account"
+        id="accountId"
         label="Transaction Account"
         required
-        error={errors?.account?.message}
+        error={errors?.accountId?.message}
       >
         <Controller
-          name="account"
+          name="accountId"
           control={control}
           rules={{ required: "Account is required!" }}
           render={({ field }) => (
             <CustomSelect
-              id="account"
+              id="accountId"
               placeholder="Select"
               options={accountOptions}
               value={field?.value}
@@ -207,7 +208,7 @@ const TransactionFormPage = () => {
               value={field?.value}
               onChange={(value) => {
                 field.onChange(value);
-                if (value === "credit") setValue("reminder", null);
+                if (value === "credit") setValue("reminderId", null);
               }}
               disabled={Boolean(transactionId) || loadingTransactionTypes}
             />
@@ -216,13 +217,13 @@ const TransactionFormPage = () => {
       </FormField>
 
       {/* Reminder payment (debit only) */}
-      <FormField id="reminder" label="Pay reminder">
+      <FormField id="reminderId" label="Pay reminder">
         <Controller
-          name="reminder"
+          name="reminderId"
           control={control}
           render={({ field }) => (
             <CustomSelect
-              id="reminder"
+              id="reminderId"
               placeholder="No reminder"
               options={reminderOptions}
               value={field.value}
@@ -243,29 +244,29 @@ const TransactionFormPage = () => {
       {/* Transaction Category */}
       {customCategory ? (
         <FormField
-          id="category"
+          id="categoryId"
           label="Custom Category"
-          error={errors?.category?.message}
+          error={errors?.categoryId?.message}
         >
           <CustomInput
-            id="category"
+            id="categoryId"
             type="text"
             placeholder=""
-            {...register("category")}
+            {...register("categoryId")}
           />
         </FormField>
       ) : (
         <FormField
-          id="category"
+          id="categoryId"
           label="Transaction Category"
-          error={errors?.category?.message}
+          error={errors?.categoryId?.message}
         >
           <Controller
-            name="category"
+            name="categoryId"
             control={control}
             render={({ field }) => (
               <CustomSelect
-                id="category"
+                id="categoryId"
                 placeholder="Select"
                 options={categoryOptions}
                 value={field?.value}

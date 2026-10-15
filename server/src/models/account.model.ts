@@ -3,9 +3,9 @@ import { Schema, model, Types, HydratedDocument } from "mongoose";
 import { ACCOUNT_TYPES } from "../contants";
 
 interface AccountFields {
-  owner: Types.ObjectId;
-  bank: Types.ObjectId;
-  accountName: string;
+  ownerId: Types.ObjectId;
+  bankId: Types.ObjectId;
+  name: string;
   accountNumber?: string | null;
   accountType?: string | null;
   openingBalance: number;
@@ -14,16 +14,17 @@ interface AccountFields {
 
 const accountSchema = new Schema<AccountFields>(
   {
-    owner: {
+    ownerId: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
     },
-    bank: {
+    bankId: {
       type: Types.ObjectId,
+      ref: "Bank",
       required: true,
     },
-    accountName: {
+    name: {
       type: String,
       required: true,
       index: true,

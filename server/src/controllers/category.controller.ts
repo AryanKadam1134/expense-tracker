@@ -15,7 +15,7 @@ const addCategory = asynchandler(async (req, res) => {
 
   const categoryExists = await Category.findOne({
     name,
-    owner: loggedUserId,
+    ownerId: loggedUserId,
   });
 
   if (categoryExists) {
@@ -24,7 +24,7 @@ const addCategory = asynchandler(async (req, res) => {
 
   const createCategory = await Category.create({
     name,
-    owner: loggedUserId,
+    ownerId: loggedUserId,
   });
 
   return res
@@ -50,7 +50,7 @@ const updateCategory = asynchandler(async (req, res) => {
   const categoryExists = await Category.findOne({
     _id: { $ne: category?._id },
     name,
-    owner: loggedUserId,
+    ownerId: loggedUserId,
   });
 
   if (categoryExists) {
@@ -79,7 +79,7 @@ const getCategory = asynchandler(async (req, res) => {
 });
 
 const getCategories = asynchandler(async (req, res) => {
-  const categories = await Category.find({ owner: req.user?._id });
+  const categories = await Category.find({ ownerId: req.user?._id });
 
   if (categories?.length === 0) {
     return res

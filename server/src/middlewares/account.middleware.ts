@@ -16,7 +16,7 @@ export const getAccountById = asynchandler(async (req, res, next) => {
     throw new ApiError(404, "Account not found!");
   }
 
-  if (accountExists.owner.toString() !== req.user?._id.toString()) {
+  if (accountExists.ownerId.toString() !== req.user?._id.toString()) {
     throw new ApiError(403, "Unauthorized!");
   }
 

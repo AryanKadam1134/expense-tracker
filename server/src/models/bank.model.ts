@@ -1,15 +1,16 @@
 import { Schema, model, Types, HydratedDocument } from "mongoose";
 
 interface BankFields {
-  owner: Types.ObjectId;
+  ownerId: Types.ObjectId;
   name: string;
 }
 
 const bankSchema = new Schema<BankFields>(
   {
-    owner: {
+    ownerId: {
       type: Types.ObjectId,
       ref: "User",
+      required: true,
     },
     name: {
       type: String,

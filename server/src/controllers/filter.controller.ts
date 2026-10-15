@@ -26,7 +26,7 @@ const getReminderRepeats = asynchandler(async (req, res) => {
 
 const getUserBanksAsOptions = asynchandler(async (req, res) => {
   const banks = await Bank.find({
-    owner: req.user?._id,
+    ownerId: req.user?._id,
   });
 
   if (banks?.length === 0) {
@@ -45,7 +45,7 @@ const getUserBanksAsOptions = asynchandler(async (req, res) => {
 
 const getUserAccountsAsOptions = asynchandler(async (req, res) => {
   const accounts = await Account.find({
-    owner: req.user?._id,
+    ownerId: req.user?._id,
   });
 
   if (accounts?.length === 0) {
@@ -56,7 +56,7 @@ const getUserAccountsAsOptions = asynchandler(async (req, res) => {
 
   const accountsAsOptions = accounts.map((account) => ({
     value: account?._id,
-    label: account?.accountName,
+    label: account?.name,
   }));
 
   return res
@@ -66,7 +66,7 @@ const getUserAccountsAsOptions = asynchandler(async (req, res) => {
 
 const getUserCategoriesAsOptions = asynchandler(async (req, res) => {
   const categories = await Category.find({
-    owner: req.user?._id,
+    ownerId: req.user?._id,
   });
 
   if (categories?.length === 0) {
@@ -87,7 +87,7 @@ const getUserCategoriesAsOptions = asynchandler(async (req, res) => {
 
 const getReminderOptions = asynchandler(async (req, res) => {
   const reminders = await Reminder.find({
-    owner: req.user?._id,
+    ownerId: req.user?._id,
   });
 
   if (reminders?.length === 0) {

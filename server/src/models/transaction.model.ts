@@ -3,27 +3,27 @@ import { Schema, model, Types, HydratedDocument } from "mongoose";
 import { TRANSACTION_TYPES } from "../contants";
 
 interface TransactionFields {
-  owner: Types.ObjectId;
-  account: Types.ObjectId;
+  ownerId: Types.ObjectId;
+  accountId: Types.ObjectId;
   title: string;
   description?: string | null;
   type: string;
   date: Date;
-  category?: Types.ObjectId | null;
+  categoryId?: Types.ObjectId | null;
   amount: number;
-  reminder?: Types.ObjectId | null;
+  reminderId?: Types.ObjectId | null;
   transferId?: string | null;
   note?: string | null;
 }
 
 const transactionSchema = new Schema<TransactionFields>(
   {
-    owner: {
+    ownerId: {
       type: Types.ObjectId,
       ref: "User",
       required: true,
     },
-    account: {
+    accountId: {
       type: Types.ObjectId,
       ref: "Account",
       required: true,
@@ -42,7 +42,7 @@ const transactionSchema = new Schema<TransactionFields>(
       type: Date,
       required: true,
     },
-    category: {
+    categoryId: {
       type: Types.ObjectId,
       ref: "Category",
     },
@@ -50,7 +50,7 @@ const transactionSchema = new Schema<TransactionFields>(
       type: Number,
       required: true,
     },
-    reminder: {
+    reminderId: {
       type: Types.ObjectId,
       ref: "Reminder",
     },

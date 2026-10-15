@@ -109,17 +109,17 @@ const ReminderFormPage = () => {
       </FormField>
 
       <FormField
-        id="openingDue"
+        id="originalDue"
         label="Opening due"
         required={!reminderId}
-        error={errors.openingDue?.message}
+        error={errors.originalDue?.message}
       >
         <CustomInput
-          id="openingDue"
+          id="originalDue"
           type="number"
           min="0.01"
           step="any"
-          {...register("openingDue", {
+          {...register("originalDue", {
             ...(reminderId
               ? {}
               : {
@@ -146,13 +146,17 @@ const ReminderFormPage = () => {
         />
       </FormField>
 
-      <FormField id="repeat" label="Repeat" error={errors.repeat?.message}>
+      <FormField
+        id="frequency"
+        label="Frequency"
+        error={errors.frequency?.message}
+      >
         <Controller
-          name="repeat"
+          name="frequency"
           control={control}
           render={({ field }) => (
             <CustomSelect
-              id="repeat"
+              id="frequency"
               placeholder="Does not repeat"
               options={reminderRepeats}
               value={field.value}

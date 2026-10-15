@@ -21,7 +21,7 @@ const addBank = asynchandler(async (req, res) => {
 
   const bankExists = await Bank.findOne({
     name,
-    owner: loggedUserId,
+    ownerId: loggedUserId,
   });
 
   if (bankExists) {
@@ -30,7 +30,7 @@ const addBank = asynchandler(async (req, res) => {
 
   const createBank = await Bank.create({
     name,
-    owner: loggedUserId,
+    ownerId: loggedUserId,
   });
 
   return res.status(200).json(new ApiRes(200, createBank, "Bank added!"));
@@ -54,7 +54,7 @@ const updateBank = asynchandler(async (req, res) => {
   const bankExists = await Bank.findOne({
     _id: { $ne: bank?._id },
     name,
-    owner: loggedUserId,
+    ownerId: loggedUserId,
   });
 
   if (bankExists) {
@@ -79,11 +79,11 @@ const deleteBank = asynchandler(async (req, res) => {
 
   try {
     await session.withTransaction(async () => {
-      const accounts = await Account.find({ bank: bank._id }).session(session);
+      const accounts = await Account.find({ bankId: bank._id }).session(session);
 
       for (const account of accounts) {
         const transactions = await Transaction.find({
-          account: account._id,
+          accountId: account._id,
         }).session(session);
 
         for (const transaction of transactions) {
@@ -110,7 +110,7 @@ const getBank = asynchandler(async (req, res) => {
 });
 
 const getBanks = asynchandler(async (req, res) => {
-  const banks = await Bank.find({ owner: req.user?._id });
+  const banks = await Bank.find({ ownerId: req.user?._id });
 
   if (banks?.length === 0) {
     return res.status(200).json(new ApiRes(200, banks, "No banks found!"));

@@ -32,7 +32,7 @@ const TransactionCard = ({ transaction, onDelete }: transactionCardsProps) => {
     note,
   } = transaction;
 
-  const { accountName } = account || {};
+  const { name: accountDisplayName } = account || {};
   const { name } = category || {};
 
   const navigate = useNavigate();
@@ -55,7 +55,7 @@ const TransactionCard = ({ transaction, onDelete }: transactionCardsProps) => {
 
   return (
     <div className="p-3 flex flex-col gap-1 border rounded-md">
-      <span>{accountName}</span>
+      <span>{accountDisplayName}</span>
       <span>{title}</span>
       <span>{description}</span>
       <span>{type}</span>

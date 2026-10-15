@@ -12,13 +12,13 @@ import { asynchandler } from "../utils/asynchandler";
 const addReminder = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
 
-  const { title, description, openingDue, dueDate, repeat } = req.body;
+  const { title, description, originalDue, dueDate, frequency } = req.body;
 
   if (!title) {
     throw new ApiError(400, "Title is required!");
   }
 
-  if (!openingDue) {
+  if (!originalDue) {
     throw new ApiError(400, "Opening due is required!");
   }
 
@@ -27,7 +27,7 @@ const addReminder = asynchandler(async (req, res) => {
   }
 
   const reminderExists = await Reminder.findOne({
-    owner: loggedUserId,
+    ownerId: loggedUserId,
     title,
   });
 
@@ -38,22 +38,22 @@ const addReminder = asynchandler(async (req, res) => {
   const fields: {
     title: string;
     description?: string;
-    openingDue: number;
-    currentDue: number;
+    originalDue: number;
+    remainingDue: number;
     dueDate: Date;
-    repeat?: string;
+    frequency?: string;
   } = {
     title,
-    openingDue,
-    currentDue: openingDue,
+    originalDue,
+    remainingDue: originalDue,
     dueDate,
   };
 
   if (description) fields.description = description;
-  if (repeat) fields.repeat = repeat;
+  if (frequency) fields.frequency = frequency;
 
   const createReminder = await Reminder.create({
-    owner: loggedUserId,
+    ownerId: loggedUserId,
     ...fields,
   });
 
@@ -71,12 +71,12 @@ const updateReminder = asynchandler(async (req, res) => {
     throw new ApiError(404, "Reminder not found!");
   }
 
-  const { title, description, dueDate, repeat } = req.body;
+  const { title, description, dueDate, frequency } = req.body;
 
   if (title) {
     const reminderTitleExists = await Reminder.findOne({
       _id: { $ne: reminder?._id },
-      owner: loggedUserId,
+      ownerId: loggedUserId,
       title,
     });
 
@@ -86,12 +86,15 @@ const updateReminder = asynchandler(async (req, res) => {
   }
 
   const fields: Partial<
-    Pick<typeof reminder, "title" | "description" | "dueDate" | "repeat">
+    Pick<
+      typeof reminder,
+      "title" | "description" | "dueDate" | "frequency"
+    >
   > = {};
 
   if (title) fields.title = title;
   if (dueDate) fields.dueDate = dueDate;
-  if (repeat) fields.repeat = repeat;
+  if (frequency) fields.frequency = frequency;
 
   if (description !== undefined) fields.description = description;
 
@@ -112,7 +115,7 @@ const deleteReminder = asynchandler(async (req, res) => {
   }
 
   const transactions = await Transaction.find({
-    reminder: reminder?._id,
+    reminderId: reminder?._id,
   });
 
   if (transactions?.length > 0) {
@@ -144,7 +147,7 @@ const getReminder = asynchandler(async (req, res) => {
 
 const getReminders = asynchandler(async (req, res) => {
   const reminders = await Reminder.find({
-    owner: req.user?._id,
+    ownerId: req.user?._id,
   });
 
   if (reminders?.length === 0) {

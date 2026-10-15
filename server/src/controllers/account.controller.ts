@@ -12,14 +12,14 @@ import { asynchandler } from "../utils/asynchandler";
 const addAccount = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
 
-  const { bank, accountName, accountNumber, accountType, openingBalance } =
+  const { bankId, name, accountNumber, accountType, openingBalance } =
     req.body;
 
-  if (!bank) {
+  if (!bankId) {
     throw new ApiError(400, "Bank is required!");
   }
 
-  if (!accountName) {
+  if (!name) {
     throw new ApiError(400, "Account name is required!");
   }
 
@@ -27,26 +27,26 @@ const addAccount = asynchandler(async (req, res) => {
     throw new ApiError(400, "Opening Balance is required!");
   }
 
-  const accountNameExists = await Account.findOne({
-    owner: loggedUserId,
-    bank,
-    accountName,
+  const accountWithSameName = await Account.findOne({
+    ownerId: loggedUserId,
+    bankId,
+    name,
   });
 
-  if (accountNameExists) {
+  if (accountWithSameName) {
     throw new ApiError(400, "Account name already for this bank!");
   }
 
   const fields: {
-    bank: Types.ObjectId;
-    accountName: string;
+    bankId: Types.ObjectId;
+    name: string;
     openingBalance: number;
     currentBalance: number;
     accountNumber?: string;
     accountType?: string;
   } = {
-    bank,
-    accountName,
+    bankId,
+    name,
     openingBalance,
     currentBalance: openingBalance,
   };
@@ -55,7 +55,7 @@ const addAccount = asynchandler(async (req, res) => {
   if (accountType) fields.accountType = accountType;
 
   const createAccount = await Account.create({
-    owner: loggedUserId,
+    ownerId: loggedUserId,
     ...fields,
   });
 
@@ -69,17 +69,17 @@ const updateAccount = asynchandler(async (req, res) => {
     throw new ApiError(404, "Account not found!");
   }
 
-  const { bank, accountName, accountNumber, accountType } = req.body;
+  const { bankId, name, accountNumber, accountType } = req.body;
 
-  if (accountName) {
-    const accountNameExists = await Account.findOne({
+  if (name) {
+    const accountWithSameName = await Account.findOne({
       _id: { $ne: account?._id },
-      owner: account?.owner,
-      bank,
-      accountName,
+      ownerId: account?.ownerId,
+      bankId,
+      name,
     });
 
-    if (accountNameExists) {
+    if (accountWithSameName) {
       throw new ApiError(400, "Account name already exists for this bank!");
     }
   }
@@ -87,12 +87,12 @@ const updateAccount = asynchandler(async (req, res) => {
   const fields: Partial<
     Pick<
       typeof account,
-      "bank" | "accountName" | "accountNumber" | "accountType"
+      "bankId" | "name" | "accountNumber" | "accountType"
     >
   > = {};
 
-  if (bank) fields.bank = bank;
-  if (accountName) fields.accountName = accountName;
+  if (bankId) fields.bankId = bankId;
+  if (name) fields.name = name;
 
   if (accountNumber !== undefined) fields.accountNumber = accountNumber;
   if (accountType !== undefined) fields.accountType = accountType;
@@ -118,7 +118,7 @@ const deleteAccount = asynchandler(async (req, res) => {
   try {
     await session.withTransaction(async () => {
       const transactions = await Transaction.find({
-        account: account._id,
+        accountId: account._id,
       }).session(session);
 
       for (const transaction of transactions) {
@@ -144,12 +144,12 @@ const getAccount = asynchandler(async (req, res) => {
 const getAccounts = asynchandler(async (req, res) => {
   const accounts = await Account.aggregate([
     {
-      $match: { owner: new Types.ObjectId(req.user?._id) },
+      $match: { ownerId: new Types.ObjectId(req.user?._id) },
     },
     {
       $lookup: {
         from: "banks",
-        localField: "bank",
+        localField: "bankId",
         foreignField: "_id",
         as: "bank",
       },

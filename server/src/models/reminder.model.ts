@@ -3,38 +3,39 @@ import { Schema, model, Types, HydratedDocument } from "mongoose";
 import { REMINDERS } from "../contants";
 
 interface ReminderFields {
-  owner: Types.ObjectId;
+  ownerId: Types.ObjectId;
   title: string;
   description?: string | null;
-  openingDue: number;
-  currentDue: number;
+  originalDue: number;
+  remainingDue: number;
   dueDate: Date;
   isPaid?: boolean | null;
-  repeat?: string | null;
+  frequency?: string | null;
 }
 
 const reminderSchema = new Schema<ReminderFields>(
   {
-    owner: {
+    ownerId: {
       type: Types.ObjectId,
       ref: "User",
+      required: true,
     },
     title: {
       type: String,
       required: true,
     },
     description: String,
-    openingDue: {
+    originalDue: {
       type: Number,
       required: true,
     },
-    currentDue: Number,
+    remainingDue: Number,
     dueDate: Date,
     isPaid: {
       type: Boolean,
       default: false,
     },
-    repeat: {
+    frequency: {
       type: String,
       enum: REMINDERS.map((r) => r.value),
     },

@@ -16,7 +16,7 @@ export const getTransactionById = asynchandler(async (req, res, next) => {
     throw new ApiError(404, "Transaction not found!");
   }
 
-  if (transactionExists.owner.toString() !== req.user?._id.toString()) {
+  if (transactionExists.ownerId.toString() !== req.user?._id.toString()) {
     throw new ApiError(403, "Unauthorized!");
   }
 

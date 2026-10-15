@@ -16,7 +16,7 @@ export const getCategoryById = asynchandler(async (req, res, next) => {
     throw new ApiError(404, "Category not found!");
   }
 
-  if (categoryExists.owner.toString() !== req.user?._id.toString()) {
+  if (categoryExists.ownerId.toString() !== req.user?._id.toString()) {
     throw new ApiError(403, "Unauthorized!");
   }
 

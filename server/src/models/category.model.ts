@@ -1,15 +1,16 @@
 import { Schema, model, Types, HydratedDocument } from "mongoose";
 
 interface CategoryFields {
-  owner: Types.ObjectId;
+  ownerId: Types.ObjectId;
   name: string;
 }
 
 const categorySchema = new Schema<CategoryFields>(
   {
-    owner: {
+    ownerId: {
       type: Types.ObjectId,
       ref: "User",
+      required: true,
     },
     name: {
       type: String,

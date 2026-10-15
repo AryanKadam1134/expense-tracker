@@ -21,16 +21,17 @@ export interface User {
 // Bank Interface
 export interface Bank {
   _id: string;
-  owner: string;
+  ownerId: string;
   name: string;
 }
 
 // Account Interface
 export interface Account {
   _id: string;
-  owner: string;
-  bank: Bank;
-  accountName: string;
+  ownerId: string;
+  bankId: string;
+  bank?: Bank;
+  name: string;
   accountNumber?: string | null;
   accountType?: string | null;
   openingBalance: number;
@@ -40,37 +41,39 @@ export interface Account {
 // Transaction Interface
 export interface Transaction {
   _id: string;
-  owner: string;
-  account: Account;
+  ownerId: string;
+  accountId: string;
+  account?: Account;
   title: string;
   description?: string | null;
   type: string;
   date: string;
+  categoryId?: string | null;
   category?: Category | null;
   amount: number;
   transferId?: string | null;
-  reminder?: string | null;
+  reminderId?: string | null;
   note?: string | null;
 }
 
 // Category Interface
 export interface Category {
   _id: string;
-  owner: string;
+  ownerId: string;
   name: string;
 }
 
 // Reminder Interface
 export interface Reminder {
   _id: string;
-  owner: string;
+  ownerId: string;
   title: string;
   description?: string | null;
-  openingDue: number;
-  currentDue: number;
+  originalDue: number;
+  remainingDue: number;
   dueDate: string;
   isPaid?: boolean | null;
-  repeat?: string | null;
+  frequency?: string | null;
 }
 
 // Filter Interface
@@ -104,22 +107,22 @@ export type BankPayload = {
 };
 
 export type AccountPayload = {
-  bank: string;
-  accountName: string;
+  bankId: string;
+  name: string;
   accountNumber?: string | null;
   accountType?: string | null;
   openingBalance: number;
 };
 
 export type TransactionPayload = {
-  account: string;
+  accountId: string;
   title: string;
   description?: string | null;
   type: string;
   date: string;
-  category?: string | null;
+  categoryId?: string | null;
   amount: number;
-  reminder: string | null;
+  reminderId: string | null;
   note?: string | null;
 };
 
@@ -130,7 +133,7 @@ export type CategoryPayload = {
 export type ReminderPayload = {
   title: string;
   description?: string | null;
-  openingDue: number;
+  originalDue: number;
   dueDate: string;
-  repeat?: string | null;
+  frequency?: string | null;
 };

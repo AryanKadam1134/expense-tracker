@@ -30,12 +30,12 @@ const addCategory = async (
 
     let categoryExists = await Category.findOne({
       ...categoryFilter,
-      owner: loggedUserId,
+      ownerId: loggedUserId,
     }).session(session);
 
     if (!categoryExists && !("_id" in categoryFilter)) {
       [categoryExists] = await Category.create(
-        [{ owner: loggedUserId, name: categoryValue }],
+        [{ ownerId: loggedUserId, name: categoryValue }],
         { session },
       );
     }
@@ -70,7 +70,7 @@ const revertAccountChangesAndDeleteTransaction = async (
     const { type, amount } = transaction;
 
     if (restoreAccountBalance) {
-      const account = await Account.findById(transaction.account).session(
+      const account = await Account.findById(transaction.accountId).session(
         session,
       );
 
@@ -94,8 +94,8 @@ const revertAccountChangesAndDeleteTransaction = async (
       await account.save({ session });
     }
 
-    if (restoreReminderDue && type === "debit" && transaction.reminder) {
-      const reminder = await Reminder.findById(transaction.reminder).session(
+    if (restoreReminderDue && type === "debit" && transaction.reminderId) {
+      const reminder = await Reminder.findById(transaction.reminderId).session(
         session,
       );
 
@@ -104,8 +104,8 @@ const revertAccountChangesAndDeleteTransaction = async (
       }
 
       if (
-        reminder.openingDue < amount ||
-        reminder.openingDue < reminder.currentDue + amount
+        reminder.originalDue < amount ||
+        reminder.originalDue < reminder.remainingDue + amount
       ) {
         throw new ApiError(400, "Restored due exceeds the opening due amount!");
       }
@@ -113,7 +113,7 @@ const revertAccountChangesAndDeleteTransaction = async (
       await Reminder.updateOne(
         { _id: reminder._id },
         {
-          $inc: { currentDue: amount },
+          $inc: { remainingDue: amount },
           $set: { isPaid: false },
         },
         { session },
@@ -142,19 +142,19 @@ const addTransaction = asynchandler(async (req, res) => {
   }
 
   const {
-    account,
+    accountId,
     title,
     description,
     type,
     date,
-    category,
+    categoryId,
     amount,
-    reminder,
+    reminderId,
     note,
   } = req.body;
 
   // --- check if account exists --- //
-  if (!account) {
+  if (!accountId) {
     throw new ApiError(400, "Account is required!");
   }
 
@@ -187,17 +187,17 @@ const addTransaction = asynchandler(async (req, res) => {
   // --- assign fields --- //
   const fields: {
     title: string;
-    account: Types.ObjectId;
+    accountId: Types.ObjectId;
     type: string;
     date: Date;
     amount: number;
     description?: string;
-    category?: Types.ObjectId | null;
-    reminder?: Types.ObjectId | null;
+    categoryId?: Types.ObjectId | null;
+    reminderId?: Types.ObjectId | null;
     note?: string;
   } = {
     title,
-    account,
+    accountId,
     type,
     date,
     amount,
@@ -214,41 +214,41 @@ const addTransaction = asynchandler(async (req, res) => {
   try {
     await session.withTransaction(async () => {
       const accountExists = await Account.findOne({
-        owner: loggedUserId,
-        _id: account,
+        ownerId: loggedUserId,
+        _id: accountId,
       }).session(session);
 
       if (!accountExists) {
         throw new ApiError(404, "Account not found!");
       }
 
-      if (type === "debit" && reminder) {
+      if (type === "debit" && reminderId) {
         const reminderExists = await Reminder.findOne({
-          owner: loggedUserId,
-          _id: reminder,
+          ownerId: loggedUserId,
+          _id: reminderId,
         }).session(session);
 
         if (!reminderExists) {
           throw new ApiError(404, "Reminder not found!");
         }
 
-        if (reminderExists.currentDue < amount) {
+        if (reminderExists.remainingDue < amount) {
           throw new ApiError(400, "Amount is greater than the due amount!");
         }
 
         await Reminder.updateOne(
           { _id: reminderExists._id },
           {
-            $inc: { currentDue: -amount },
+            $inc: { remainingDue: -amount },
             $set: {
-              isPaid: reminderExists.currentDue === amount ? true : false,
+              isPaid: reminderExists.remainingDue === amount ? true : false,
             },
           },
           { session },
         );
 
-        fields.reminder = reminderExists._id;
-      } else if (type === "credit" && reminder) {
+        fields.reminderId = reminderExists._id;
+      } else if (type === "credit" && reminderId) {
         throw new ApiError(409, "Due cannot be paid on a credit!");
       }
 
@@ -259,13 +259,17 @@ const addTransaction = asynchandler(async (req, res) => {
         );
       }
 
-      if (category) {
-        const categoryId = await addCategory(category, loggedUserId, session);
-        fields.category = categoryId;
+      if (categoryId) {
+        const resolvedCategoryId = await addCategory(
+          categoryId,
+          loggedUserId,
+          session,
+        );
+        fields.categoryId = resolvedCategoryId;
       }
 
       const [created] = await Transaction.create(
-        [{ owner: loggedUserId, ...fields }],
+        [{ ownerId: loggedUserId, ...fields }],
         { session },
       );
 
@@ -308,12 +312,12 @@ const updateTransaction = asynchandler(async (req, res) => {
     throw new ApiError(404, "Transaction not found!");
   }
 
-  const { title, description, date, category, note } = req.body;
+  const { title, description, date, categoryId, note } = req.body;
 
   const fields: Partial<
     Pick<
       typeof transaction,
-      "title" | "date" | "category" | "description" | "note"
+      "title" | "date" | "categoryId" | "description" | "note"
     >
   > = {};
 
@@ -328,11 +332,15 @@ const updateTransaction = asynchandler(async (req, res) => {
 
   try {
     await session.withTransaction(async () => {
-      if (category && category !== "") {
-        const categoryId = await addCategory(category, loggedUserId, session);
-        fields.category = categoryId;
-      } else if (category === "") {
-        fields.category = null;
+      if (categoryId && categoryId !== "") {
+        const resolvedCategoryId = await addCategory(
+          categoryId,
+          loggedUserId,
+          session,
+        );
+        fields.categoryId = resolvedCategoryId;
+      } else if (categoryId === "") {
+        fields.categoryId = null;
       }
 
       Object.assign(transaction, fields);
@@ -379,12 +387,12 @@ const getTransaction = asynchandler(async (req, res) => {
 const getTransactions = asynchandler(async (req, res) => {
   const transactions = await Transaction.aggregate([
     {
-      $match: { owner: new Types.ObjectId(req.user?._id) },
+      $match: { ownerId: new Types.ObjectId(req.user?._id) },
     },
     {
       $lookup: {
         from: "accounts",
-        localField: "account",
+        localField: "accountId",
         foreignField: "_id",
         as: "account",
       },
@@ -399,7 +407,7 @@ const getTransactions = asynchandler(async (req, res) => {
     {
       $lookup: {
         from: "categories",
-        localField: "category",
+        localField: "categoryId",
         foreignField: "_id",
         as: "category",
       },
