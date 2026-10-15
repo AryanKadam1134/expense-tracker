@@ -103,7 +103,7 @@ const SideBar = ({ isOpen, onClose }: SideBarProps) => {
             <AppLogo className="ml-3 size-9" />
 
             <p className="text-nowrap text-md font-medium text-light-text-primary">
-              Profilo
+              Expense Tracker
             </p>
           </div>
         </div>

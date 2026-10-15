@@ -11,12 +11,12 @@ import CustomSelect from "../../../components/ui/CustomSelect";
 import { accountEndpoints } from "../../../services/account.service";
 
 import useApi from "../../../hooks/useApi";
+import useBankOptions from "../../../hooks/useBankOptions";
 import useAccountTypes from "../../../hooks/useAccountTypes";
 
 import { useNotify } from "../../../context/notification";
 
 import type { AccountPayload } from "../../../types/api.types";
-import useBankOptions from "../../../hooks/useBankOptions";
 
 const AccountFormPage = () => {
   const { notify } = useNotify();

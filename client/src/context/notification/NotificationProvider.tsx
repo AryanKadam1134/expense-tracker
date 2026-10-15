@@ -21,11 +21,7 @@ const positions: ToastPosition[] = [
   "bottomRight",
 ];
 
-export function NotificationProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function NotificationProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const nextId = useRef(0);
   const timers = useRef(new Map<number, ReturnType<typeof setTimeout>>());
@@ -98,7 +94,10 @@ export function NotificationProvider({
         return;
       }
       startedAt.current.set(id, Date.now());
-      timers.current.set(id, setTimeout(() => closeToast(id), timeLeft));
+      timers.current.set(
+        id,
+        setTimeout(() => closeToast(id), timeLeft),
+      );
     },
     [closeToast],
   );
@@ -128,7 +127,10 @@ export function NotificationProvider({
       if (duration > 0) {
         remaining.current.set(id, duration);
         startedAt.current.set(id, Date.now());
-        timers.current.set(id, setTimeout(() => closeToast(id), duration));
+        timers.current.set(
+          id,
+          setTimeout(() => closeToast(id), duration),
+        );
       }
       return id;
     },

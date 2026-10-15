@@ -4,6 +4,7 @@ import {
   type Dispatch,
   type SetStateAction,
 } from "react";
+
 import type { GoogleAuth, Login, User } from "../../types/api.types";
 
 export interface AuthContextType {

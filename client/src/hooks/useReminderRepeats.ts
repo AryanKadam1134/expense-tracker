@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 import { filterEndpoints } from "../services/filter.service";
+
 import useApi from "./useApi";
 
 import type { Filter } from "../types/api.types";

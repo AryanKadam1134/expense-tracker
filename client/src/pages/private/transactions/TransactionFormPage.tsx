@@ -75,8 +75,7 @@ const TransactionFormPage = () => {
   const onSubmit: SubmitHandler<TransactionPayload> = (payload) => {
     const requestPayload = {
       ...payload,
-      reminderId:
-        payload.type === "debit" ? payload.reminderId || null : null,
+      reminderId: payload.type === "debit" ? payload.reminderId || null : null,
     };
 
     callApi(

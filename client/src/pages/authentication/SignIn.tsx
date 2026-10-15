@@ -38,7 +38,7 @@ const SignIn = () => {
 
   return (
     <Authentication
-      heading="Welcome to Profilo"
+      heading="Welcome to Expense Tracker"
       onSubmit={handleSubmit(onSubmit)}
       formContent={
         <>
