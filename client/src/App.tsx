@@ -28,6 +28,8 @@ import ReminderFormPage from "./pages/private/reminders/ReminderFormPage";
 import { useAuth } from "./context/auth";
 import BanksPage from "./pages/private/banks/BanksPage";
 import BankFormPage from "./pages/private/banks/BankFormPage";
+import B2BTransfersPage from "./pages/private/transfers/B2BTransfersPage";
+import B2BTransferFormPage from "./pages/private/transfers/B2BTransferFormPage";
 
 const PublicRoute = () => {
   const { user, authLoading } = useAuth();
@@ -88,6 +90,12 @@ const App = () => {
                 path=":transactionId/edit"
                 element={<TransactionFormPage />}
               />
+            </Route>
+
+            <Route path="/transfers">
+              <Route index element={<B2BTransfersPage />} />
+              <Route path="add" element={<B2BTransferFormPage />} />
+              <Route path=":transferId/edit" element={<B2BTransferFormPage />} />
             </Route>
 
             <Route path="/categories">

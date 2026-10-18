@@ -14,6 +14,7 @@ declare global {
       bank?: BankDocument;
       account?: AccountDocument;
       transaction?: TransactionDocument;
+      transferTransactions?: TransactionDocument[];
       category?: CategoryDocument;
       reminder?: ReminderDocument;
     }

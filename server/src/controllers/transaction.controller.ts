@@ -1,4 +1,5 @@
 import mongoose, { ClientSession, Types } from "mongoose";
+import { randomUUID } from "node:crypto";
 
 import { Account } from "../models/account.model";
 import { Category } from "../models/category.model";
@@ -209,7 +210,7 @@ const addTransaction = asynchandler(async (req, res) => {
 
   // Create the optional category, transaction, and balance change atomically.
   const session = await mongoose.startSession();
-  let createTransaction: InstanceType<typeof Transaction> | undefined;
+  let createTransaction: TransactionDocument | undefined;
 
   try {
     await session.withTransaction(async () => {
@@ -312,6 +313,13 @@ const updateTransaction = asynchandler(async (req, res) => {
     throw new ApiError(404, "Transaction not found!");
   }
 
+  if (transaction.transferId) {
+    throw new ApiError(
+      409,
+      "Use the transfer update endpoint to update both transaction records!",
+    );
+  }
+
   const { title, description, date, categoryId, note } = req.body;
 
   const fields: Partial<
@@ -328,7 +336,7 @@ const updateTransaction = asynchandler(async (req, res) => {
   if (note !== undefined) fields.note = note;
 
   const session = await mongoose.startSession();
-  let updatedTransaction: InstanceType<typeof Transaction> | undefined;
+  let updatedTransaction: TransactionDocument | undefined;
 
   try {
     await session.withTransaction(async () => {
@@ -339,7 +347,7 @@ const updateTransaction = asynchandler(async (req, res) => {
           session,
         );
         fields.categoryId = resolvedCategoryId;
-      } else if (categoryId === "") {
+      } else if (categoryId === "" || categoryId === null) {
         fields.categoryId = null;
       }
 
@@ -361,6 +369,13 @@ const deleteTransaction = asynchandler(async (req, res) => {
 
   if (!transaction) {
     throw new ApiError(404, "Transaction not found!");
+  }
+
+  if (transaction.transferId) {
+    throw new ApiError(
+      409,
+      "Use the transfer delete endpoint to delete both transaction records!",
+    );
   }
 
   const session = await mongoose.startSession();
@@ -387,7 +402,10 @@ const getTransaction = asynchandler(async (req, res) => {
 const getTransactions = asynchandler(async (req, res) => {
   const transactions = await Transaction.aggregate([
     {
-      $match: { ownerId: new Types.ObjectId(req.user?._id) },
+      $match: {
+        ownerId: new Types.ObjectId(req.user?._id),
+        transferId: { $exists: false },
+      },
     },
     {
       $lookup: {
@@ -432,11 +450,404 @@ const getTransactions = asynchandler(async (req, res) => {
     .json(new ApiRes(200, transactions, "Transactions fetched!"));
 });
 
+const addB2BTransaction = asynchandler(async (req, res) => {
+  const loggedUserId = req.user?._id;
+
+  if (!loggedUserId) {
+    throw new ApiError(401, "Authentication required!");
+  }
+
+  const {
+    debitAccountId,
+    creditAccountId,
+    title,
+    description,
+    date,
+    categoryId,
+    amount,
+    note,
+  } = req.body;
+
+  // --- check if account exists --- //
+  if (!debitAccountId) {
+    throw new ApiError(400, "Debit Account is required!");
+  }
+
+  if (!creditAccountId) {
+    throw new ApiError(400, "Credit Account is required!");
+  }
+
+  if (String(debitAccountId) === String(creditAccountId)) {
+    throw new ApiError(400, "Debit and credit accounts must be different!");
+  }
+
+  // --- check required fields --- //
+  if (!title) {
+    throw new ApiError(400, "Title is required!");
+  }
+
+  if (!date) {
+    throw new ApiError(400, "Date is required!");
+  }
+
+  if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
+    throw new ApiError(400, "Enter a valid amount!");
+  }
+  // --- check required fields --- //
+
+  const transferId = randomUUID();
+  const sharedFields: {
+    title: string;
+    date: Date;
+    amount: number;
+    transferId: string;
+    description?: string;
+    categoryId?: Types.ObjectId | null;
+    note?: string;
+  } = {
+    title,
+    date: new Date(date),
+    amount,
+    transferId,
+  };
+
+  if (Number.isNaN(sharedFields.date.getTime())) {
+    throw new ApiError(400, "Enter a valid date!");
+  }
+
+  if (description) sharedFields.description = description;
+  if (note) sharedFields.note = note;
+
+  const session = await mongoose.startSession();
+  let debitTransaction: TransactionDocument | undefined;
+  let creditTransaction: TransactionDocument | undefined;
+
+  try {
+    await session.withTransaction(async () => {
+      const debitAccount = await Account.findOne({
+        _id: debitAccountId,
+        ownerId: loggedUserId,
+      }).session(session);
+      const creditAccount = await Account.findOne({
+        _id: creditAccountId,
+        ownerId: loggedUserId,
+      }).session(session);
+
+      if (!debitAccount) {
+        throw new ApiError(404, "Couldn't find Debit Account!");
+      }
+
+      if (!creditAccount) {
+        throw new ApiError(404, "Couldn't find Credit Account!");
+      }
+
+      if (debitAccount.currentBalance < amount) {
+        throw new ApiError(
+          400,
+          "Not sufficient balance available for debitting!",
+        );
+      }
+
+      const transactionFields = { ...sharedFields };
+      if (categoryId) {
+        const resolvedCategoryId = await addCategory(
+          categoryId,
+          loggedUserId,
+          session,
+        );
+        transactionFields.categoryId = resolvedCategoryId;
+      }
+
+      [debitTransaction, creditTransaction] = await Transaction.create(
+        [
+          {
+            ...transactionFields,
+            ownerId: loggedUserId,
+            accountId: debitAccount._id,
+            type: "debit",
+          },
+          {
+            ...transactionFields,
+            ownerId: loggedUserId,
+            accountId: creditAccount._id,
+            type: "credit",
+          },
+        ],
+        { session, ordered: true },
+      );
+
+      const debitUpdate = await Account.updateOne(
+        { _id: debitAccount._id },
+        { $inc: { currentBalance: -amount } },
+        { session },
+      );
+      const creditUpdate = await Account.updateOne(
+        { _id: creditAccount._id },
+        { $inc: { currentBalance: amount } },
+        { session },
+      );
+
+      if (
+        !debitTransaction ||
+        !creditTransaction ||
+        debitUpdate.matchedCount !== 1 ||
+        creditUpdate.matchedCount !== 1
+      ) {
+        throw new ApiError(500, "Couldn't initiate the Transaction!");
+      }
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  if (!debitTransaction || !creditTransaction) {
+    throw new ApiError(500, "Couldn't initiate the Transaction!");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiRes(
+        200,
+        { transferId, debitTransaction, creditTransaction },
+        "Transaction completed!",
+      ),
+    );
+});
+
+const updateB2BTransaction = asynchandler(async (req, res) => {
+  const loggedUserId = req.user?._id;
+
+  if (!loggedUserId) {
+    throw new ApiError(401, "Authentication required!");
+  }
+
+  const transferId = req.params.transferId;
+  const transactions = req.transferTransactions;
+
+  if (!transferId || !transactions || transactions.length !== 2) {
+    throw new ApiError(404, "Transfer not found!");
+  }
+
+  const { title, description, date, categoryId, note } = req.body;
+  const fields: Partial<
+    Pick<
+      TransactionDocument,
+      "title" | "description" | "date" | "categoryId" | "note"
+    >
+  > = {};
+
+  if (title) fields.title = title;
+
+  if (date !== undefined) {
+    const parsedDate = new Date(date);
+    if (Number.isNaN(parsedDate.getTime())) {
+      throw new ApiError(400, "Enter a valid date!");
+    }
+    fields.date = parsedDate;
+  }
+
+  if (description !== undefined) fields.description = description;
+  if (note !== undefined) fields.note = note;
+
+  const session = await mongoose.startSession();
+  let updatedTransactions: TransactionDocument[] = [];
+
+  try {
+    await session.withTransaction(async () => {
+      const transactionFields = { ...fields };
+
+      if (categoryId && categoryId !== "") {
+        const resolvedCategoryId = await addCategory(
+          categoryId,
+          loggedUserId,
+          session,
+        );
+        transactionFields.categoryId = resolvedCategoryId;
+      } else if (categoryId === "" || categoryId === null) {
+        transactionFields.categoryId = null;
+      }
+
+      updatedTransactions = [];
+      for (const transaction of transactions) {
+        Object.assign(transaction, transactionFields);
+        updatedTransactions.push(await transaction.save({ session }));
+      }
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiRes(
+        200,
+        { transferId, transactions: updatedTransactions },
+        "Transfer updated!",
+      ),
+    );
+});
+
+const deleteB2BTransaction = asynchandler(async (req, res) => {
+  const loggedUserId = req.user?._id;
+
+  if (!loggedUserId) {
+    throw new ApiError(401, "Authentication required!");
+  }
+
+  const transferId = req.params.transferId;
+  const transactions = req.transferTransactions;
+
+  if (!transferId || !transactions || transactions.length !== 2) {
+    throw new ApiError(404, "Transfer not found!");
+  }
+
+  const debitTransaction = transactions.find(
+    (transaction) => transaction.type === "debit",
+  );
+  const creditTransaction = transactions.find(
+    (transaction) => transaction.type === "credit",
+  );
+
+  if (!debitTransaction || !creditTransaction) {
+    throw new ApiError(409, "Transfer must have one debit and one credit!");
+  }
+
+  if (debitTransaction.amount !== creditTransaction.amount) {
+    throw new ApiError(409, "Transfer amounts do not match!");
+  }
+
+  const session = await mongoose.startSession();
+
+  try {
+    await session.withTransaction(async () => {
+      // Reverse the debit first, then remove the transfer's credit.
+      await revertAccountChangesAndDeleteTransaction(debitTransaction, session);
+      await revertAccountChangesAndDeleteTransaction(
+        creditTransaction,
+        session,
+      );
+    });
+  } finally {
+    await session.endSession();
+  }
+
+  return res
+    .status(200)
+    .json(new ApiRes(200, { transferId }, "Transfer deleted!"));
+});
+
+const getB2BTransaction = asynchandler(async (req, res) => {
+  const transactions = req.transferTransactions;
+  const transferId = req.params.transferId;
+
+  if (!transferId || !transactions || transactions.length !== 2) {
+    throw new ApiError(404, "Transfer not found!");
+  }
+
+  const debitTransaction = transactions.find(
+    (transaction) => transaction.type === "debit",
+  );
+  const creditTransaction = transactions.find(
+    (transaction) => transaction.type === "credit",
+  );
+
+  if (!debitTransaction || !creditTransaction) {
+    throw new ApiError(409, "Transfer must have one debit and one credit!");
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiRes(
+        200,
+        { transferId, debitTransaction, creditTransaction },
+        "Transfer fetched!",
+      ),
+    );
+});
+
+const getB2BTransactions = asynchandler(async (req, res) => {
+  const ownerId = req.user?._id;
+
+  if (!ownerId) {
+    throw new ApiError(401, "Authentication required!");
+  }
+
+  const transferGroups = await Transaction.aggregate([
+    {
+      $match: {
+        ownerId: new Types.ObjectId(ownerId),
+        transferId: { $type: "string" },
+      },
+    },
+    {
+      $lookup: {
+        from: "accounts",
+        localField: "accountId",
+        foreignField: "_id",
+        as: "account",
+      },
+    },
+    {
+      $addFields: {
+        account: { $first: "$account" },
+      },
+    },
+    {
+      $lookup: {
+        from: "categories",
+        localField: "categoryId",
+        foreignField: "_id",
+        as: "category",
+      },
+    },
+    {
+      $addFields: {
+        category: { $first: "$category" },
+      },
+    },
+    {
+      $group: {
+        _id: "$transferId",
+        transactions: { $push: "$$ROOT" },
+      },
+    },
+  ]);
+
+  const transfers = transferGroups.flatMap((group) => {
+    const debitTransaction = group.transactions.find(
+      (transaction: TransactionDocument) => transaction.type === "debit",
+    );
+    const creditTransaction = group.transactions.find(
+      (transaction: TransactionDocument) => transaction.type === "credit",
+    );
+
+    if (!debitTransaction || !creditTransaction) return [];
+
+    return [
+      {
+        transferId: group._id as string,
+        debitTransaction,
+        creditTransaction,
+      },
+    ];
+  });
+
+  return res.status(200).json(new ApiRes(200, transfers, "Transfers fetched!"));
+});
+
 export {
   addTransaction,
   updateTransaction,
+  updateB2BTransaction,
   deleteTransaction,
+  deleteB2BTransaction,
   getTransaction,
   getTransactions,
+  getB2BTransaction,
+  getB2BTransactions,
+  addB2BTransaction,
   revertAccountChangesAndDeleteTransaction,
 };

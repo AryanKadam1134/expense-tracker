@@ -10,6 +10,7 @@ import {
   Tags,
   BellRing,
   Landmark,
+  Repeat2,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 
@@ -38,6 +39,7 @@ const menus: MenuItem[] = [
   { name: "Banks", path: "/banks", icon: Landmark },
   { name: "Accounts", path: "/accounts", icon: SquareUserRound },
   { name: "Transactions", path: "/transactions", icon: ArrowLeftRight },
+  { name: "Transfers", path: "/transfers", icon: Repeat2 },
   { name: "Categories", path: "/categories", icon: Tags },
   { name: "Reminders", path: "/reminders", icon: BellRing },
 ];

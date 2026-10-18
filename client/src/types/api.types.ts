@@ -56,6 +56,28 @@ export interface Transaction {
   note?: string | null;
 }
 
+export interface B2BTransfer {
+  transferId: string;
+  debitTransaction: Transaction;
+  creditTransaction: Transaction;
+}
+
+export type B2BTransactionPayload = {
+  debitAccountId: string;
+  creditAccountId: string;
+  title: string;
+  description?: string | null;
+  date: string;
+  categoryId?: string | null;
+  amount: number;
+  note?: string | null;
+};
+
+export type B2BTransactionUpdatePayload = Pick<
+  B2BTransactionPayload,
+  "title" | "description" | "date" | "categoryId" | "note"
+>;
+
 // Category Interface
 export interface Category {
   _id: string;
