@@ -85,6 +85,7 @@ const CategoryFormPage = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="grid max-w-xl grid-cols-1 gap-6"
     >
+      {/* Category name */}
       <FormField
         id="name"
         label="Category name"
@@ -111,6 +112,7 @@ const CategoryFormPage = () => {
           onClick={() => navigate(-1)}
           disabled={loading.saving}
         />
+
         <CustomButton
           type="submit"
           name={loading.saving ? "Saving..." : "Save"}

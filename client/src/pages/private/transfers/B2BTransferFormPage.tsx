@@ -2,35 +2,44 @@ import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
-import CustomButton from "../../../components/ui/CustomButton";
-import CustomDatePicker from "../../../components/ui/CustomDatePicker";
+import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomSelect from "../../../components/ui/CustomSelect";
+import CustomButton from "../../../components/ui/CustomButton";
 import CustomTextArea from "../../../components/ui/CustomTextArea";
-import FormField from "../../../components/ui/FormField";
-import { useNotify } from "../../../context/notification";
-import useAccountOptions from "../../../hooks/useAccountOptions";
-import useApi from "../../../hooks/useApi";
-import useCategoryOptions from "../../../hooks/useCategoryOptions";
+import CustomDatePicker from "../../../components/ui/CustomDatePicker";
+
+import { formatDateInISO } from "../../../utils/formatDate";
+
 import { transactionEndpoints } from "../../../services/transaction.service";
+
+import useApi from "../../../hooks/useApi";
+import useAccountOptions from "../../../hooks/useAccountOptions";
+import useCategoryOptions from "../../../hooks/useCategoryOptions";
+
+import { useNotify } from "../../../context/notification";
+
 import type {
   B2BTransactionPayload,
   B2BTransactionUpdatePayload,
 } from "../../../types/api.types";
-import { formatDateInISO } from "../../../utils/formatDate";
 
 const B2BTransferFormPage = () => {
+  const { notify } = useNotify();
+
   const { transferId } = useParams();
   const isEditing = Boolean(transferId);
   const navigate = useNavigate();
-  const { notify } = useNotify();
+
   const { loading, callApi } = useApi({
     loadingTransfer: isEditing,
     saving: false,
   });
   const { loadingAccountOptions, accountOptions } = useAccountOptions();
   const { loadingCategoryOptions, categoryOptions } = useCategoryOptions();
+
   const [customCategory, setCustomCategory] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -51,9 +60,10 @@ const B2BTransferFormPage = () => {
   });
 
   const debitAccountId = watch("debitAccountId");
-  
+
   const fetchTransfer = useCallback(() => {
     if (!transferId) return;
+
     callApi(
       "loadingTransfer",
       () => transactionEndpoints.getB2BTransaction(transferId),
@@ -78,10 +88,6 @@ const B2BTransferFormPage = () => {
       },
     );
   }, [callApi, transferId, reset, notify, navigate]);
-
-  useEffect(() => {
-    fetchTransfer();
-  }, [fetchTransfer]);
 
   const onSubmit: SubmitHandler<B2BTransactionPayload> = (payload) => {
     if (isEditing && transferId) {
@@ -135,10 +141,15 @@ const B2BTransferFormPage = () => {
     );
   };
 
+  useEffect(() => {
+    fetchTransfer();
+  }, [fetchTransfer]);
+
   if (loading.loadingTransfer) return <p>Loading transfer...</p>;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+      {/* From account */}
       <FormField
         id="debitAccountId"
         label="From account"
@@ -161,6 +172,8 @@ const B2BTransferFormPage = () => {
           )}
         />
       </FormField>
+
+      {/* To account */}
       <FormField
         id="creditAccountId"
         label="To account"
@@ -188,6 +201,8 @@ const B2BTransferFormPage = () => {
           )}
         />
       </FormField>
+
+      {/* Title */}
       <FormField
         id="title"
         label="Title"
@@ -199,6 +214,8 @@ const B2BTransferFormPage = () => {
           {...register("title", { required: "Title is required!" })}
         />
       </FormField>
+
+      {/* Amount */}
       <FormField
         id="amount"
         label="Amount"
@@ -216,12 +233,15 @@ const B2BTransferFormPage = () => {
           disabled={isEditing}
         />
       </FormField>
+
+      {/* Date */}
       <FormField id="date" label="Date" required error={errors.date?.message}>
         <CustomDatePicker
           id="date"
           {...register("date", { required: "Date is required!" })}
         />
       </FormField>
+
       <div className="flex items-end pb-2">
         <label className="flex items-center gap-2 text-sm">
           <input
@@ -232,6 +252,8 @@ const B2BTransferFormPage = () => {
           Enter a new category
         </label>
       </div>
+
+      {/* Category */}
       <FormField
         id="categoryId"
         label={customCategory ? "New category" : "Category"}
@@ -260,6 +282,8 @@ const B2BTransferFormPage = () => {
           />
         )}
       </FormField>
+
+      {/* Description */}
       <FormField
         id="description"
         label="Description"
@@ -271,9 +295,12 @@ const B2BTransferFormPage = () => {
           {...register("description")}
         />
       </FormField>
+
+      {/* Note */}
       <FormField id="note" label="Note" error={errors.note?.message}>
         <CustomTextArea id="note" rows={3} {...register("note")} />
       </FormField>
+
       <div className="col-span-2 flex justify-end gap-2">
         <CustomButton
           type="button"
@@ -281,6 +308,7 @@ const B2BTransferFormPage = () => {
           variant="green"
           onClick={() => navigate("/transfers")}
         />
+
         <CustomButton
           type="submit"
           name={loading.saving ? "Saving..." : "Save transfer"}

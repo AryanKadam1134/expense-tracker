@@ -80,6 +80,7 @@ const BankFormPage = () => {
       onSubmit={handleSubmit(onSubmit)}
       className="grid max-w-xl grid-cols-1 gap-6"
     >
+      {/* Bank name */}
       <FormField
         id="name"
         label="Bank name"
@@ -106,6 +107,7 @@ const BankFormPage = () => {
           onClick={() => navigate(-1)}
           disabled={loading.saving}
         />
+
         <CustomButton
           type="submit"
           name={loading.saving ? "Saving..." : "Save"}

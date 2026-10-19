@@ -89,11 +89,12 @@ const ReminderFormPage = () => {
   };
 
   useEffect(() => {
-    if (reminderId) fetchReminder();
-  }, [fetchReminder, reminderId]);
+    fetchReminder();
+  }, [fetchReminder]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+      {/* Title */}
       <FormField
         id="title"
         label="Title"
@@ -108,6 +109,7 @@ const ReminderFormPage = () => {
         />
       </FormField>
 
+      {/* Opening due */}
       <FormField
         id="originalDue"
         label="Opening due"
@@ -134,6 +136,7 @@ const ReminderFormPage = () => {
         />
       </FormField>
 
+      {/* Due date */}
       <FormField
         id="dueDate"
         label="Due date"
@@ -146,6 +149,7 @@ const ReminderFormPage = () => {
         />
       </FormField>
 
+      {/* Frequency */}
       <FormField
         id="frequency"
         label="Frequency"
@@ -167,6 +171,7 @@ const ReminderFormPage = () => {
         />
       </FormField>
 
+      {/* Description */}
       <FormField
         id="description"
         label="Description"

@@ -3,15 +3,21 @@ import { useNavigate } from "react-router-dom";
 import { Plus } from "lucide-react";
 
 import B2BTransferCard from "../../../components/B2BTransferCard";
+
 import CustomButton from "../../../components/ui/CustomButton";
-import useApi from "../../../hooks/useApi";
+
 import { transactionEndpoints } from "../../../services/transaction.service";
+
+import useApi from "../../../hooks/useApi";
+
 import type { B2BTransfer } from "../../../types/api.types";
 
 const B2BTransfersPage = () => {
-  const [transfers, setTransfers] = useState<B2BTransfer[]>([]);
-  const { loading, callApi } = useApi({ loadingTransfers: false });
   const navigate = useNavigate();
+
+  const { loading, callApi } = useApi({ loadingTransfers: false });
+
+  const [transfers, setTransfers] = useState<B2BTransfer[]>([]);
 
   const fetchTransfers = useCallback(() => {
     callApi("loadingTransfers", transactionEndpoints.getB2BTransactions, {
@@ -19,19 +25,19 @@ const B2BTransfersPage = () => {
     });
   }, [callApi]);
 
-  useEffect(() => fetchTransfers(), [fetchTransfers]);
+  useEffect(() => {
+    fetchTransfers();
+  }, [fetchTransfers]);
 
   return (
-    <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold">Bank to bank transfers</h1>
-        <CustomButton
-          name="Add transfer"
-          icon={Plus}
-          className="w-fit"
-          onClick={() => navigate("add")}
-        />
-      </div>
+    <div className="flex flex-col gap-4">
+      <CustomButton
+        name="Add transfer"
+        icon={Plus}
+        className="self-end w-fit"
+        onClick={() => navigate("add")}
+      />
+
       {loading.loadingTransfers ? (
         <p>Loading transfers...</p>
       ) : transfers.length ? (
@@ -49,7 +55,7 @@ const B2BTransfersPage = () => {
       ) : (
         <p>No bank to bank transfers yet.</p>
       )}
-    </section>
+    </div>
   );
 };
 

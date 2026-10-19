@@ -32,7 +32,7 @@ const TransactionFormPage = () => {
 
   const { loading, callApi } = useApi({
     transactionLoading: true,
-    creating: false,
+    saving: false,
   });
   const { loadingAccountOptions, accountOptions } = useAccountOptions();
   const { loadingCategoryOptions, categoryOptions } = useCategoryOptions();
@@ -79,7 +79,7 @@ const TransactionFormPage = () => {
     };
 
     callApi(
-      "creating",
+      "saving",
       () =>
         transactionId
           ? transactionEndpoints.updateTransaction(
@@ -110,9 +110,8 @@ const TransactionFormPage = () => {
   };
 
   useEffect(() => {
-    if (!transactionId) return;
     fetchTransaction();
-  }, [fetchTransaction, transactionId]);
+  }, [fetchTransaction]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
@@ -306,13 +305,22 @@ const TransactionFormPage = () => {
         />
       </FormField>
 
-      {/* Submit */}
-      <CustomButton
-        type="submit"
-        name={loading.creating ? "Saving..." : "Save"}
-        className="w-fit col-span-2 justify-self-end"
-        loading={loading.creating}
-      />
+      <div className="col-span-2 flex justify-end gap-2">
+        <CustomButton
+          type="button"
+          name="Cancel"
+          variant="green"
+          onClick={() => navigate(-1)}
+          disabled={loading.saving}
+        />
+
+        <CustomButton
+          type="submit"
+          name={loading.saving ? "Saving..." : "Save"}
+          className="w-fit col-span-2 justify-self-end"
+          loading={loading.saving}
+        />
+      </div>
     </form>
   );
 };

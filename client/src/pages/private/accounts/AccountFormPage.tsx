@@ -26,7 +26,7 @@ const AccountFormPage = () => {
 
   const { loading, callApi } = useApi({
     accountLoading: true,
-    creating: false,
+    saving: false,
   });
   const { loadingAccountTypes, accountTypes } = useAccountTypes();
   const { loadingBankOptions, bankOptions } = useBankOptions();
@@ -53,7 +53,7 @@ const AccountFormPage = () => {
 
   const onSubmit: SubmitHandler<AccountPayload> = (payload) => {
     callApi(
-      "creating",
+      "saving",
       () =>
         accountId
           ? accountEndpoints.updateAccount(payload, accountId)
@@ -81,9 +81,8 @@ const AccountFormPage = () => {
   };
 
   useEffect(() => {
-    if (!accountId) return;
     fetchAccount();
-  }, [fetchAccount, accountId]);
+  }, [fetchAccount]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
@@ -181,13 +180,22 @@ const AccountFormPage = () => {
         />
       </FormField>
 
-      {/* Submit */}
-      <CustomButton
-        type="submit"
-        name={loading.creating ? "Saving..." : "Save"}
-        className="w-fit col-span-2 justify-self-end"
-        loading={loading.creating}
-      />
+      <div className="flex justify-end gap-2">
+        <CustomButton
+          type="button"
+          name="Cancel"
+          variant="green"
+          onClick={() => navigate(-1)}
+          disabled={loading.saving}
+        />
+
+        <CustomButton
+          type="submit"
+          name={loading.saving ? "Saving..." : "Save"}
+          className="w-fit col-span-2 justify-self-end"
+          loading={loading.saving}
+        />
+      </div>
     </form>
   );
 };
