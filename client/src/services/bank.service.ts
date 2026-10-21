@@ -5,7 +5,7 @@ import type { ApiResponse, Bank, BankPayload } from "../types/api.types";
 export const bankEndpoints = {
   addBank: (body: BankPayload) => api.post<ApiResponse<Bank>>("/banks", body),
 
-  updateBank: (body: BankPayload, bankId: string) =>
+  updateBank: (bankId: string, body: BankPayload) =>
     api.put<ApiResponse<Bank>>(`/banks/${bankId}`, body),
 
   deleteBank: (bankId: string) =>

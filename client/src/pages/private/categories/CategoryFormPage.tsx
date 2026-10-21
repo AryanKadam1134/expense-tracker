@@ -21,6 +21,8 @@ const CategoryFormPage = () => {
   const { categoryId } = useParams();
   const navigate = useNavigate();
 
+  const isEditing = Boolean(categoryId);
+
   const { loading, callApi } = useApi({
     categoryLoading: false,
     saving: false,
@@ -51,14 +53,14 @@ const CategoryFormPage = () => {
     callApi(
       "saving",
       () =>
-        categoryId
-          ? categoryEndpoints.updateCategory(body, categoryId)
+        isEditing && categoryId
+          ? categoryEndpoints.updateCategory(categoryId, body)
           : categoryEndpoints.addCategory(body),
       {
         onSuccess: (response) => {
           notify.success(
             response.message ||
-              (categoryId ? "Category updated!" : "Category created!"),
+              (isEditing ? "Category updated!" : "Category created!"),
           );
 
           navigate("/categories");
@@ -67,7 +69,7 @@ const CategoryFormPage = () => {
           notify.error(
             error instanceof Error
               ? error.message
-              : categoryId
+              : isEditing
                 ? "Couldn't update category!"
                 : "Couldn't create category!",
           );

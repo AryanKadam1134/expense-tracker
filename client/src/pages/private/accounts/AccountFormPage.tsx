@@ -24,6 +24,8 @@ const AccountFormPage = () => {
   const { accountId } = useParams();
   const navigate = useNavigate();
 
+  const isEditing = Boolean(accountId);
+
   const { loading, callApi } = useApi({
     accountLoading: true,
     saving: false,
@@ -55,14 +57,14 @@ const AccountFormPage = () => {
     callApi(
       "saving",
       () =>
-        accountId
-          ? accountEndpoints.updateAccount(payload, accountId)
+        isEditing && accountId
+          ? accountEndpoints.updateAccount(accountId, payload)
           : accountEndpoints.addAccount(payload),
       {
         onSuccess: (res) => {
           notify.success(
             res?.message ||
-              (accountId ? "Account updated!" : "Account created!"),
+              (isEditing ? "Account updated!" : "Account created!"),
           );
 
           navigate("/accounts");
@@ -71,7 +73,7 @@ const AccountFormPage = () => {
           const errorMessage =
             error instanceof Error
               ? error?.message
-              : accountId
+              : isEditing
                 ? "Couldn't update account!"
                 : "Couldn't create account!";
           notify.error(errorMessage);
@@ -176,7 +178,7 @@ const AccountFormPage = () => {
           {...register("openingBalance", {
             required: "Opening balance is required!",
           })}
-          disabled={Boolean(accountId)}
+          disabled={isEditing}
         />
       </FormField>
 

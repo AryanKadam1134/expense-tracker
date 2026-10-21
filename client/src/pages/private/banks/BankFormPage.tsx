@@ -21,6 +21,8 @@ const BankFormPage = () => {
   const { bankId } = useParams();
   const navigate = useNavigate();
 
+  const isEditing = Boolean(bankId);
+
   const { loading, callApi } = useApi({
     bankLoading: false,
     saving: false,
@@ -47,13 +49,13 @@ const BankFormPage = () => {
     callApi(
       "saving",
       () =>
-        bankId
-          ? bankEndpoints.updateBank(body, bankId)
+        isEditing && bankId
+          ? bankEndpoints.updateBank(bankId, body)
           : bankEndpoints.addBank(body),
       {
         onSuccess: (response) => {
           notify.success(
-            response.message || (bankId ? "Bank updated!" : "Bank created!"),
+            response.message || (isEditing ? "Bank updated!" : "Bank created!"),
           );
 
           navigate("/banks");
@@ -62,7 +64,7 @@ const BankFormPage = () => {
           notify.error(
             error instanceof Error
               ? error.message
-              : bankId
+              : isEditing
                 ? "Couldn't update bank!"
                 : "Couldn't create bank!",
           );

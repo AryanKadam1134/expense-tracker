@@ -6,7 +6,7 @@ export const accountEndpoints = {
   addAccount: (body: AccountPayload) =>
     api.post<ApiResponse<Account>>(`/accounts`, body),
 
-  updateAccount: (body: AccountPayload, accountId: string) =>
+  updateAccount: (accountId: string, body: AccountPayload) =>
     api.put<ApiResponse<Account>>(`/accounts/${accountId}`, body),
 
   deleteAccount: (accountId: string) =>

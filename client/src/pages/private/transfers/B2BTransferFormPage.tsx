@@ -19,10 +19,8 @@ import useCategoryOptions from "../../../hooks/useCategoryOptions";
 
 import { useNotify } from "../../../context/notification";
 
-import type {
-  B2BTransactionPayload,
-  B2BTransactionUpdatePayload,
-} from "../../../types/api.types";
+import type { B2BTransactionPayload } from "../../../types/api.types";
+import CustomCheckbox from "../../../components/ui/CustomCheckbox";
 
 const B2BTransferFormPage = () => {
   const { notify } = useNotify();
@@ -38,7 +36,7 @@ const B2BTransferFormPage = () => {
   const { loadingAccountOptions, accountOptions } = useAccountOptions();
   const { loadingCategoryOptions, categoryOptions } = useCategoryOptions();
 
-  const [customCategory, setCustomCategory] = useState(false);
+  const [customCategory, setCustomCategory] = useState<boolean>(false);
 
   const {
     register,
@@ -49,14 +47,6 @@ const B2BTransferFormPage = () => {
     formState: { errors },
   } = useForm<B2BTransactionPayload>({
     mode: "onChange",
-    defaultValues: {
-      title: "",
-      date: "",
-      amount: 0,
-      description: "",
-      note: "",
-      categoryId: "",
-    },
   });
 
   const debitAccountId = watch("debitAccountId");
@@ -90,52 +80,34 @@ const B2BTransferFormPage = () => {
   }, [callApi, transferId, reset, notify, navigate]);
 
   const onSubmit: SubmitHandler<B2BTransactionPayload> = (payload) => {
-    if (isEditing && transferId) {
-      const updatePayload: B2BTransactionUpdatePayload = {
-        title: payload.title,
-        description: payload.description,
-        date: payload.date,
-        categoryId: payload.categoryId || null,
-        note: payload.note,
-      };
-
-      callApi(
-        "saving",
-        () =>
-          transactionEndpoints.updateB2BTransaction(transferId, updatePayload),
-        {
-          onSuccess: (res) => {
-            notify.success(res.message || "Transfer updated!");
-            navigate("/transfers");
-          },
-          onError: (error) =>
-            notify.error(
-              error instanceof Error
-                ? error.message
-                : "Couldn't update transfer!",
-            ),
-        },
-      );
-      return;
-    }
+    const requestPayload: B2BTransactionPayload = {
+      ...payload,
+      categoryId: payload.categoryId || null,
+    };
 
     callApi(
       "saving",
       () =>
-        transactionEndpoints.addB2BTransaction({
-          ...payload,
-          categoryId: payload.categoryId || null,
-        }),
+        isEditing && transferId
+          ? transactionEndpoints.updateB2BTransaction(
+              transferId,
+              requestPayload,
+            )
+          : transactionEndpoints.addB2BTransaction(requestPayload),
       {
         onSuccess: (res) => {
-          notify.success(res.message || "Transfer created!");
+          notify.success(
+            res.message ||
+              (isEditing ? "Transfer updated!" : "Transfer created!"),
+          );
+
           navigate("/transfers");
         },
         onError: (error) =>
           notify.error(
             error instanceof Error
               ? error.message
-              : "Couldn't create transfer!",
+              : "Couldn't update transfer!",
           ),
       },
     );
@@ -242,16 +214,13 @@ const B2BTransferFormPage = () => {
         />
       </FormField>
 
-      <div className="flex items-end pb-2">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={customCategory}
-            onChange={(event) => setCustomCategory(event.target.checked)}
-          />
-          Enter a new category
-        </label>
-      </div>
+      <FormField id="checkbox" label="Enter a new category" type="checkbox">
+        <CustomCheckbox
+          id="checkbox"
+          checked={customCategory}
+          onChange={(event) => setCustomCategory(event.target.checked)}
+        />
+      </FormField>
 
       {/* Category */}
       <FormField

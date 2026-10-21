@@ -10,7 +10,7 @@ export const reminderEndpoints = {
   addReminder: (body: ReminderPayload) =>
     api.post<ApiResponse<Reminder>>("/reminders", body),
 
-  updateReminder: (body: Partial<ReminderPayload>, reminderId: string) =>
+  updateReminder: (reminderId: string, body: Partial<ReminderPayload>) =>
     api.put<ApiResponse<Reminder>>(`/reminders/${reminderId}`, body),
 
   deleteReminder: (reminderId: string) =>

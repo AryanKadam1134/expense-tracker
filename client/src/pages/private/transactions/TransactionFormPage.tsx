@@ -8,6 +8,7 @@ import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomSelect from "../../../components/ui/CustomSelect";
 import CustomTextArea from "../../../components/ui/CustomTextArea";
+import CustomCheckbox from "../../../components/ui/CustomCheckbox";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
 import { formatDateInISO } from "../../../utils/formatDate";
@@ -29,6 +30,8 @@ const TransactionFormPage = () => {
 
   const { transactionId } = useParams();
   const navigate = useNavigate();
+
+  const isEditing = Boolean(transactionId);
 
   const { loading, callApi } = useApi({
     transactionLoading: true,
@@ -81,17 +84,17 @@ const TransactionFormPage = () => {
     callApi(
       "saving",
       () =>
-        transactionId
+        isEditing && transactionId
           ? transactionEndpoints.updateTransaction(
-              requestPayload,
               transactionId,
+              requestPayload,
             )
           : transactionEndpoints.addTransaction(requestPayload),
       {
         onSuccess: (res) => {
           notify.success(
             res?.message ||
-              (transactionId ? "Transaction updated!" : "Transaction created!"),
+              (isEditing ? "Transaction updated!" : "Transaction created!"),
           );
 
           navigate("/transactions");
@@ -100,7 +103,7 @@ const TransactionFormPage = () => {
           const errorMessage =
             error instanceof Error
               ? error?.message
-              : transactionId
+              : isEditing
                 ? "Couldn't update transaction!"
                 : "Couldn't create transaction!";
           notify.error(errorMessage);
@@ -133,7 +136,7 @@ const TransactionFormPage = () => {
               options={accountOptions}
               value={field?.value}
               onChange={field?.onChange}
-              disabled={Boolean(transactionId) || loadingAccountOptions}
+              disabled={isEditing || loadingAccountOptions}
             />
           )}
         />
@@ -208,7 +211,7 @@ const TransactionFormPage = () => {
                 field.onChange(value);
                 if (value === "credit") setValue("reminderId", null);
               }}
-              disabled={Boolean(transactionId) || loadingTransactionTypes}
+              disabled={isEditing || loadingTransactionTypes}
             />
           )}
         />
@@ -226,39 +229,35 @@ const TransactionFormPage = () => {
               options={reminderOptions}
               value={field.value}
               onChange={(value) => field.onChange(value || null)}
-              disabled={
-                Boolean(transactionId) || isCredit || loadingReminderOptions
-              }
+              disabled={isEditing || isCredit || loadingReminderOptions}
             />
           )}
         />
       </FormField>
 
       {/* Custom Category Checkbox */}
-      <button type="button" onClick={() => setCustomCategory((prev) => !prev)}>
-        {customCategory ? "Custom Active" : "Custom Inactive"}
-      </button>
+      <FormField id="checkbox" label="Enter a new category" type="checkbox">
+        <CustomCheckbox
+          id="checkbox"
+          checked={customCategory}
+          onChange={(event) => setCustomCategory(event.target.checked)}
+        />
+      </FormField>
 
       {/* Transaction Category */}
-      {customCategory ? (
-        <FormField
-          id="categoryId"
-          label="Custom Category"
-          error={errors?.categoryId?.message}
-        >
+      <FormField
+        id="categoryId"
+        label={customCategory ? "New category" : "Category"}
+        error={errors?.categoryId?.message}
+      >
+        {customCategory ? (
           <CustomInput
             id="categoryId"
             type="text"
             placeholder=""
             {...register("categoryId")}
           />
-        </FormField>
-      ) : (
-        <FormField
-          id="categoryId"
-          label="Transaction Category"
-          error={errors?.categoryId?.message}
-        >
+        ) : (
           <Controller
             name="categoryId"
             control={control}
@@ -273,8 +272,8 @@ const TransactionFormPage = () => {
               />
             )}
           />
-        </FormField>
-      )}
+        )}
+      </FormField>
 
       {/* Amount */}
       <FormField
@@ -291,7 +290,7 @@ const TransactionFormPage = () => {
             required: "Amount is required!",
             valueAsNumber: true,
           })}
-          disabled={Boolean(transactionId)}
+          disabled={isEditing}
         />
       </FormField>
 

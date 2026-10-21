@@ -27,6 +27,8 @@ const ReminderFormPage = () => {
   const { reminderId } = useParams();
   const navigate = useNavigate();
 
+  const isEditing = Boolean(reminderId);
+
   const { loading, callApi } = useApi({
     loadingReminder: false,
     saving: false,
@@ -63,14 +65,14 @@ const ReminderFormPage = () => {
     callApi(
       "saving",
       () =>
-        reminderId
-          ? reminderEndpoints.updateReminder(payload, reminderId)
+        isEditing && reminderId
+          ? reminderEndpoints.updateReminder(reminderId, payload)
           : reminderEndpoints.addReminder(payload),
       {
         onSuccess: (response) => {
           notify.success(
             response.message ||
-              (reminderId ? "Reminder updated!" : "Reminder created!"),
+              (isEditing ? "Reminder updated!" : "Reminder created!"),
           );
 
           navigate("/reminders");
@@ -79,7 +81,7 @@ const ReminderFormPage = () => {
           notify.error(
             error instanceof Error
               ? error.message
-              : reminderId
+              : isEditing
                 ? "Couldn't update reminder!"
                 : "Couldn't create reminder!",
           );
@@ -113,7 +115,7 @@ const ReminderFormPage = () => {
       <FormField
         id="originalDue"
         label="Opening due"
-        required={!reminderId}
+        required={!isEditing}
         error={errors.originalDue?.message}
       >
         <CustomInput
@@ -122,7 +124,7 @@ const ReminderFormPage = () => {
           min="0.01"
           step="any"
           {...register("originalDue", {
-            ...(reminderId
+            ...(isEditing
               ? {}
               : {
                   required: "Opening due is required!",
@@ -132,7 +134,7 @@ const ReminderFormPage = () => {
                     "Opening due must be greater than 0!",
                 }),
           })}
-          disabled={Boolean(reminderId)}
+          disabled={isEditing}
         />
       </FormField>
 

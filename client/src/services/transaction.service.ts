@@ -4,7 +4,6 @@ import type {
   ApiResponse,
   B2BTransfer,
   B2BTransactionPayload,
-  B2BTransactionUpdatePayload,
   Transaction,
   TransactionPayload,
 } from "../types/api.types";
@@ -13,7 +12,7 @@ export const transactionEndpoints = {
   addTransaction: (body: TransactionPayload) =>
     api.post<ApiResponse<Transaction>>(`/transactions`, body),
 
-  updateTransaction: (body: TransactionPayload, transactionId: string) =>
+  updateTransaction: (transactionId: string, body: TransactionPayload) =>
     api.put<ApiResponse<Transaction>>(`/transactions/${transactionId}`, body),
 
   deleteTransaction: (transactionId: string) =>
@@ -33,10 +32,11 @@ export const transactionEndpoints = {
   addB2BTransaction: (body: B2BTransactionPayload) =>
     api.post<ApiResponse<B2BTransfer>>(`/transactions/transfer`, body),
 
-  updateB2BTransaction: (
-    transferId: string,
-    body: B2BTransactionUpdatePayload,
-  ) => api.put<ApiResponse<B2BTransfer>>(`/transactions/transfer/${transferId}`, body),
+  updateB2BTransaction: (transferId: string, body: B2BTransactionPayload) =>
+    api.put<ApiResponse<B2BTransfer>>(
+      `/transactions/transfer/${transferId}`,
+      body,
+    ),
 
   deleteB2BTransaction: (transferId: string) =>
     api.delete<ApiResponse<unknown>>(`/transactions/transfer/${transferId}`),
