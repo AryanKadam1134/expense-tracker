@@ -1,6 +1,12 @@
 import api from "./api.service";
 
-import type { ApiResponse, Bank, BankPayload } from "../types/api.types";
+import type {
+  ApiResponse,
+  Bank,
+  BankPayload,
+  PaginatedData,
+  PaginationParams,
+} from "../types/api.types";
 
 export const bankEndpoints = {
   addBank: (body: BankPayload) => api.post<ApiResponse<Bank>>("/banks", body),
@@ -13,5 +19,6 @@ export const bankEndpoints = {
 
   getBank: (bankId: string) => api.get<ApiResponse<Bank>>(`/banks/${bankId}`),
 
-  getBanks: () => api.get<ApiResponse<Bank[]>>("/banks"),
+  getBanks: (params: PaginationParams) =>
+    api.get<ApiResponse<PaginatedData<Bank>>>("/banks", { params }),
 };

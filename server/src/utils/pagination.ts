@@ -25,10 +25,19 @@ const paginateQuery = async <T>({
   sort = { createdAt: -1 },
   populate = "",
 }: QueryPaginationOptions<T>) => {
-  const skip = (page - 1) * limit;
+  const parsedPage = Number(page) || 1;
+  const parsedLimit = Number(limit) || 10;
+  const safePage = parsedPage < 1 ? 1 : parsedPage;
+  const safeLimit = parsedLimit < 1 ? 10 : parsedLimit;
+  const skip = (safePage - 1) * safeLimit;
 
   const [data, total] = await Promise.all([
-    model.find(filter).sort(sort).skip(skip).limit(limit).populate(populate),
+    model
+      .find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(safeLimit)
+      .populate(populate),
     model.countDocuments(filter),
   ]);
 
@@ -36,9 +45,9 @@ const paginateQuery = async <T>({
     data,
     pagination: {
       total: Number(total),
-      page: Number(page),
-      limit: Number(limit),
-      totalPages: Math.ceil(total / limit),
+      page: Number(safePage),
+      limit: Number(safeLimit),
+      totalPages: total === 0 ? 0 : Math.ceil(total / safeLimit),
     },
   };
 };

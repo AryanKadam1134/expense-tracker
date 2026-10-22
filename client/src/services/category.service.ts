@@ -4,6 +4,8 @@ import type {
   ApiResponse,
   Category,
   CategoryPayload,
+  PaginatedData,
+  PaginationParams,
 } from "../types/api.types";
 
 export const categoryEndpoints = {
@@ -19,5 +21,6 @@ export const categoryEndpoints = {
   getCategory: (categoryId: string) =>
     api.get<ApiResponse<Category>>(`/categories/${categoryId}`),
 
-  getCategories: () => api.get<ApiResponse<Category[]>>("/categories"),
+  getCategories: (params: PaginationParams) =>
+    api.get<ApiResponse<PaginatedData<Category>>>("/categories", { params }),
 };

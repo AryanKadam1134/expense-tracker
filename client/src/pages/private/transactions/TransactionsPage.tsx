@@ -5,28 +5,44 @@ import { ArrowLeftRight } from "lucide-react";
 
 import TransactionCard from "../../../components/TransactionCard";
 
+import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
 
 import { transactionEndpoints } from "../../../services/transaction.service";
 
 import useApi from "../../../hooks/useApi";
 
-import type { Transaction } from "../../../types/api.types";
+import type {
+  PaginationData,
+  PaginationParams,
+  Transaction,
+} from "../../../types/api.types";
 
 const TransactionsPage = () => {
-  const [transactions, setTransactions] = useState<Transaction[]>([]);
-
   const { loading, callApi } = useApi({ transactionsLoading: false });
 
   const navigate = useNavigate();
 
+  const [params, setParams] = useState<PaginationParams>({
+    page: 1,
+    limit: 10,
+  });
+
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+
   const fetchTransactions = useCallback(() => {
-    callApi("transactionsLoading", transactionEndpoints.getTransactions, {
-      onSuccess: (res) => {
-        setTransactions(res.data);
+    callApi(
+      "transactionsLoading",
+      () => transactionEndpoints.getTransactions(params),
+      {
+        onSuccess: (res) => {
+          setTransactions(res.data.data);
+          setPagination(res.data.pagination);
+        },
       },
-    });
-  }, [callApi]);
+    );
+  }, [callApi, params]);
 
   useEffect(() => {
     fetchTransactions();
@@ -58,6 +74,12 @@ const TransactionsPage = () => {
       ) : (
         <div>No transactions yet.</div>
       )}
+
+      <Pagination
+        currentPage={pagination?.page ?? 1}
+        totalPages={pagination?.totalPages ?? 0}
+        onPageChange={(page) => setParams((prev) => ({ ...prev, page }))}
+      />
     </div>
   );
 };

@@ -5,30 +5,42 @@ import { BellRing } from "lucide-react";
 
 import ReminderCard from "../../../components/ReminderCard";
 
+import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
 
 import { reminderEndpoints } from "../../../services/reminder.service";
 
 import useApi from "../../../hooks/useApi";
 
-import type { Reminder } from "../../../types/api.types";
+import type {
+  PaginationData,
+  PaginationParams,
+  Reminder,
+} from "../../../types/api.types";
 
 const RemindersPage = () => {
-  const navigate = useNavigate();
-
   const { loading, callApi } = useApi({
     loadingReminders: false,
   });
 
+  const navigate = useNavigate();
+
+  const [params, setParams] = useState<PaginationParams>({
+    page: 1,
+    limit: 10,
+  });
+
   const [reminders, setReminders] = useState<Reminder[]>([]);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
 
   const fetchReminders = useCallback(() => {
-    callApi("loadingReminders", reminderEndpoints.getReminders, {
+    callApi("loadingReminders", () => reminderEndpoints.getReminders(params), {
       onSuccess: (res) => {
-        setReminders(res.data);
+        setReminders(res.data.data);
+        setPagination(res.data.pagination);
       },
     });
-  }, [callApi]);
+  }, [callApi, params]);
 
   useEffect(() => {
     fetchReminders();
@@ -60,6 +72,12 @@ const RemindersPage = () => {
       ) : (
         <p>No reminders yet.</p>
       )}
+
+      <Pagination
+        currentPage={pagination?.page ?? 1}
+        totalPages={pagination?.totalPages ?? 0}
+        onPageChange={(page) => setParams((prev) => ({ ...prev, page }))}
+      />
     </div>
   );
 };

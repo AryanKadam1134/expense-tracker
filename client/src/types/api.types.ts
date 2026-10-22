@@ -95,6 +95,11 @@ export interface PaginationData {
   totalPages: number;
 }
 
+export interface PaginatedData<T> {
+  data: T[];
+  pagination: PaginationData;
+}
+
 // <!------ Request Payload Types ------!>
 export type GoogleAuth = {
   code: string;

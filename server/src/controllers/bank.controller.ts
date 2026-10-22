@@ -9,6 +9,7 @@ import { revertAccountChangesAndDeleteTransaction } from "./transaction.controll
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
+import { paginateQuery } from "../utils/pagination";
 
 const addBank = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
@@ -79,7 +80,9 @@ const deleteBank = asynchandler(async (req, res) => {
 
   try {
     await session.withTransaction(async () => {
-      const accounts = await Account.find({ bankId: bank._id }).session(session);
+      const accounts = await Account.find({ bankId: bank._id }).session(
+        session,
+      );
 
       for (const account of accounts) {
         const transactions = await Transaction.find({
@@ -110,9 +113,18 @@ const getBank = asynchandler(async (req, res) => {
 });
 
 const getBanks = asynchandler(async (req, res) => {
-  const banks = await Bank.find({ ownerId: req.user?._id });
+  const { page, limit } = req.query;
+  const parsedPage = typeof page === "string" ? Number(page) : undefined;
+  const parsedLimit = typeof limit === "string" ? Number(limit) : undefined;
 
-  if (banks?.length === 0) {
+  const banks = await paginateQuery({
+    model: Bank,
+    filter: { ownerId: req.user?._id },
+    page: parsedPage,
+    limit: parsedLimit,
+  });
+
+  if (banks.data.length === 0) {
     return res.status(200).json(new ApiRes(200, banks, "No banks found!"));
   }
 

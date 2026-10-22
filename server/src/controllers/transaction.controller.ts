@@ -9,6 +9,7 @@ import { Transaction, TransactionDocument } from "../models/transaction.model";
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
+import { paginateAggregate } from "../utils/pagination";
 
 import { TRANSACTION_TYPES } from "../contants";
 
@@ -400,46 +401,55 @@ const getTransaction = asynchandler(async (req, res) => {
 });
 
 const getTransactions = asynchandler(async (req, res) => {
-  const transactions = await Transaction.aggregate([
-    {
-      $match: {
-        ownerId: new Types.ObjectId(req.user?._id),
-        transferId: { $exists: false },
-      },
-    },
-    {
-      $lookup: {
-        from: "accounts",
-        localField: "accountId",
-        foreignField: "_id",
-        as: "account",
-      },
-    },
-    {
-      $addFields: {
-        account: {
-          $first: "$account",
-        },
-      },
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "categoryId",
-        foreignField: "_id",
-        as: "category",
-      },
-    },
-    {
-      $addFields: {
-        category: {
-          $first: "$category",
-        },
-      },
-    },
-  ]);
+  const { page, limit } = req.query;
+  const parsedPage = typeof page === "string" ? Number(page) : undefined;
+  const parsedLimit = typeof limit === "string" ? Number(limit) : undefined;
 
-  if (transactions?.length === 0) {
+  const transactions = await paginateAggregate({
+    model: Transaction,
+    page: parsedPage,
+    limit: parsedLimit,
+    pipeline: [
+      {
+        $match: {
+          ownerId: new Types.ObjectId(req.user?._id),
+          transferId: { $exists: false },
+        },
+      },
+      {
+        $lookup: {
+          from: "accounts",
+          localField: "accountId",
+          foreignField: "_id",
+          as: "account",
+        },
+      },
+      {
+        $addFields: {
+          account: {
+            $first: "$account",
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $addFields: {
+          category: {
+            $first: "$category",
+          },
+        },
+      },
+    ],
+  });
+
+  if (transactions.data.length === 0) {
     return res
       .status(200)
       .json(new ApiRes(200, transactions, "No transactions found!"));
@@ -775,67 +785,86 @@ const getB2BTransactions = asynchandler(async (req, res) => {
     throw new ApiError(401, "Authentication required!");
   }
 
-  const transferGroups = await Transaction.aggregate([
-    {
-      $match: {
-        ownerId: new Types.ObjectId(ownerId),
-        transferId: { $type: "string" },
-      },
-    },
-    {
-      $lookup: {
-        from: "accounts",
-        localField: "accountId",
-        foreignField: "_id",
-        as: "account",
-      },
-    },
-    {
-      $addFields: {
-        account: { $first: "$account" },
-      },
-    },
-    {
-      $lookup: {
-        from: "categories",
-        localField: "categoryId",
-        foreignField: "_id",
-        as: "category",
-      },
-    },
-    {
-      $addFields: {
-        category: { $first: "$category" },
-      },
-    },
-    {
-      $group: {
-        _id: "$transferId",
-        transactions: { $push: "$$ROOT" },
-      },
-    },
-  ]);
+  const { page, limit } = req.query;
+  const parsedPage = typeof page === "string" ? Number(page) : undefined;
+  const parsedLimit = typeof limit === "string" ? Number(limit) : undefined;
 
-  const transfers = transferGroups.flatMap((group) => {
-    const debitTransaction = group.transactions.find(
-      (transaction: TransactionDocument) => transaction.type === "debit",
-    );
-    const creditTransaction = group.transactions.find(
-      (transaction: TransactionDocument) => transaction.type === "credit",
-    );
-
-    if (!debitTransaction || !creditTransaction) return [];
-
-    return [
+  const transferPage = await paginateAggregate({
+    model: Transaction,
+    page: parsedPage,
+    limit: parsedLimit,
+    pipeline: [
       {
-        transferId: group._id as string,
-        debitTransaction,
-        creditTransaction,
+        $match: {
+          ownerId: new Types.ObjectId(ownerId),
+          transferId: { $type: "string" },
+        },
       },
-    ];
+      {
+        $lookup: {
+          from: "accounts",
+          localField: "accountId",
+          foreignField: "_id",
+          as: "account",
+        },
+      },
+      {
+        $addFields: {
+          account: { $first: "$account" },
+        },
+      },
+      {
+        $lookup: {
+          from: "categories",
+          localField: "categoryId",
+          foreignField: "_id",
+          as: "category",
+        },
+      },
+      {
+        $addFields: {
+          category: { $first: "$category" },
+        },
+      },
+      {
+        $group: {
+          _id: "$transferId",
+          transactions: { $push: "$$ROOT" },
+        },
+      },
+    ],
   });
 
-  return res.status(200).json(new ApiRes(200, transfers, "Transfers fetched!"));
+  const transfers = transferPage.data.flatMap(
+    (group: { _id: string; transactions: TransactionDocument[] }) => {
+      const debitTransaction = group.transactions.find(
+        (transaction) => transaction.type === "debit",
+      );
+      const creditTransaction = group.transactions.find(
+        (transaction) => transaction.type === "credit",
+      );
+
+      if (!debitTransaction || !creditTransaction) return [];
+
+      return [
+        {
+          transferId: group._id,
+          debitTransaction,
+          creditTransaction,
+        },
+      ];
+    },
+  );
+
+  return res
+    .status(200)
+    .json(
+      new ApiRes(
+        200,
+        { data: transfers, pagination: transferPage.pagination },
+        "Transfers fetched!",
+      ),
+    );
 });
 
 export {

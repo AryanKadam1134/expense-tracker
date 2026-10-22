@@ -4,14 +4,9 @@ import type {
   Account,
   AccountPayload,
   ApiResponse,
-  PaginationData,
+  PaginatedData,
   PaginationParams,
 } from "../types/api.types";
-
-interface AccountsResponse {
-  data: Account[];
-  pagination: PaginationData;
-}
 
 export const accountEndpoints = {
   addAccount: (body: AccountPayload) =>
@@ -27,5 +22,5 @@ export const accountEndpoints = {
     api.get<ApiResponse<Account>>(`/accounts/${accountId}`),
 
   getAccounts: (params: PaginationParams) =>
-    api.get<ApiResponse<AccountsResponse>>(`/accounts`, { params }),
+    api.get<ApiResponse<PaginatedData<Account>>>(`/accounts`, { params }),
 };

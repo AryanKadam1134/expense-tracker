@@ -8,6 +8,7 @@ import { revertAccountChangesAndDeleteTransaction } from "./transaction.controll
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
+import { paginateQuery } from "../utils/pagination";
 
 const addReminder = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
@@ -86,10 +87,7 @@ const updateReminder = asynchandler(async (req, res) => {
   }
 
   const fields: Partial<
-    Pick<
-      typeof reminder,
-      "title" | "description" | "dueDate" | "frequency"
-    >
+    Pick<typeof reminder, "title" | "description" | "dueDate" | "frequency">
   > = {};
 
   if (title) fields.title = title;
@@ -146,11 +144,18 @@ const getReminder = asynchandler(async (req, res) => {
 });
 
 const getReminders = asynchandler(async (req, res) => {
-  const reminders = await Reminder.find({
-    ownerId: req.user?._id,
+  const { page, limit } = req.query;
+  const parsedPage = typeof page === "string" ? Number(page) : undefined;
+  const parsedLimit = typeof limit === "string" ? Number(limit) : undefined;
+
+  const reminders = await paginateQuery({
+    model: Reminder,
+    filter: { ownerId: req.user?._id },
+    page: parsedPage,
+    limit: parsedLimit,
   });
 
-  if (reminders?.length === 0) {
+  if (reminders.data.length === 0) {
     return res
       .status(200)
       .json(new ApiRes(200, reminders, "No reminders found!"));

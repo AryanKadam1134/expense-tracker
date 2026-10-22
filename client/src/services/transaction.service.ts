@@ -4,6 +4,8 @@ import type {
   ApiResponse,
   B2BTransfer,
   B2BTransactionPayload,
+  PaginatedData,
+  PaginationParams,
   Transaction,
   TransactionPayload,
 } from "../types/api.types";
@@ -21,13 +23,18 @@ export const transactionEndpoints = {
   getTransaction: (transactionId: string) =>
     api.get<ApiResponse<Transaction>>(`transactions/${transactionId}`),
 
-  getTransactions: () => api.get<ApiResponse<Transaction[]>>(`/transactions`),
+  getTransactions: (params: PaginationParams) =>
+    api.get<ApiResponse<PaginatedData<Transaction>>>(`/transactions`, {
+      params,
+    }),
 
   getB2BTransaction: (transferId: string) =>
     api.get<ApiResponse<B2BTransfer>>(`/transactions/transfer/${transferId}`),
 
-  getB2BTransactions: () =>
-    api.get<ApiResponse<B2BTransfer[]>>(`/transactions/transfer`),
+  getB2BTransactions: (params: PaginationParams) =>
+    api.get<ApiResponse<PaginatedData<B2BTransfer>>>(`/transactions/transfer`, {
+      params,
+    }),
 
   addB2BTransaction: (body: B2BTransactionPayload) =>
     api.post<ApiResponse<B2BTransfer>>(`/transactions/transfer`, body),

@@ -4,6 +4,8 @@ import type {
   ApiResponse,
   Reminder,
   ReminderPayload,
+  PaginatedData,
+  PaginationParams,
 } from "../types/api.types";
 
 export const reminderEndpoints = {
@@ -19,5 +21,6 @@ export const reminderEndpoints = {
   getReminder: (reminderId: string) =>
     api.get<ApiResponse<Reminder>>(`/reminders/${reminderId}`),
 
-  getReminders: () => api.get<ApiResponse<Reminder[]>>("/reminders"),
+  getReminders: (params: PaginationParams) =>
+    api.get<ApiResponse<PaginatedData<Reminder>>>("/reminders", { params }),
 };

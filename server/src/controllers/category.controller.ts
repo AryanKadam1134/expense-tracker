@@ -3,6 +3,7 @@ import { Category } from "../models/category.model";
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
+import { paginateQuery } from "../utils/pagination";
 
 const addCategory = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
@@ -79,9 +80,18 @@ const getCategory = asynchandler(async (req, res) => {
 });
 
 const getCategories = asynchandler(async (req, res) => {
-  const categories = await Category.find({ ownerId: req.user?._id });
+  const { page, limit } = req.query;
+  const parsedPage = typeof page === "string" ? Number(page) : undefined;
+  const parsedLimit = typeof limit === "string" ? Number(limit) : undefined;
 
-  if (categories?.length === 0) {
+  const categories = await paginateQuery({
+    model: Category,
+    filter: { ownerId: req.user?._id },
+    page: parsedPage,
+    limit: parsedLimit,
+  });
+
+  if (categories.data.length === 0) {
     return res
       .status(200)
       .json(new ApiRes(200, categories, "No categories found!"));

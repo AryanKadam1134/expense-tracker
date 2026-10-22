@@ -4,26 +4,45 @@ import { Plus } from "lucide-react";
 
 import B2BTransferCard from "../../../components/B2BTransferCard";
 
+import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
 
 import { transactionEndpoints } from "../../../services/transaction.service";
 
 import useApi from "../../../hooks/useApi";
 
-import type { B2BTransfer } from "../../../types/api.types";
+import type {
+  B2BTransfer,
+  PaginationData,
+  PaginationParams,
+} from "../../../types/api.types";
 
 const B2BTransfersPage = () => {
+  const { loading, callApi } = useApi({ loadingTransfers: false });
+
   const navigate = useNavigate();
 
-  const { loading, callApi } = useApi({ loadingTransfers: false });
+  const [params, setParams] = useState<PaginationParams>({
+    page: 1,
+    limit: 10,
+  });
 
   const [transfers, setTransfers] = useState<B2BTransfer[]>([]);
 
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+
   const fetchTransfers = useCallback(() => {
-    callApi("loadingTransfers", transactionEndpoints.getB2BTransactions, {
-      onSuccess: (res) => setTransfers(res.data),
-    });
-  }, [callApi]);
+    callApi(
+      "loadingTransfers",
+      () => transactionEndpoints.getB2BTransactions(params),
+      {
+        onSuccess: (res) => {
+          setTransfers(res.data.data);
+          setPagination(res.data.pagination);
+        },
+      },
+    );
+  }, [callApi, params]);
 
   useEffect(() => {
     fetchTransfers();
@@ -55,6 +74,12 @@ const B2BTransfersPage = () => {
       ) : (
         <p>No bank to bank transfers yet.</p>
       )}
+
+      <Pagination
+        currentPage={pagination?.page ?? 1}
+        totalPages={pagination?.totalPages ?? 0}
+        onPageChange={(page) => setParams((prev) => ({ ...prev, page }))}
+      />
     </div>
   );
 };
