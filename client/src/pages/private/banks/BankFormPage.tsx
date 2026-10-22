@@ -7,9 +7,11 @@ import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
 
-import useApi from "../../../hooks/useApi";
+import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 
 import { bankEndpoints } from "../../../services/bank.service";
+
+import useApi from "../../../hooks/useApi";
 
 import { useNotify } from "../../../context/notification";
 
@@ -32,7 +34,7 @@ const BankFormPage = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<BankPayload>({ mode: "onChange" });
 
   const fetchBank = useCallback(() => {
@@ -44,14 +46,25 @@ const BankFormPage = () => {
   }, [callApi, bankId, reset]);
 
   const onSubmit: SubmitHandler<BankPayload> = (payload) => {
-    const body = { name: payload.name.trim() };
+    const body = isEditing
+      ? getUpdatedFields(payload, dirtyFields)
+      : { name: payload.name.trim() };
+
+    if (isEditing && Object.keys(body).length === 0) {
+      notify.info("No changes to save.");
+      return;
+    }
+
+    if ("name" in body && body.name !== undefined) {
+      body.name = body.name.trim();
+    }
 
     callApi(
       "saving",
       () =>
         isEditing && bankId
           ? bankEndpoints.updateBank(bankId, body)
-          : bankEndpoints.addBank(body),
+          : bankEndpoints.addBank({ name: payload.name.trim() }),
       {
         onSuccess: (response) => {
           notify.success(

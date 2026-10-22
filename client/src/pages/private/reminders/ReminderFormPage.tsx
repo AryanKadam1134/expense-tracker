@@ -11,6 +11,7 @@ import CustomTextArea from "../../../components/ui/CustomTextArea";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
 import { formatDateInISO } from "../../../utils/formatDate";
+import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 
 import { reminderEndpoints } from "../../../services/reminder.service";
 
@@ -40,7 +41,7 @@ const ReminderFormPage = () => {
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<ReminderPayload>({ mode: "onChange" });
 
   const fetchReminder = useCallback(() => {
@@ -62,11 +63,18 @@ const ReminderFormPage = () => {
   }, [callApi, reminderId, reset]);
 
   const onSubmit: SubmitHandler<ReminderPayload> = (payload) => {
+    const updatePayload = getUpdatedFields(payload, dirtyFields);
+
+    if (isEditing && Object.keys(updatePayload).length === 0) {
+      notify.info("No changes to save.");
+      return;
+    }
+
     callApi(
       "saving",
       () =>
         isEditing && reminderId
-          ? reminderEndpoints.updateReminder(reminderId, payload)
+          ? reminderEndpoints.updateReminder(reminderId, updatePayload)
           : reminderEndpoints.addReminder(payload),
       {
         onSuccess: (response) => {

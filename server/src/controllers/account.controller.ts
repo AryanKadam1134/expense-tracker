@@ -71,12 +71,12 @@ const updateAccount = asynchandler(async (req, res) => {
 
   const { bankId, name, accountNumber, accountType } = req.body;
 
-  if (name) {
+  if (name !== undefined || bankId !== undefined) {
     const accountWithSameName = await Account.findOne({
       _id: { $ne: account?._id },
       ownerId: account?.ownerId,
-      bankId,
-      name,
+      bankId: bankId ?? account.bankId,
+      name: name ?? account.name,
     });
 
     if (accountWithSameName) {

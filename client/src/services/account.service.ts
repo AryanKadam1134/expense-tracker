@@ -12,7 +12,7 @@ export const accountEndpoints = {
   addAccount: (body: AccountPayload) =>
     api.post<ApiResponse<Account>>(`/accounts`, body),
 
-  updateAccount: (accountId: string, body: AccountPayload) =>
+  updateAccount: (accountId: string, body: Partial<AccountPayload>) =>
     api.put<ApiResponse<Account>>(`/accounts/${accountId}`, body),
 
   deleteAccount: (accountId: string) =>

@@ -11,6 +11,7 @@ import CustomCheckbox from "../../../components/ui/CustomCheckbox";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
 import { formatDateInISO } from "../../../utils/formatDate";
+import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 
 import { transactionEndpoints } from "../../../services/transaction.service";
 
@@ -44,7 +45,7 @@ const B2BTransferFormPage = () => {
     reset,
     control,
     watch,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<B2BTransactionPayload>({
     mode: "onChange",
   });
@@ -84,15 +85,34 @@ const B2BTransferFormPage = () => {
       ...payload,
       categoryId: payload.categoryId || null,
     };
+    
+    const updatePayload = getUpdatedFields(
+      {
+        title: payload.title,
+        description: payload.description,
+        date: payload.date,
+        categoryId: payload.categoryId,
+        note: payload.note,
+      },
+      {
+        title: dirtyFields.title,
+        description: dirtyFields.description,
+        date: dirtyFields.date,
+        categoryId: dirtyFields.categoryId,
+        note: dirtyFields.note,
+      },
+    );
+
+    if (isEditing && Object.keys(updatePayload).length === 0) {
+      notify.info("No changes to save.");
+      return;
+    }
 
     callApi(
       "saving",
       () =>
         isEditing && transferId
-          ? transactionEndpoints.updateB2BTransaction(
-              transferId,
-              requestPayload,
-            )
+          ? transactionEndpoints.updateB2BTransaction(transferId, updatePayload)
           : transactionEndpoints.addB2BTransaction(requestPayload),
       {
         onSuccess: (res) => {

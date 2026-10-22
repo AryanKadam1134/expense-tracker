@@ -7,9 +7,11 @@ import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
 
-import useApi from "../../../hooks/useApi";
+import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 
 import { categoryEndpoints } from "../../../services/category.service";
+
+import useApi from "../../../hooks/useApi";
 
 import { useNotify } from "../../../context/notification";
 
@@ -32,7 +34,7 @@ const CategoryFormPage = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<CategoryPayload>({ mode: "onChange" });
 
   const fetchCategory = useCallback(() => {
@@ -48,14 +50,25 @@ const CategoryFormPage = () => {
   }, [callApi, categoryId, reset]);
 
   const onSubmit: SubmitHandler<CategoryPayload> = (payload) => {
-    const body = { name: payload.name.trim() };
+    const body = isEditing
+      ? getUpdatedFields(payload, dirtyFields)
+      : { name: payload.name.trim() };
+
+    if (isEditing && Object.keys(body).length === 0) {
+      notify.info("No changes to save.");
+      return;
+    }
+
+    if ("name" in body && body.name !== undefined) {
+      body.name = body.name.trim();
+    }
 
     callApi(
       "saving",
       () =>
         isEditing && categoryId
           ? categoryEndpoints.updateCategory(categoryId, body)
-          : categoryEndpoints.addCategory(body),
+          : categoryEndpoints.addCategory({ name: payload.name.trim() }),
       {
         onSuccess: (response) => {
           notify.success(

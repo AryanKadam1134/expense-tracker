@@ -12,6 +12,7 @@ import CustomCheckbox from "../../../components/ui/CustomCheckbox";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
 import { formatDateInISO } from "../../../utils/formatDate";
+import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 
 import { transactionEndpoints } from "../../../services/transaction.service";
 
@@ -49,7 +50,7 @@ const TransactionFormPage = () => {
     control,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<TransactionPayload>({
     mode: "onChange",
     defaultValues: { reminderId: null },
@@ -80,15 +81,33 @@ const TransactionFormPage = () => {
       ...payload,
       reminderId: payload.type === "debit" ? payload.reminderId || null : null,
     };
+    const updatePayload = getUpdatedFields(
+      {
+        title: payload.title,
+        description: payload.description,
+        date: payload.date,
+        categoryId: payload.categoryId,
+        note: payload.note,
+      },
+      {
+        title: dirtyFields.title,
+        description: dirtyFields.description,
+        date: dirtyFields.date,
+        categoryId: dirtyFields.categoryId,
+        note: dirtyFields.note,
+      },
+    );
+
+    if (isEditing && Object.keys(updatePayload).length === 0) {
+      notify.info("No changes to save.");
+      return;
+    }
 
     callApi(
       "saving",
       () =>
         isEditing && transactionId
-          ? transactionEndpoints.updateTransaction(
-              transactionId,
-              requestPayload,
-            )
+          ? transactionEndpoints.updateTransaction(transactionId, updatePayload)
           : transactionEndpoints.addTransaction(requestPayload),
       {
         onSuccess: (res) => {

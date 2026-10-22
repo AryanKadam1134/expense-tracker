@@ -144,6 +144,13 @@ export type TransactionPayload = {
   note?: string | null;
 };
 
+export type TransactionUpdatePayload = Partial<
+  Pick<
+    TransactionPayload,
+    "title" | "description" | "date" | "categoryId" | "note"
+  >
+>;
+
 export type CategoryPayload = {
   name: string;
 };
@@ -166,6 +173,13 @@ export type B2BTransactionPayload = {
   amount: number;
   note?: string | null;
 };
+
+export type B2BTransactionUpdatePayload = Partial<
+  Pick<
+    B2BTransactionPayload,
+    "title" | "description" | "date" | "categoryId" | "note"
+  >
+>;
 
 export type PaginationParams = {
   page: number;

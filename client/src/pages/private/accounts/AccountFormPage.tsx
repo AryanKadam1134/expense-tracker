@@ -8,6 +8,8 @@ import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomSelect from "../../../components/ui/CustomSelect";
 
+import { getUpdatedFields } from "../../../utils/getUpdatedFields";
+
 import { accountEndpoints } from "../../../services/account.service";
 
 import useApi from "../../../hooks/useApi";
@@ -38,7 +40,7 @@ const AccountFormPage = () => {
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { errors, dirtyFields },
   } = useForm<AccountPayload>({
     mode: "onChange",
   });
@@ -54,11 +56,18 @@ const AccountFormPage = () => {
   }, [callApi, accountId, reset]);
 
   const onSubmit: SubmitHandler<AccountPayload> = (payload) => {
+    const updatePayload = getUpdatedFields(payload, dirtyFields);
+
+    if (isEditing && Object.keys(updatePayload).length === 0) {
+      notify.info("No changes to save.");
+      return;
+    }
+
     callApi(
       "saving",
       () =>
         isEditing && accountId
-          ? accountEndpoints.updateAccount(accountId, payload)
+          ? accountEndpoints.updateAccount(accountId, updatePayload)
           : accountEndpoints.addAccount(payload),
       {
         onSuccess: (res) => {
