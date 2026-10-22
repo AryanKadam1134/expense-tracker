@@ -1,6 +1,17 @@
 import api from "./api.service";
 
-import type { Account, AccountPayload, ApiResponse } from "../types/api.types";
+import type {
+  Account,
+  AccountPayload,
+  ApiResponse,
+  PaginationData,
+  PaginationParams,
+} from "../types/api.types";
+
+interface AccountsResponse {
+  data: Account[];
+  pagination: PaginationData;
+}
 
 export const accountEndpoints = {
   addAccount: (body: AccountPayload) =>
@@ -15,5 +26,6 @@ export const accountEndpoints = {
   getAccount: (accountId: string) =>
     api.get<ApiResponse<Account>>(`/accounts/${accountId}`),
 
-  getAccounts: () => api.get<ApiResponse<Account[]>>(`/accounts`),
+  getAccounts: (params: PaginationParams) =>
+    api.get<ApiResponse<AccountsResponse>>(`/accounts`, { params }),
 };

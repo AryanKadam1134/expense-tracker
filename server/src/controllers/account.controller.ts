@@ -8,12 +8,12 @@ import { revertAccountChangesAndDeleteTransaction } from "./transaction.controll
 import ApiRes from "../utils/ApiRes";
 import ApiError from "../utils/ApiError";
 import { asynchandler } from "../utils/asynchandler";
+import { paginateAggregate } from "../utils/pagination";
 
 const addAccount = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;
 
-  const { bankId, name, accountNumber, accountType, openingBalance } =
-    req.body;
+  const { bankId, name, accountNumber, accountType, openingBalance } = req.body;
 
   if (!bankId) {
     throw new ApiError(400, "Bank is required!");
@@ -85,10 +85,7 @@ const updateAccount = asynchandler(async (req, res) => {
   }
 
   const fields: Partial<
-    Pick<
-      typeof account,
-      "bankId" | "name" | "accountNumber" | "accountType"
-    >
+    Pick<typeof account, "bankId" | "name" | "accountNumber" | "accountType">
   > = {};
 
   if (bankId) fields.bankId = bankId;
@@ -142,28 +139,37 @@ const getAccount = asynchandler(async (req, res) => {
 });
 
 const getAccounts = asynchandler(async (req, res) => {
-  const accounts = await Account.aggregate([
-    {
-      $match: { ownerId: new Types.ObjectId(req.user?._id) },
-    },
-    {
-      $lookup: {
-        from: "banks",
-        localField: "bankId",
-        foreignField: "_id",
-        as: "bank",
+  const { page, limit } = req.query;
+  const parsedPage = typeof page === "string" ? Number(page) : undefined;
+  const parsedLimit = typeof limit === "string" ? Number(limit) : undefined;
+
+  const accounts = await paginateAggregate({
+    model: Account,
+    pipeline: [
+      {
+        $match: { ownerId: new Types.ObjectId(req.user?._id) },
       },
-    },
-    {
-      $addFields: {
-        bank: {
-          $first: "$bank",
+      {
+        $lookup: {
+          from: "banks",
+          localField: "bankId",
+          foreignField: "_id",
+          as: "bank",
         },
       },
-    },
-  ]);
+      {
+        $addFields: {
+          bank: {
+            $first: "$bank",
+          },
+        },
+      },
+    ],
+    page: parsedPage,
+    limit: parsedLimit,
+  });
 
-  if (accounts?.length === 0) {
+  if (accounts?.data?.length === 0) {
     return res
       .status(200)
       .json(new ApiRes(200, accounts, "No accounts found!"));

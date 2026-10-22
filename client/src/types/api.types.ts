@@ -1,3 +1,4 @@
+// <!------ Interfaces ------!>
 // Api Response Interface
 export interface ApiResponse<T = unknown> {
   success: boolean;
@@ -87,7 +88,14 @@ export interface Filter {
   label: string;
 }
 
-// Request Payload Types
+export interface PaginationData {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// <!------ Request Payload Types ------!>
 export type GoogleAuth = {
   code: string;
   rememberMe?: boolean;
@@ -152,4 +160,9 @@ export type B2BTransactionPayload = {
   categoryId?: string | null;
   amount: number;
   note?: string | null;
+};
+
+export type PaginationParams = {
+  page: number;
+  limit: number;
 };

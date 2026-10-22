@@ -7,6 +7,7 @@ import CustomInput from "../../../components/ui/CustomInput";
 import CustomSelect from "../../../components/ui/CustomSelect";
 import CustomButton from "../../../components/ui/CustomButton";
 import CustomTextArea from "../../../components/ui/CustomTextArea";
+import CustomCheckbox from "../../../components/ui/CustomCheckbox";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
 import { formatDateInISO } from "../../../utils/formatDate";
@@ -20,7 +21,6 @@ import useCategoryOptions from "../../../hooks/useCategoryOptions";
 import { useNotify } from "../../../context/notification";
 
 import type { B2BTransactionPayload } from "../../../types/api.types";
-import CustomCheckbox from "../../../components/ui/CustomCheckbox";
 
 const B2BTransferFormPage = () => {
   const { notify } = useNotify();

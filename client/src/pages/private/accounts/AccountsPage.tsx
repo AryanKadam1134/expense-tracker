@@ -5,28 +5,41 @@ import { SquareUserRound } from "lucide-react";
 
 import AccountCard from "../../../components/AccountCard";
 
+import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
 
 import { accountEndpoints } from "../../../services/account.service";
 
 import useApi from "../../../hooks/useApi";
 
-import type { Account } from "../../../types/api.types";
+import type {
+  PaginationData,
+  Account,
+  PaginationParams,
+} from "../../../types/api.types";
 
 const AccountsPage = () => {
-  const [accounts, setAccounts] = useState<Account[]>([]);
-
   const { loading, callApi } = useApi({ accountsLoading: false });
 
   const navigate = useNavigate();
 
+  const [params, setParams] = useState<PaginationParams>({
+    page: 1,
+    limit: 10,
+  });
+
+  const [accounts, setAccounts] = useState<Account[]>([]);
+  const [pagination, setPagination] = useState<PaginationData | null>(null);
+
   const fetchAccounts = useCallback(() => {
-    callApi("accountsLoading", accountEndpoints.getAccounts, {
+    callApi("accountsLoading", () => accountEndpoints.getAccounts(params), {
       onSuccess: (res) => {
-        setAccounts(res.data);
+        const { data } = res;
+        setAccounts(data?.data);
+        setPagination(data?.pagination);
       },
     });
-  }, [callApi]);
+  }, [callApi, params]);
 
   useEffect(() => {
     fetchAccounts();
@@ -58,6 +71,12 @@ const AccountsPage = () => {
       ) : (
         <div>No accounts yet.</div>
       )}
+
+      <Pagination
+        currentPage={pagination?.page ?? 1}
+        totalPages={pagination?.totalPages ?? 0}
+        onPageChange={(page) => setParams((prev) => ({ ...prev, page: page }))}
+      />
     </div>
   );
 };
