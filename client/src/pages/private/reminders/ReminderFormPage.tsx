@@ -103,7 +103,21 @@ const ReminderFormPage = () => {
   }, [fetchReminder]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
+    >
+      <div className="col-span-full mb-1 border-b border-light-border-primary pb-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
+          Payment planning
+        </p>
+        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
+          {isEditing ? "Edit reminder" : "Add a reminder"}
+        </h1>
+        <p className="mt-1 text-sm text-light-text-secondary">
+          Keep track of a due amount and when it needs attention.
+        </p>
+      </div>
       {/* Title */}
       <FormField
         id="title"
@@ -186,7 +200,7 @@ const ReminderFormPage = () => {
         id="description"
         label="Description"
         error={errors.description?.message}
-        className="col-span-2"
+        className="col-span-full"
       >
         <CustomTextArea
           id="description"
@@ -196,7 +210,7 @@ const ReminderFormPage = () => {
         />
       </FormField>
 
-      <div className="col-span-2 flex justify-end gap-2">
+      <div className="col-span-full flex justify-end gap-2">
         <CustomButton
           type="button"
           name="Cancel"

@@ -29,17 +29,17 @@ export default function Pagination({
   for (let i = startPage; i <= endPage; i++) pageNumbers.push(i);
 
   const buttonBaseClasses =
-    "px-3.5 py-1.5 text-dark-text-primary rounded-md transition-colors font-medium";
-  const inactiveButtonClasses = `${buttonBaseClasses} bg-light-bg-secondary dark:bg-dark-bg-secondary text-light-text-primary dark:text-dark-text-primary hover:bg-light-bg-hover dark:hover:bg-dark-bg-hover cursor-pointer`;
-  const disabledButtonClasses = `${buttonBaseClasses} bg-light-bg-secondary dark:bg-dark-bg-secondary text-light-text-tertiary dark:text-dark-text-tertiary opacity-50 cursor-not-allowed`;
-  const activeButtonClasses = `${buttonBaseClasses} bg-blue-500 hover:bg-blue-600`;
+    "flex size-9 items-center justify-center rounded-xl text-sm font-medium transition-colors";
+  const inactiveButtonClasses = `${buttonBaseClasses} bg-light-bg-primary text-light-text-secondary shadow-sm ring-1 ring-light-border-primary hover:bg-light-bg-hover cursor-pointer`;
+  const disabledButtonClasses = `${buttonBaseClasses} bg-light-bg-secondary text-light-text-tertiary opacity-50 cursor-not-allowed`;
+  const activeButtonClasses = `${buttonBaseClasses} bg-[#174936] text-white shadow-sm`;
   const navButtonClasses = (isDisabled: boolean) =>
     isDisabled
       ? disabledButtonClasses
-      : `${buttonBaseClasses} bg-light-bg-secondary dark:bg-dark-bg-secondary text-light-text-primary dark:text-dark-text-primary hover:bg-light-bg-hover dark:hover:bg-dark-bg-hover cursor-pointer`;
+      : `${buttonBaseClasses} bg-light-bg-primary text-light-text-secondary shadow-sm ring-1 ring-light-border-primary hover:bg-light-bg-hover cursor-pointer`;
 
   return (
-    <div className="flex justify-center gap-2 text-sm">
+    <div className="flex flex-wrap justify-center gap-1.5 text-sm">
       {/* Prev Button */}
       <button
         onClick={() => onPageChange(currentPage - 1)}

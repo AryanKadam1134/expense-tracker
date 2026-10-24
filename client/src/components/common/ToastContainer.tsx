@@ -38,8 +38,8 @@ const toastStyles: Record<ToastType, { icon: string; iconBg: string }> = {
     iconBg: "bg-amber-500/10",
   },
   info: {
-    icon: "text-blue-500",
-    iconBg: "bg-blue-500/10",
+    icon: "text-emerald-700",
+    iconBg: "bg-emerald-600/10",
   },
 };
 
@@ -195,7 +195,7 @@ function Toast({ toast, onRemove, onPause, onResume }: ToastProps) {
       p-4 w-[calc(100vw-2rem)] sm:w-96 flex ${description ? "items-start" : "items-center"} gap-3
       text-light-text-primary dark:text-dark-text-primary
       bg-light-bg-primary dark:bg-dark-bg-tertiary
-      border border-light-border-primary dark:border-dark-border-primary rounded-lg shadow-lg
+      border border-light-border-primary dark:border-dark-border-primary rounded-2xl shadow-xl
       pointer-events-auto ${isDragging && "select-none"}`}
     >
       {/* Icon */}

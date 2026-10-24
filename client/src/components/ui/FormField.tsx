@@ -55,7 +55,7 @@ const FormField = ({
 
         <label
           htmlFor={id}
-          className={`w-full flex ${isCheckbox || orientation == "horizontal" ? "flex-col gap-0.5" : "flex-row items-center whitespace-nowrap"} justify-between font-medium text-[13px] text-light-text-primary dark:text-dark-text-primary
+          className={`w-full flex ${isCheckbox || orientation == "horizontal" ? "flex-col gap-0.5" : "flex-row items-center whitespace-nowrap"} justify-between font-medium text-xs text-light-text-secondary dark:text-dark-text-secondary
           ${bold && `font-semibold`}`}
         >
           <p>

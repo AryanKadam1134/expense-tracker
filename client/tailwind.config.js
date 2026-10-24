@@ -7,27 +7,27 @@ export default {
         light: {
           bg: {
             primary: "#ffffff", // Main background
-            secondary: "#f6f7f9", // Secondary background
-            tertiary: "#e7eaf0", // Tertiary surfaces / skeletons
-            hover: "#e8eaed", // Hover state
+            secondary: "#f3f7f4",
+            tertiary: "#e7f0e9",
+            hover: "#edf4ef",
           },
           text: {
-            primary: "#1a1a1a", // Primary text
-            secondary: "#4a4a4a", // Secondary text
-            tertiary: "#6b7280", // Tertiary text
+            primary: "#172b24",
+            secondary: "#52645b",
+            tertiary: "#84938b",
           },
           border: {
-            primary: "#e5e7eb", // Primary border
-            secondary: "#d1d5db", // Secondary border
+            primary: "#e1e9e3",
+            secondary: "#cbd8ce",
           },
           input: {
             bg: "#ffffff",
-            bgFocus: "#f3f4f6",
-            bgDisabled: "#f3f4f6",
-            border: "#d1d5db",
+            bgFocus: "#f8fbf8",
+            bgDisabled: "#f1f5f2",
+            border: "#d6e1d8",
             borderFocus: "transparent",
-            ring: "#3b82f6",
-            text: "#1a1a1a",
+            ring: "#5b9a75",
+            text: "#172b24",
             placeholder: "#9ca3af",
             error: "#ef4444",
           },
@@ -35,28 +35,28 @@ export default {
         // Dark Mode - Subtle, easy on the eyes
         dark: {
           bg: {
-            primary: "#0f0f0f", // Main background - almost black but warm
-            secondary: "#1a1a1a", // Slightly lighter
-            tertiary: "#242424", // Secondary surfaces
-            hover: "#2d2d2d", // Hover state
+            primary: "#142019",
+            secondary: "#101914",
+            tertiary: "#1c2b21",
+            hover: "#26382c",
           },
           text: {
-            primary: "#f5f5f5", // Primary text - soft white
-            secondary: "#d4d4d4", // Secondary text
-            tertiary: "#9ca3af", // Tertiary text - muted
+            primary: "#f0f7f1",
+            secondary: "#d2e0d5",
+            tertiary: "#91a397",
           },
           border: {
-            primary: "#2d2d2d", // Primary border
-            secondary: "#404040", // Secondary border
+            primary: "#2b3b30",
+            secondary: "#3b5041",
           },
           input: {
             bg: "#1a1a1a",
-            bgFocus: "#262626",
-            bgDisabled: "#262626",
-            border: "#404040",
+            bgFocus: "#1e3024",
+            bgDisabled: "#1a2920",
+            border: "#3b5041",
             borderFocus: "transparent",
-            ring: "#60a5fa",
-            text: "#f5f5f5",
+            ring: "#79bf91",
+            text: "#f0f7f1",
             placeholder: "#737373",
             error: "#f87171",
           },

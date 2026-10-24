@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeftRight } from "lucide-react";
 
 import TransactionCard from "../../../components/TransactionCard";
+import PageHeader from "../../../components/common/PageHeader";
 
 import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -49,16 +50,23 @@ const TransactionsPage = () => {
   }, [fetchTransactions]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <CustomButton
-        name="Add Transaction"
-        icon={ArrowLeftRight}
-        onClick={() => navigate("add")}
-        className="self-end w-fit"
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading="Transactions"
+        subHeading="See where money is moving across your accounts."
+      >
+        <CustomButton
+          name="Add Transaction"
+          icon={ArrowLeftRight}
+          onClick={() => navigate("add")}
+          className="w-fit"
+        />
+      </PageHeader>
 
       {loading.transactionsLoading ? (
-        <div>Loading transactions...</div>
+        <div className="rounded-2xl border border-light-border-primary bg-light-bg-primary p-8 text-center text-sm text-light-text-tertiary">
+          Loading transactions...
+        </div>
       ) : transactions?.length ? (
         transactions?.map((transaction) => (
           <TransactionCard
@@ -72,7 +80,10 @@ const TransactionsPage = () => {
           />
         ))
       ) : (
-        <div>No transactions yet.</div>
+        <div className="rounded-2xl border border-dashed border-light-border-secondary bg-light-bg-primary px-6 py-12 text-center text-sm text-light-text-secondary">
+          No transactions yet. Add your first transaction to begin tracking
+          activity.
+        </div>
       )}
 
       <Pagination

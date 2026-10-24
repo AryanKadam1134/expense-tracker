@@ -85,7 +85,7 @@ const B2BTransferFormPage = () => {
       ...payload,
       categoryId: payload.categoryId || null,
     };
-    
+
     const updatePayload = getUpdatedFields(
       {
         title: payload.title,
@@ -140,7 +140,22 @@ const B2BTransferFormPage = () => {
   if (loading.loadingTransfer) return <p>Loading transfer...</p>;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
+    >
+      <div className="col-span-full mb-1 border-b border-light-border-primary pb-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
+          Between your accounts
+        </p>
+        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
+          {isEditing ? "Edit transfer" : "Add a transfer"}
+        </h1>
+        <p className="mt-1 text-sm text-light-text-secondary">
+          Keep both sides of a transfer connected as money moves between
+          accounts.
+        </p>
+      </div>
       {/* From account */}
       <FormField
         id="debitAccountId"
@@ -290,7 +305,7 @@ const B2BTransferFormPage = () => {
         <CustomTextArea id="note" rows={3} {...register("note")} />
       </FormField>
 
-      <div className="col-span-2 flex justify-end gap-2">
+      <div className="col-span-full flex justify-end gap-2">
         <CustomButton
           type="button"
           name="Cancel"

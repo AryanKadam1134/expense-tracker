@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Landmark } from "lucide-react";
 
 import BankCard from "../../../components/BankCard";
+import PageHeader from "../../../components/common/PageHeader";
 
 import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -45,16 +46,23 @@ const BanksPage = () => {
   }, [fetchBanks]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <CustomButton
-        name="Add Bank"
-        icon={Landmark}
-        onClick={() => navigate("add")}
-        className="self-end w-fit"
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading="Banks"
+        subHeading="Organize the financial institutions connected to your accounts."
+      >
+        <CustomButton
+          name="Add Bank"
+          icon={Landmark}
+          onClick={() => navigate("add")}
+          className="w-fit"
+        />
+      </PageHeader>
 
       {loading.banksLoading ? (
-        <p>Loading banks...</p>
+        <p className="rounded-2xl border border-light-border-primary bg-light-bg-primary p-8 text-center text-sm text-light-text-tertiary">
+          Loading banks...
+        </p>
       ) : banks.length ? (
         banks.map((bank) => (
           <BankCard
@@ -68,7 +76,9 @@ const BanksPage = () => {
           />
         ))
       ) : (
-        <p>No banks yet.</p>
+        <p className="rounded-2xl border border-dashed border-light-border-secondary bg-light-bg-primary px-6 py-12 text-center text-sm text-light-text-secondary">
+          No banks yet. Add a bank to organize your accounts.
+        </p>
       )}
 
       <Pagination

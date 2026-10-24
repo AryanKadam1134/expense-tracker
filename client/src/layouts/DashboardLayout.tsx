@@ -9,14 +9,14 @@ const DashboardLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen bg-light-bg-secondary dark:bg-dark-bg-secondary">
       <SideBar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      <div className="flex flex-col w-full overflow-hidden">
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Header onMenuClick={() => setIsSidebarOpen(true)} />
 
-        <div className="flex-1 px-6 py-5 sm:px-8 sm:py-7 h-full bg-light-bg-secondary dark:bg-dark-bg-secondary overflow-y-auto">
-          <div className="max-w-full mx-auto">
+        <div className="h-full flex-1 overflow-y-auto px-4 py-5 sm:px-8 sm:py-8">
+          <div className="mx-auto w-full max-w-7xl">
             <Outlet />
           </div>
         </div>

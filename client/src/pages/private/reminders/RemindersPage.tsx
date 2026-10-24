@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { BellRing } from "lucide-react";
 
 import ReminderCard from "../../../components/ReminderCard";
+import PageHeader from "../../../components/common/PageHeader";
 
 import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -47,16 +48,23 @@ const RemindersPage = () => {
   }, [fetchReminders]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <CustomButton
-        name="Add Reminder"
-        icon={BellRing}
-        onClick={() => navigate("add")}
-        className="w-fit self-end"
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading="Reminders"
+        subHeading="Track upcoming payments and see what is still due."
+      >
+        <CustomButton
+          name="Add Reminder"
+          icon={BellRing}
+          onClick={() => navigate("add")}
+          className="w-fit"
+        />
+      </PageHeader>
 
       {loading.loadingReminders ? (
-        <p>Loading reminders...</p>
+        <p className="rounded-2xl border border-light-border-primary bg-light-bg-primary p-8 text-center text-sm text-light-text-tertiary">
+          Loading reminders...
+        </p>
       ) : reminders.length ? (
         reminders.map((reminder) => (
           <ReminderCard
@@ -70,7 +78,9 @@ const RemindersPage = () => {
           />
         ))
       ) : (
-        <p>No reminders yet.</p>
+        <p className="rounded-2xl border border-dashed border-light-border-secondary bg-light-bg-primary px-6 py-12 text-center text-sm text-light-text-secondary">
+          No reminders yet. Add one to keep an upcoming payment in view.
+        </p>
       )}
 
       <Pagination

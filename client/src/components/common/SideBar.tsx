@@ -45,7 +45,7 @@ const menus: MenuItem[] = [
 ];
 
 const menuStyle =
-  "px-3 py-2.5 flex items-center gap-2.5 text-sm min-w-45 rounded-md transition-all duration-200";
+  "group flex min-w-45 items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-all duration-200";
 
 const NavItem = ({ menu, onClick }: NavItemProps) => {
   const Icon = menu.icon;
@@ -58,13 +58,16 @@ const NavItem = ({ menu, onClick }: NavItemProps) => {
         `${menuStyle}
         ${
           isActive
-            ? "bg-light-bg-hover text-light-text-primary font-medium"
+            ? "bg-[#eaf3ec] font-medium text-[#174936] shadow-sm"
             : "text-light-text-secondary hover:bg-light-bg-hover hover:text-light-text-primary"
         }
         `
       }
     >
-      <Icon size={17} />
+      <Icon
+        size={18}
+        className="shrink-0 transition-transform group-hover:scale-105"
+      />
       <p className="text-nowrap">{menu.name}</p>
     </NavLink>
   );
@@ -96,48 +99,54 @@ const SideBar = ({ isOpen, onClose }: SideBarProps) => {
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
           md:translate-x-0
           flex flex-col px-2.5
-          border-r border-light-border-primary
+          border-r border-light-border-primary shadow-[8px_0_30px_rgba(24,55,39,0.03)]
         `}
       >
         {/* Header */}
-        <div className="shrink-0 h-16 flex items-center border-b border-light-border-primary">
-          <div className="flex items-center gap-2.5">
-            <AppLogo className="ml-3 size-9" />
+        <div className="flex h-18 shrink-0 items-center border-b border-light-border-primary px-3">
+          <div className="flex items-center gap-3">
+            <AppLogo className="size-10" />
 
-            <p className="text-nowrap text-md font-medium text-light-text-primary">
-              Expense Tracker
-            </p>
+            <div>
+              <p className="text-nowrap text-sm font-semibold tracking-tight text-light-text-primary">
+                Expense Tracker
+              </p>
+              <p className="text-[11px] text-light-text-tertiary">
+                Personal finance
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Menus */}
-        <div className="py-3 flex flex-col gap-2 justify-between h-full">
-          <div className="flex-1 flex flex-col gap-1.5">
+        <div className="flex h-full flex-col justify-between gap-4 py-5">
+          <div className="flex flex-1 flex-col gap-1.5">
+            <p className="mb-2 px-3.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-light-text-tertiary">
+              Workspace
+            </p>
+
             {menus.map((menu) => (
               <NavItem key={menu.name} menu={menu} onClick={onClose} />
             ))}
           </div>
 
-          <NavItem
-            menu={{ name: "Settings", path: "/settings", icon: Settings }}
-            onClick={onClose}
-          />
+          <div className="flex flex-col gap-1 border-t border-light-border-primary pt-4">
+            <NavItem
+              menu={{ name: "Settings", path: "/settings", icon: Settings }}
+              onClick={onClose}
+            />
 
-          {/* Logout */}
-          <button
-            onClick={() => {
-              logout();
-              onClose();
-            }}
-            className={`
-              ${menuStyle}
-              text-red-600 hover:text-red-700 hover:bg-red-50
-              cursor-pointer
-            `}
-          >
-            <LogOut size={17} />
-            <p className="text-nowrap">Logout</p>
-          </button>
+            <button
+              onClick={() => {
+                logout();
+                onClose();
+              }}
+              className={`${menuStyle} cursor-pointer text-rose-600 hover:bg-rose-50 hover:text-rose-700`}
+            >
+              <LogOut size={18} />
+              <p className="text-nowrap">Log out</p>
+            </button>
+          </div>
         </div>
       </div>
     </>

@@ -6,9 +6,26 @@
 }
 
 body {
-  font-family: "Poppins", sans-serif;
+  font-family: "DM Sans", sans-serif;
+  color: #172b24;
+  background: #f3f7f4;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+::selection {
+  color: #173c2b;
+  background: #d6ebdc;
 }
 
 .ant-message {
-  font-family: "Poppins", sans-serif;
+  font-family: "DM Sans", sans-serif;
 }

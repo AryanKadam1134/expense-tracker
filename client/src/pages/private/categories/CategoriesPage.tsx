@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Tags } from "lucide-react";
 
 import CategoryCard from "../../../components/CategoryCard";
+import PageHeader from "../../../components/common/PageHeader";
 
 import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -49,16 +50,23 @@ const CategoriesPage = () => {
   }, [fetchCategories]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <CustomButton
-        name="Add Category"
-        icon={Tags}
-        onClick={() => navigate("add")}
-        className="self-end w-fit"
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading="Categories"
+        subHeading="Give transactions useful labels so your activity is easier to understand."
+      >
+        <CustomButton
+          name="Add Category"
+          icon={Tags}
+          onClick={() => navigate("add")}
+          className="w-fit"
+        />
+      </PageHeader>
 
       {loading.categoriesLoading ? (
-        <p>Loading categories...</p>
+        <p className="rounded-2xl border border-light-border-primary bg-light-bg-primary p-8 text-center text-sm text-light-text-tertiary">
+          Loading categories...
+        </p>
       ) : categories.length ? (
         categories.map((category) => (
           <CategoryCard
@@ -72,7 +80,10 @@ const CategoriesPage = () => {
           />
         ))
       ) : (
-        <p>No categories yet.</p>
+        <p className="rounded-2xl border border-dashed border-light-border-secondary bg-light-bg-primary px-6 py-12 text-center text-sm text-light-text-secondary">
+          No categories yet. Add a category to make your transaction list easier
+          to scan.
+        </p>
       )}
 
       <Pagination

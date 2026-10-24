@@ -19,13 +19,13 @@ const PageHeader = ({
     >
       <div>
         {heading && (
-          <h1 className="text-2xl font-semibold text-light-text-primary dark:text-dark-text-primary">
+          <h1 className="text-2xl font-semibold tracking-tight text-light-text-primary dark:text-dark-text-primary sm:text-[28px]">
             {heading}
           </h1>
         )}
 
         {subHeading && (
-          <p className="mt-1 text-sm text-light-text-secondary dark:text-dark-text-secondary">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-light-text-secondary dark:text-dark-text-secondary">
             {subHeading}
           </p>
         )}

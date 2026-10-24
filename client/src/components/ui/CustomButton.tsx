@@ -5,9 +5,11 @@ import { Loader2 } from "lucide-react";
 import { cn } from "../../utils/cn";
 
 const variants = {
-  default: "text-white bg-blue-400 hover:bg-blue-500 border border-transparent",
-  red: "text-white bg-red-400 hover:bg-red-500 border border-transparent",
-  green: "text-white bg-green-400 hover:bg-green-500 border border-transparent",
+  default:
+    "text-white bg-[#174936] hover:bg-[#103b2b] border border-transparent shadow-sm hover:shadow-md",
+  red: "text-white bg-rose-600 hover:bg-rose-700 border border-transparent shadow-sm",
+  green:
+    "text-[#24533d] bg-[#eaf3ec] hover:bg-[#dcebe0] border border-[#d8e7dc]",
 } as const;
 
 const sizes = {
@@ -61,7 +63,7 @@ const CustomButton = ({
       {...props}
       className={cn(
         className,
-        "rounded-md transition-colors",
+        "rounded-xl transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#79a98a] focus-visible:ring-offset-2",
         "disabled:cursor-not-allowed disabled:opacity-60",
         variants[variant],
         sizes[size].text,

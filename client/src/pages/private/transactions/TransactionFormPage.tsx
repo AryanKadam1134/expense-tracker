@@ -136,7 +136,21 @@ const TransactionFormPage = () => {
   }, [fetchTransaction]);
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-2 gap-6">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
+    >
+      <div className="col-span-full mb-1 border-b border-light-border-primary pb-5">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
+          Transaction entry
+        </p>
+        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
+          {isEditing ? "Edit transaction" : "Add a transaction"}
+        </h1>
+        <p className="mt-1 text-sm text-light-text-secondary">
+          Record money moving into or out of one of your accounts.
+        </p>
+      </div>
       {/* Transaction Account */}
       <FormField
         id="accountId"
@@ -323,7 +337,7 @@ const TransactionFormPage = () => {
         />
       </FormField>
 
-      <div className="col-span-2 flex justify-end gap-2">
+      <div className="col-span-full flex justify-end gap-2">
         <CustomButton
           type="button"
           name="Cancel"
@@ -335,7 +349,6 @@ const TransactionFormPage = () => {
         <CustomButton
           type="submit"
           name={loading.saving ? "Saving..." : "Save"}
-          className="w-fit col-span-2 justify-self-end"
           loading={loading.saving}
         />
       </div>

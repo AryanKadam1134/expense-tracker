@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { SquareUserRound } from "lucide-react";
 
 import AccountCard from "../../../components/AccountCard";
+import PageHeader from "../../../components/common/PageHeader";
 
 import Pagination from "../../../components/ui/Pagination";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -46,16 +47,23 @@ const AccountsPage = () => {
   }, [fetchAccounts]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <CustomButton
-        name="Add Account"
-        icon={SquareUserRound}
-        onClick={() => navigate("add")}
-        className="self-end w-fit"
-      />
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading="Accounts"
+        subHeading="Keep your balances and account details in one clear place."
+      >
+        <CustomButton
+          name="Add Account"
+          icon={SquareUserRound}
+          onClick={() => navigate("add")}
+          className="w-fit"
+        />
+      </PageHeader>
 
       {loading.accountsLoading ? (
-        <div>Loading accounts...</div>
+        <div className="rounded-2xl border border-light-border-primary bg-light-bg-primary p-8 text-center text-sm text-light-text-tertiary">
+          Loading accounts...
+        </div>
       ) : accounts?.length ? (
         accounts?.map((account) => (
           <AccountCard
@@ -69,7 +77,10 @@ const AccountsPage = () => {
           />
         ))
       ) : (
-        <div>No accounts yet.</div>
+        <div className="rounded-2xl border border-dashed border-light-border-secondary bg-light-bg-primary px-6 py-12 text-center text-sm text-light-text-secondary">
+          No accounts yet. Add an account to start keeping your balances
+          organized.
+        </div>
       )}
 
       <Pagination
