@@ -21,21 +21,19 @@ const REMINDERS = [
   { value: "yearly", label: "Yearly" },
 ];
 
-const TOKEN_OPTIONS: CookieOptions = {
+const BASE_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
-  secure: isProduction ? true : false,
+  secure: isProduction,
   sameSite: isProduction ? "none" : "strict",
 };
 
-const ACCESS_TOKEN_OPTIONS: CookieOptions = {
-  httpOnly: true,
-  secure: isProduction ? true : false,
-  sameSite: isProduction ? "none" : "strict",
+const SESSION_COOKIE_OPTIONS: CookieOptions = {
+  ...BASE_COOKIE_OPTIONS,
 };
 
-const REFRESH_TOKEN_OPTIONS: CookieOptions = {
+const REFRESH_TOKEN_COOKIE_OPTIONS: CookieOptions = {
   httpOnly: true,
-  secure: isProduction ? true : false,
+  secure: isProduction,
   sameSite: isProduction ? "none" : "strict",
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };
@@ -45,7 +43,6 @@ export {
   ACCOUNT_TYPES,
   TRANSACTION_TYPES,
   REMINDERS,
-  TOKEN_OPTIONS,
-  ACCESS_TOKEN_OPTIONS,
-  REFRESH_TOKEN_OPTIONS,
+  SESSION_COOKIE_OPTIONS,
+  REFRESH_TOKEN_COOKIE_OPTIONS,
 };

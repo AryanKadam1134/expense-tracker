@@ -11,9 +11,8 @@ import { getEnv } from "../utils/getEnv";
 import { asynchandler } from "../utils/asynchandler";
 
 import {
-  ACCESS_TOKEN_OPTIONS,
-  REFRESH_TOKEN_OPTIONS,
-  TOKEN_OPTIONS,
+  SESSION_COOKIE_OPTIONS,
+  REFRESH_TOKEN_COOKIE_OPTIONS,
 } from "../contants";
 
 const generateAccessAndRefreshToken = async (
@@ -185,10 +184,6 @@ const googleAuth = asynchandler(async (req, res) => {
 
   const { accessToken, refreshToken } = cookieTokens;
 
-  if (!accessToken || !refreshToken) {
-    throw new ApiError(500, "Couldn't generate tokens!");
-  }
-
   const loggedUser = await User.findById(user._id).select(
     "-password -sessions -googleId -otp -otpExpiryDate",
   );
@@ -196,11 +191,11 @@ const googleAuth = asynchandler(async (req, res) => {
   // ✅ SAME cookie logic as your login
   return res
     .status(200)
-    .cookie("accessToken", accessToken, ACCESS_TOKEN_OPTIONS)
+    .cookie("accessToken", accessToken, SESSION_COOKIE_OPTIONS)
     .cookie(
       "refreshToken",
       refreshToken,
-      rememberMe ? REFRESH_TOKEN_OPTIONS : TOKEN_OPTIONS,
+      rememberMe ? REFRESH_TOKEN_COOKIE_OPTIONS : SESSION_COOKIE_OPTIONS,
     )
     .json(new ApiRes(200, loggedUser, "Google auth successful!"));
 });
@@ -222,7 +217,7 @@ const registerUser = asynchandler(async (req, res) => {
     throw new ApiError(409, "User already exists with same username or email!");
   }
 
-  const createdUser = await User.create({
+  await User.create({
     username,
     email,
     password,
@@ -236,7 +231,7 @@ const registerUser = asynchandler(async (req, res) => {
 });
 
 const loginUser = asynchandler(async (req, res) => {
-  const { userCredential, password } = req.body;
+  const { userCredential, password, rememberMe } = req.body;
 
   if (!userCredential) {
     throw new ApiError(400, "Username or Email is required!");
@@ -278,8 +273,12 @@ const loginUser = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, ACCESS_TOKEN_OPTIONS)
-    .cookie("refreshToken", refreshToken, REFRESH_TOKEN_OPTIONS)
+    .cookie("accessToken", accessToken, SESSION_COOKIE_OPTIONS)
+    .cookie(
+      "refreshToken",
+      refreshToken,
+      rememberMe ? REFRESH_TOKEN_COOKIE_OPTIONS : SESSION_COOKIE_OPTIONS,
+    )
     .json(new ApiRes(200, loggedUser, "user logged in successfully!"));
 });
 
@@ -292,8 +291,8 @@ const logoutUser = asynchandler(async (req, res) => {
 
   return res
     .status(204)
-    .clearCookie("accessToken", TOKEN_OPTIONS)
-    .clearCookie("refreshToken", TOKEN_OPTIONS)
+    .clearCookie("accessToken", SESSION_COOKIE_OPTIONS)
+    .clearCookie("refreshToken", SESSION_COOKIE_OPTIONS)
     .json(new ApiRes(204, {}, "user logged out successfully!"));
 });
 
@@ -345,11 +344,11 @@ const refreshSession = asynchandler(async (req, res) => {
 
   return res
     .status(200)
-    .cookie("accessToken", accessToken, ACCESS_TOKEN_OPTIONS)
+    .cookie("accessToken", accessToken, SESSION_COOKIE_OPTIONS)
     .cookie(
       "refreshToken",
       refreshToken,
-      rememberMe ? REFRESH_TOKEN_OPTIONS : TOKEN_OPTIONS,
+      rememberMe ? REFRESH_TOKEN_COOKIE_OPTIONS : SESSION_COOKIE_OPTIONS,
     )
     .json(new ApiRes(200, user, "refreshed tokens successfully!"));
 });
