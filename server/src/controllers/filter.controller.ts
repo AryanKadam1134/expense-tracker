@@ -88,6 +88,7 @@ const getUserCategoriesAsOptions = asynchandler(async (req, res) => {
 const getReminderOptions = asynchandler(async (req, res) => {
   const reminders = await Reminder.find({
     ownerId: req.user?._id,
+    remainingDue: { $gt: 0 },
   });
 
   if (reminders?.length === 0) {
@@ -99,6 +100,7 @@ const getReminderOptions = asynchandler(async (req, res) => {
   const remindersAsOptions = reminders.map((reminder) => ({
     value: reminder?._id,
     label: reminder?.title,
+    remainingDue: reminder.remainingDue,
   }));
 
   return res

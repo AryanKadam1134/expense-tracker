@@ -234,8 +234,11 @@ const addTransaction = asynchandler(async (req, res) => {
           throw new ApiError(404, "Reminder not found!");
         }
 
-        if (reminderExists.remainingDue < amount) {
-          throw new ApiError(400, "Amount is greater than the due amount!");
+        if (amount !== reminderExists.remainingDue) {
+          throw new ApiError(
+            400,
+            "Payment amount must equal the reminder's remaining due!",
+          );
         }
 
         await Reminder.updateOne(
@@ -243,7 +246,7 @@ const addTransaction = asynchandler(async (req, res) => {
           {
             $inc: { remainingDue: -amount },
             $set: {
-              isPaid: reminderExists.remainingDue === amount ? true : false,
+              isPaid: true,
             },
           },
           { session },

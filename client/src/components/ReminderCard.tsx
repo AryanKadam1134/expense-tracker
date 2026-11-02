@@ -71,9 +71,6 @@ const ReminderCard = ({ reminder, onDelete }: ReminderCardProps) => {
                 <CalendarClock size={14} /> Due{" "}
                 {formatDateInAlphaNumeric(reminder.dueDate)}
               </span>
-              {reminder.frequency && (
-                <span className="capitalize">Repeats {reminder.frequency}</span>
-              )}
             </div>
             <div className="mt-4 max-w-md">
               <div className="mb-1.5 flex justify-between gap-3 text-xs">

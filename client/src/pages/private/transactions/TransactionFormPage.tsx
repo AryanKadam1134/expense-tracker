@@ -57,7 +57,9 @@ const TransactionFormPage = () => {
   });
 
   const selectedType = watch("type");
+  const selectedReminderId = watch("reminderId");
   const isCredit = selectedType === "credit";
+  const isReminderSelected = Boolean(selectedReminderId);
 
   const [customCategory, setCustomCategory] = useState<boolean>(false);
 
@@ -261,7 +263,20 @@ const TransactionFormPage = () => {
               placeholder="No reminder"
               options={reminderOptions}
               value={field.value}
-              onChange={(value) => field.onChange(value || null)}
+              onChange={(value) => {
+                field.onChange(value || null);
+                if (value) {
+                  const selectedReminder = reminderOptions.find(
+                    (reminder) => reminder.value === value,
+                  );
+                  if (selectedReminder) {
+                    setValue("amount", selectedReminder.remainingDue, {
+                      shouldValidate: true,
+                      shouldDirty: true,
+                    });
+                  }
+                }
+              }}
               disabled={isEditing || isCredit || loadingReminderOptions}
             />
           )}
@@ -311,7 +326,7 @@ const TransactionFormPage = () => {
       {/* Amount */}
       <FormField
         id="amount"
-        label="Amount"
+        label={isReminderSelected ? "Amount (fixed by reminder)" : "Amount"}
         required
         error={errors?.amount?.message}
       >
@@ -324,6 +339,12 @@ const TransactionFormPage = () => {
             valueAsNumber: true,
           })}
           disabled={isEditing}
+          readOnly={isReminderSelected}
+          className={
+            isReminderSelected
+              ? "cursor-not-allowed bg-light-input-bgDisabled"
+              : ""
+          }
         />
       </FormField>
 

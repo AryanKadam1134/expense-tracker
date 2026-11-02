@@ -88,6 +88,10 @@ export interface Filter {
   label: string;
 }
 
+export interface ReminderOption extends Filter {
+  remainingDue: number;
+}
+
 export interface PaginationData {
   total: number;
   page: number;

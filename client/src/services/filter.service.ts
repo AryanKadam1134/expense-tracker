@@ -1,6 +1,6 @@
 import api from "./api.service";
 
-import type { ApiResponse, Filter } from "../types/api.types";
+import type { ApiResponse, Filter, ReminderOption } from "../types/api.types";
 
 export const filterEndpoints = {
   getBanksOptions: () =>
@@ -16,7 +16,7 @@ export const filterEndpoints = {
     api.get<ApiResponse<Filter[]>>(`/filters/reminder-repeats`),
 
   getReminderOptions: () =>
-    api.get<ApiResponse<Filter[]>>(`/filters/reminder-options`),
+    api.get<ApiResponse<ReminderOption[]>>(`/filters/reminder-options`),
 
   getAccountOptions: () =>
     api.get<ApiResponse<Filter[]>>(`/filters/account-options`),

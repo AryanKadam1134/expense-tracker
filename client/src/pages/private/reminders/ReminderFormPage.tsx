@@ -1,12 +1,11 @@
 import { useCallback, useEffect } from "react";
 
-import { Controller, useForm, type SubmitHandler } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
-import CustomSelect from "../../../components/ui/CustomSelect";
 import CustomTextArea from "../../../components/ui/CustomTextArea";
 import CustomDatePicker from "../../../components/ui/CustomDatePicker";
 
@@ -16,7 +15,6 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { reminderEndpoints } from "../../../services/reminder.service";
 
 import useApi from "../../../hooks/useApi";
-import useReminderRepeats from "../../../hooks/useReminderRepeats";
 
 import { useNotify } from "../../../context/notification";
 
@@ -34,13 +32,10 @@ const ReminderFormPage = () => {
     loadingReminder: false,
     saving: false,
   });
-  const { loadingReminderRepeats, reminderRepeats } = useReminderRepeats();
-
   const {
     register,
     handleSubmit,
     reset,
-    control,
     formState: { errors, dirtyFields },
   } = useForm<ReminderPayload>({ mode: "onChange" });
 
@@ -170,28 +165,6 @@ const ReminderFormPage = () => {
         <CustomDatePicker
           id="dueDate"
           {...register("dueDate", { required: "Due date is required!" })}
-        />
-      </FormField>
-
-      {/* Frequency */}
-      <FormField
-        id="frequency"
-        label="Frequency"
-        error={errors.frequency?.message}
-      >
-        <Controller
-          name="frequency"
-          control={control}
-          render={({ field }) => (
-            <CustomSelect
-              id="frequency"
-              placeholder="Does not repeat"
-              options={reminderRepeats}
-              value={field.value}
-              onChange={(value) => field.onChange(value || null)}
-              disabled={loadingReminderRepeats}
-            />
-          )}
         />
       </FormField>
 
