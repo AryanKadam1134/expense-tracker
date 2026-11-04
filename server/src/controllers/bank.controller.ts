@@ -17,7 +17,9 @@ const addBank = asynchandler(async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    throw new ApiError(400, "Name is required!");
+    throw new ApiError(400, "Name is required!", {
+      name: ["Bank name is required!"],
+    });
   }
 
   const bankExists = await Bank.findOne({
@@ -26,7 +28,9 @@ const addBank = asynchandler(async (req, res) => {
   });
 
   if (bankExists) {
-    throw new ApiError(400, "Bank already exists!");
+    throw new ApiError(400, "Bank already exists!", {
+      name: ["A bank with this name already exists!"],
+    });
   }
 
   const createBank = await Bank.create({
@@ -49,7 +53,9 @@ const updateBank = asynchandler(async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    throw new ApiError(400, "Name is required!");
+    throw new ApiError(400, "Name is required!", {
+      name: ["Bank name is required!"],
+    });
   }
 
   const bankExists = await Bank.findOne({
@@ -59,7 +65,9 @@ const updateBank = asynchandler(async (req, res) => {
   });
 
   if (bankExists) {
-    throw new ApiError(400, "Bank already exists!");
+    throw new ApiError(400, "Bank already exists!", {
+      name: ["A bank with this name already exists!"],
+    });
   }
 
   Object.assign(bank, { name });

@@ -13,7 +13,10 @@ export interface AuthContextType {
   user: User | null;
   authLoading: boolean;
   googleAuth: (body: GoogleAuth) => void;
-  login: (payload: Login) => Promise<boolean | undefined>;
+  login: (
+    payload: Login,
+    onError?: (error: unknown) => void,
+  ) => Promise<boolean | undefined>;
   setUser: Dispatch<SetStateAction<User | null>>;
   logout: () => void;
 }

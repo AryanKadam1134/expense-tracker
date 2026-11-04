@@ -22,7 +22,9 @@ const addCategory = async (
 
   try {
     if (typeof category !== "string") {
-      throw new ApiError(400, "Enter a valid category!");
+      throw new ApiError(400, "Enter a valid category!", {
+        categoryId: ["Enter a valid category!"],
+      });
     }
 
     const categoryValue = category.trim();
@@ -43,7 +45,9 @@ const addCategory = async (
     }
 
     if (!categoryExists) {
-      throw new ApiError(404, "Category not found!");
+      throw new ApiError(404, "Category not found!", {
+        categoryId: ["Category not found!"],
+      });
     }
 
     return categoryExists._id;
@@ -155,36 +159,24 @@ const addTransaction = asynchandler(async (req, res) => {
     note,
   } = req.body;
 
-  // --- check if account exists --- //
-  if (!accountId) {
-    throw new ApiError(400, "Account is required!");
-  }
+  const fieldErrors: Record<string, string[]> = {};
+  if (!accountId) fieldErrors.accountId = ["Account is required!"];
+  if (!title) fieldErrors.title = ["Title is required!"];
+  if (!type) fieldErrors.type = ["Transaction type is required!"];
+  else if (!TRANSACTION_TYPES.map((t) => t.value).includes(type))
+    fieldErrors.type = ["Enter a valid transaction type!"];
+  if (!date) fieldErrors.date = ["Date is required!"];
+  if (!amount) fieldErrors.amount = ["Amount is required!"];
+  else if (typeof amount !== "number" || amount <= 0)
+    fieldErrors.amount = ["Enter a valid amount!"];
 
-  // --- check required fields --- //
-  if (!title) {
-    throw new ApiError(400, "Title is required!");
+  if (Object.keys(fieldErrors).length) {
+    throw new ApiError(
+      400,
+      "Please correct the highlighted fields.",
+      fieldErrors,
+    );
   }
-
-  if (!type) {
-    throw new ApiError(400, "Account type is required!");
-  }
-
-  if (!TRANSACTION_TYPES.map((t) => t.value).includes(type)) {
-    throw new ApiError(400, "Enter a valid Transaction type!");
-  }
-
-  if (!date) {
-    throw new ApiError(400, "Date is required!");
-  }
-
-  if (!amount) {
-    throw new ApiError(400, "Amount is required!");
-  }
-
-  if (typeof amount !== "number" || amount <= 0) {
-    throw new ApiError(400, "Enter a valid amount!");
-  }
-  // --- check required fields --- //
 
   // --- assign fields --- //
   const fields: {
@@ -221,7 +213,9 @@ const addTransaction = asynchandler(async (req, res) => {
       }).session(session);
 
       if (!accountExists) {
-        throw new ApiError(404, "Account not found!");
+        throw new ApiError(404, "Account not found!", {
+          accountId: ["Account not found!"],
+        });
       }
 
       if (type === "debit" && reminderId) {
@@ -231,13 +225,16 @@ const addTransaction = asynchandler(async (req, res) => {
         }).session(session);
 
         if (!reminderExists) {
-          throw new ApiError(404, "Reminder not found!");
+          throw new ApiError(404, "Reminder not found!", {
+            reminderId: ["Reminder not found!"],
+          });
         }
 
         if (amount !== reminderExists.remainingDue) {
           throw new ApiError(
             400,
             "Payment amount must equal the reminder's remaining due!",
+            { amount: ["Payment must equal the reminder's remaining due!"] },
           );
         }
 
@@ -254,13 +251,16 @@ const addTransaction = asynchandler(async (req, res) => {
 
         fields.reminderId = reminderExists._id;
       } else if (type === "credit" && reminderId) {
-        throw new ApiError(409, "Due cannot be paid on a credit!");
+        throw new ApiError(409, "Due cannot be paid on a credit!", {
+          reminderId: ["Only debit transactions can pay a reminder."],
+        });
       }
 
       if (type === "debit" && accountExists?.currentBalance < amount) {
         throw new ApiError(
           400,
           "Not sufficient balance available for debitting!",
+          { amount: ["Insufficient account balance for this debit."] },
         );
       }
 
@@ -481,32 +481,29 @@ const addB2BTransaction = asynchandler(async (req, res) => {
     note,
   } = req.body;
 
-  // --- check if account exists --- //
-  if (!debitAccountId) {
-    throw new ApiError(400, "Debit Account is required!");
-  }
+  const fieldErrors: Record<string, string[]> = {};
+  if (!debitAccountId)
+    fieldErrors.debitAccountId = ["Source account is required!"];
+  if (!creditAccountId)
+    fieldErrors.creditAccountId = ["Destination account is required!"];
+  if (
+    debitAccountId &&
+    creditAccountId &&
+    String(debitAccountId) === String(creditAccountId)
+  )
+    fieldErrors.creditAccountId = ["Choose a different destination account!"];
+  if (!title) fieldErrors.title = ["Title is required!"];
+  if (!date) fieldErrors.date = ["Date is required!"];
+  if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0)
+    fieldErrors.amount = ["Enter a valid amount!"];
 
-  if (!creditAccountId) {
-    throw new ApiError(400, "Credit Account is required!");
+  if (Object.keys(fieldErrors).length) {
+    throw new ApiError(
+      400,
+      "Please correct the highlighted fields.",
+      fieldErrors,
+    );
   }
-
-  if (String(debitAccountId) === String(creditAccountId)) {
-    throw new ApiError(400, "Debit and credit accounts must be different!");
-  }
-
-  // --- check required fields --- //
-  if (!title) {
-    throw new ApiError(400, "Title is required!");
-  }
-
-  if (!date) {
-    throw new ApiError(400, "Date is required!");
-  }
-
-  if (typeof amount !== "number" || !Number.isFinite(amount) || amount <= 0) {
-    throw new ApiError(400, "Enter a valid amount!");
-  }
-  // --- check required fields --- //
 
   const transferId = randomUUID();
   const sharedFields: {
@@ -525,7 +522,9 @@ const addB2BTransaction = asynchandler(async (req, res) => {
   };
 
   if (Number.isNaN(sharedFields.date.getTime())) {
-    throw new ApiError(400, "Enter a valid date!");
+    throw new ApiError(400, "Enter a valid date!", {
+      date: ["Enter a valid date!"],
+    });
   }
 
   if (description) sharedFields.description = description;
@@ -547,17 +546,22 @@ const addB2BTransaction = asynchandler(async (req, res) => {
       }).session(session);
 
       if (!debitAccount) {
-        throw new ApiError(404, "Couldn't find Debit Account!");
+        throw new ApiError(404, "Couldn't find Debit Account!", {
+          debitAccountId: ["Source account not found!"],
+        });
       }
 
       if (!creditAccount) {
-        throw new ApiError(404, "Couldn't find Credit Account!");
+        throw new ApiError(404, "Couldn't find Credit Account!", {
+          creditAccountId: ["Destination account not found!"],
+        });
       }
 
       if (debitAccount.currentBalance < amount) {
         throw new ApiError(
           400,
           "Not sufficient balance available for debitting!",
+          { amount: ["Insufficient balance in the source account."] },
         );
       }
 
@@ -655,7 +659,9 @@ const updateB2BTransaction = asynchandler(async (req, res) => {
   if (date !== undefined) {
     const parsedDate = new Date(date);
     if (Number.isNaN(parsedDate.getTime())) {
-      throw new ApiError(400, "Enter a valid date!");
+      throw new ApiError(400, "Enter a valid date!", {
+        date: ["Enter a valid date!"],
+      });
     }
     fields.date = parsedDate;
   }

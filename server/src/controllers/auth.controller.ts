@@ -203,18 +203,58 @@ const googleAuth = asynchandler(async (req, res) => {
 const registerUser = asynchandler(async (req, res) => {
   const { username, email, password, firstName, lastName } = req.body;
 
-  if (
-    [username, email, password, firstName, lastName].some(
-      (field) => typeof field === "string" && field?.trim() === "",
-    )
-  ) {
-    throw new ApiError(400, "All fields are required!");
+  const fieldErrors: Record<string, string[]> = {};
+
+  if (typeof firstName !== "string" || !firstName.trim())
+    fieldErrors.firstName = ["First name is required!"];
+
+  if (typeof username !== "string" || !username.trim())
+    fieldErrors.username = ["Username is required!"];
+  if (typeof username === "string" && username.trim()) {
+    if (username.length < 3 || username.length > 30)
+      fieldErrors.username = ["Username must be between 3 and 30 characters."];
+    else if (!/^[a-zA-Z0-9_-]+$/.test(username))
+      fieldErrors.username = [
+        "Username can only contain letters, numbers, hyphens, and underscores.",
+      ];
   }
 
-  const userExists = await User.findOne({ $or: [{ username }, { email }] });
+  if (typeof email !== "string" || !email.trim())
+    fieldErrors.email = ["Email is required!"];
+  else if (!/^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(email))
+    fieldErrors.email = ["Enter a valid email address."];
 
-  if (userExists) {
-    throw new ApiError(409, "User already exists with same username or email!");
+  if (typeof password !== "string" || !password)
+    fieldErrors.password = ["Password is required!"];
+  else if (password.length < 8 || password.length > 16)
+    fieldErrors.password = ["Password must be between 8 and 16 characters."];
+
+  if (Object.keys(fieldErrors).length) {
+    throw new ApiError(
+      400,
+      "Please correct the highlighted fields.",
+      fieldErrors,
+    );
+  }
+
+  const userExistsWithUsername = await User.findOne({
+    username,
+  });
+
+  const userExistsWithEmail = await User.findOne({
+    email,
+  });
+
+  if (userExistsWithUsername) {
+    throw new ApiError(409, "Username already taken!", {
+      username: ["Username already exists!"],
+    });
+  }
+
+  if (userExistsWithEmail) {
+    throw new ApiError(409, "User already exist with this email!", {
+      email: ["Email already exists!"],
+    });
   }
 
   await User.create({
@@ -234,11 +274,15 @@ const loginUser = asynchandler(async (req, res) => {
   const { userCredential, password, rememberMe } = req.body;
 
   if (!userCredential) {
-    throw new ApiError(400, "Username or Email is required!");
+    throw new ApiError(400, "Username or Email is required!", {
+      userCredential: ["Username or email is required!"],
+    });
   }
 
   if (!password) {
-    throw new ApiError(400, "Password is required!");
+    throw new ApiError(400, "Password is required!", {
+      password: ["Password is required!"],
+    });
   }
 
   const userExists = await User.findOne({
@@ -246,13 +290,17 @@ const loginUser = asynchandler(async (req, res) => {
   });
 
   if (!userExists) {
-    throw new ApiError(404, "User not found!");
+    throw new ApiError(404, "User not found!", {
+      userCredential: ["No account matches this username or email!"],
+    });
   }
 
   const isPasswordCorrect = await userExists.isPasswordCorrect(password);
 
   if (!isPasswordCorrect) {
-    throw new ApiError(401, "Invalid password!");
+    throw new ApiError(401, "Invalid password!", {
+      password: ["The password is incorrect!"],
+    });
   }
 
   const tokens = await generateAccessAndRefreshToken(userExists._id, req);

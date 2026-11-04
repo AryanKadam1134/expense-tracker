@@ -17,6 +17,7 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { transactionEndpoints } from "../../../services/transaction.service";
 
 import useApi from "../../../hooks/useApi";
+import useFieldErrors from "../../../hooks/useFieldErrors";
 import useAccountOptions from "../../../hooks/useAccountOptions";
 import useCategoryOptions from "../../../hooks/useCategoryOptions";
 import useReminderOptions from "../../../hooks/useReminderOptions";
@@ -50,11 +51,13 @@ const TransactionFormPage = () => {
     control,
     watch,
     setValue,
+    setError,
     formState: { errors, dirtyFields },
   } = useForm<TransactionPayload>({
     mode: "onChange",
     defaultValues: { reminderId: null },
   });
+  const { addErrors } = useFieldErrors(setError);
 
   const selectedType = watch("type");
   const selectedReminderId = watch("reminderId");
@@ -121,6 +124,7 @@ const TransactionFormPage = () => {
           navigate("/transactions");
         },
         onError: (error) => {
+          addErrors(error);
           const errorMessage =
             error instanceof Error
               ? error?.message
@@ -253,7 +257,11 @@ const TransactionFormPage = () => {
       </FormField>
 
       {/* Reminder payment (debit only) */}
-      <FormField id="reminderId" label="Pay reminder">
+      <FormField
+        id="reminderId"
+        label="Pay reminder"
+        error={errors?.reminderId?.message}
+      >
         <Controller
           name="reminderId"
           control={control}

@@ -13,6 +13,7 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { accountEndpoints } from "../../../services/account.service";
 
 import useApi from "../../../hooks/useApi";
+import useFieldErrors from "../../../hooks/useFieldErrors";
 import useBankOptions from "../../../hooks/useBankOptions";
 import useAccountTypes from "../../../hooks/useAccountTypes";
 
@@ -40,10 +41,12 @@ const AccountFormPage = () => {
     handleSubmit,
     reset,
     control,
+    setError,
     formState: { errors, dirtyFields },
   } = useForm<AccountPayload>({
     mode: "onChange",
   });
+  const { addErrors } = useFieldErrors(setError);
 
   const fetchAccount = useCallback(() => {
     if (!accountId) return;
@@ -79,6 +82,7 @@ const AccountFormPage = () => {
           navigate("/accounts");
         },
         onError: (error) => {
+          addErrors(error);
           const errorMessage =
             error instanceof Error
               ? error?.message

@@ -11,6 +11,8 @@ import CustomButton from "../../components/ui/CustomButton";
 import CustomCheckbox from "../../components/ui/CustomCheckbox";
 import CustomInputPassword from "../../components/ui/CustomInputPassword";
 
+import useFieldErrors from "../../hooks/useFieldErrors";
+
 import { useAuth } from "../../context/auth";
 
 import type { Login } from "../../types/api.types";
@@ -24,15 +26,17 @@ const SignIn = () => {
     register,
     handleSubmit,
     control,
+    setError,
     formState: { errors, isSubmitting },
   } = useForm<Login>({
     mode: "onChange",
   });
+  const { addErrors } = useFieldErrors(setError);
 
   const rememberMe = useWatch({ control, name: "rememberMe" });
 
   const onSubmit: SubmitHandler<Login> = async (payload) => {
-    const success = await login(payload);
+    const success = await login(payload, addErrors);
     if (success) navigate("/details");
   };
 

@@ -4,10 +4,10 @@ import { v4 as uuidv4 } from "uuid";
 
 import { authEndpoints } from "../../services/auth.service";
 
+import useApi from "../../hooks/useApi";
+
 import { AuthContext } from "./useAuth";
 import { useNotify } from "../notification";
-
-import useApi from "../../hooks/useApi";
 
 import type { GoogleAuth, Login, User } from "../../types/api.types";
 
@@ -51,7 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const login = async (payload: Login) => {
+  const login = async (payload: Login, onError?: (error: unknown) => void) => {
     const data = await callApi(
       "login",
       () => authEndpoints.login(payload, config),
@@ -65,6 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             error instanceof Error ? error?.message : "Login failed!";
           notify.error(errorMessage);
           setError(errorMessage);
+          onError?.(error);
         },
       },
     );

@@ -11,7 +11,9 @@ const addCategory = asynchandler(async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    throw new ApiError(400, "Name is required!");
+    throw new ApiError(400, "Name is required!", {
+      name: ["Category name is required!"],
+    });
   }
 
   const categoryExists = await Category.findOne({
@@ -20,7 +22,9 @@ const addCategory = asynchandler(async (req, res) => {
   });
 
   if (categoryExists) {
-    throw new ApiError(400, "Category already exists!");
+    throw new ApiError(400, "Category already exists!", {
+      name: ["A category with this name already exists!"],
+    });
   }
 
   const createCategory = await Category.create({
@@ -45,7 +49,9 @@ const updateCategory = asynchandler(async (req, res) => {
   const { name } = req.body;
 
   if (!name) {
-    throw new ApiError(400, "Name is required!");
+    throw new ApiError(400, "Name is required!", {
+      name: ["Category name is required!"],
+    });
   }
 
   const categoryExists = await Category.findOne({
@@ -55,7 +61,9 @@ const updateCategory = asynchandler(async (req, res) => {
   });
 
   if (categoryExists) {
-    throw new ApiError(400, "Category already exists!");
+    throw new ApiError(400, "Category already exists!", {
+      name: ["A category with this name already exists!"],
+    });
   }
 
   Object.assign(category, { name });

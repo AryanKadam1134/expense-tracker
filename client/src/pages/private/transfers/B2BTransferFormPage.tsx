@@ -16,6 +16,7 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { transactionEndpoints } from "../../../services/transaction.service";
 
 import useApi from "../../../hooks/useApi";
+import useFieldErrors from "../../../hooks/useFieldErrors";
 import useAccountOptions from "../../../hooks/useAccountOptions";
 import useCategoryOptions from "../../../hooks/useCategoryOptions";
 
@@ -45,10 +46,12 @@ const B2BTransferFormPage = () => {
     reset,
     control,
     watch,
+    setError,
     formState: { errors, dirtyFields },
   } = useForm<B2BTransactionPayload>({
     mode: "onChange",
   });
+  const { addErrors } = useFieldErrors(setError);
 
   const debitAccountId = watch("debitAccountId");
 
@@ -123,12 +126,16 @@ const B2BTransferFormPage = () => {
 
           navigate("/transfers");
         },
-        onError: (error) =>
+        onError: (error) => {
+          addErrors(error);
           notify.error(
             error instanceof Error
               ? error.message
-              : "Couldn't update transfer!",
-          ),
+              : isEditing
+                ? "Couldn't update transfer!"
+                : "Couldn't create transfer!",
+          );
+        },
       },
     );
   };

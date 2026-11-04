@@ -1,13 +1,13 @@
-class ApiError<T> extends Error {
+class ApiError extends Error {
   statusCode: number;
   message: string;
-  errors: unknown[];
+  errors: Record<string, unknown>;
   success: boolean;
 
   constructor(
     statusCode: number = 500,
     message: string = "Something went wrong!",
-    errors: unknown[] = [],
+    errors: Record<string, unknown> = {},
     success: boolean = false,
     stack: string = "",
   ) {

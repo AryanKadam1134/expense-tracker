@@ -15,6 +15,7 @@ import CustomInputPassword from "../../components/ui/CustomInputPassword";
 import { authEndpoints } from "../../services/auth.service";
 
 import useApi from "../../hooks/useApi";
+import useFieldErrors from "../../hooks/useFieldErrors";
 
 import { useNotify } from "../../context/notification/useNotify";
 
@@ -25,7 +26,7 @@ const SignUp = () => {
 
   const { loading, callApi } = useApi({ registering: false });
 
-  const [error, setError] = useState<string | null>(null);
+  const [error, setApiError] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -33,16 +34,18 @@ const SignUp = () => {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors },
   } = useForm<Register>({
     mode: "onChange",
   });
+  const { addErrors } = useFieldErrors(setError);
 
   const onSubmit: SubmitHandler<Register> = (payload) => {
     callApi("registering", () => authEndpoints.register(payload), {
       onSuccess: (res) => {
         reset();
-        setError(null);
+        setApiError(null);
         notify.success(res?.message || "Account created!");
         navigate("/signin");
       },
@@ -50,7 +53,8 @@ const SignUp = () => {
         const errorMessage =
           error instanceof Error ? error?.message : "Registration failed!";
         notify.error(errorMessage);
-        setError(errorMessage);
+        setApiError(errorMessage);
+        addErrors(error);
       },
     });
   };

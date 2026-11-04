@@ -16,15 +16,21 @@ const addReminder = asynchandler(async (req, res) => {
   const { title, description, originalDue, dueDate, frequency } = req.body;
 
   if (!title) {
-    throw new ApiError(400, "Title is required!");
+    throw new ApiError(400, "Title is required!", {
+      title: ["Title is required!"],
+    });
   }
 
   if (!originalDue) {
-    throw new ApiError(400, "Opening due is required!");
+    throw new ApiError(400, "Opening due is required!", {
+      originalDue: ["Opening due is required!"],
+    });
   }
 
   if (!dueDate) {
-    throw new ApiError(400, "Due date is required!");
+    throw new ApiError(400, "Due date is required!", {
+      dueDate: ["Due date is required!"],
+    });
   }
 
   const reminderExists = await Reminder.findOne({
@@ -33,7 +39,9 @@ const addReminder = asynchandler(async (req, res) => {
   });
 
   if (reminderExists) {
-    throw new ApiError(400, "Title already exists!");
+    throw new ApiError(400, "Title already exists!", {
+      title: ["A reminder with this title already exists!"],
+    });
   }
 
   const fields: {
@@ -82,7 +90,9 @@ const updateReminder = asynchandler(async (req, res) => {
     });
 
     if (reminderTitleExists) {
-      throw new ApiError(400, "Reminder title already exists!");
+      throw new ApiError(400, "Reminder title already exists!", {
+        title: ["A reminder with this title already exists!"],
+      });
     }
   }
 

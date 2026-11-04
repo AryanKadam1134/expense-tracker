@@ -15,6 +15,7 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { reminderEndpoints } from "../../../services/reminder.service";
 
 import useApi from "../../../hooks/useApi";
+import useFieldErrors from "../../../hooks/useFieldErrors";
 
 import { useNotify } from "../../../context/notification";
 
@@ -36,8 +37,10 @@ const ReminderFormPage = () => {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, dirtyFields },
   } = useForm<ReminderPayload>({ mode: "onChange" });
+  const { addErrors } = useFieldErrors(setError);
 
   const fetchReminder = useCallback(() => {
     if (!reminderId) return;
@@ -81,6 +84,7 @@ const ReminderFormPage = () => {
           navigate("/reminders");
         },
         onError: (error) => {
+          addErrors(error);
           notify.error(
             error instanceof Error
               ? error.message

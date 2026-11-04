@@ -16,15 +16,21 @@ const addAccount = asynchandler(async (req, res) => {
   const { bankId, name, accountNumber, accountType, openingBalance } = req.body;
 
   if (!bankId) {
-    throw new ApiError(400, "Bank is required!");
+    throw new ApiError(400, "Bank is required!", {
+      bankId: ["Bank is required!"],
+    });
   }
 
   if (!name) {
-    throw new ApiError(400, "Account name is required!");
+    throw new ApiError(400, "Account name is required!", {
+      name: ["Account name is required!"],
+    });
   }
 
   if (!openingBalance) {
-    throw new ApiError(400, "Opening Balance is required!");
+    throw new ApiError(400, "Opening Balance is required!", {
+      openingBalance: ["Opening balance is required!"],
+    });
   }
 
   const accountWithSameName = await Account.findOne({
@@ -34,7 +40,9 @@ const addAccount = asynchandler(async (req, res) => {
   });
 
   if (accountWithSameName) {
-    throw new ApiError(400, "Account name already for this bank!");
+    throw new ApiError(400, "Account name already for this bank!", {
+      name: ["An account with this name already exists for this bank!"],
+    });
   }
 
   const fields: {
@@ -80,7 +88,9 @@ const updateAccount = asynchandler(async (req, res) => {
     });
 
     if (accountWithSameName) {
-      throw new ApiError(400, "Account name already exists for this bank!");
+      throw new ApiError(400, "Account name already exists for this bank!", {
+        name: ["An account with this name already exists for this bank!"],
+      });
     }
   }
 

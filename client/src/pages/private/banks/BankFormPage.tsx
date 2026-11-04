@@ -12,6 +12,7 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { bankEndpoints } from "../../../services/bank.service";
 
 import useApi from "../../../hooks/useApi";
+import useFieldErrors from "../../../hooks/useFieldErrors";
 
 import { useNotify } from "../../../context/notification";
 
@@ -34,8 +35,10 @@ const BankFormPage = () => {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, dirtyFields },
   } = useForm<BankPayload>({ mode: "onChange" });
+  const { addErrors } = useFieldErrors(setError);
 
   const fetchBank = useCallback(() => {
     if (!bankId) return;
@@ -74,6 +77,7 @@ const BankFormPage = () => {
           navigate("/banks");
         },
         onError: (error) => {
+          addErrors(error);
           notify.error(
             error instanceof Error
               ? error.message

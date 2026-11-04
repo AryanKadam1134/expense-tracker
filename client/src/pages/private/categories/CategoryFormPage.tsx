@@ -12,6 +12,7 @@ import { getUpdatedFields } from "../../../utils/getUpdatedFields";
 import { categoryEndpoints } from "../../../services/category.service";
 
 import useApi from "../../../hooks/useApi";
+import useFieldErrors from "../../../hooks/useFieldErrors";
 
 import { useNotify } from "../../../context/notification";
 
@@ -34,8 +35,10 @@ const CategoryFormPage = () => {
     register,
     handleSubmit,
     reset,
+    setError,
     formState: { errors, dirtyFields },
   } = useForm<CategoryPayload>({ mode: "onChange" });
+  const { addErrors } = useFieldErrors(setError);
 
   const fetchCategory = useCallback(() => {
     if (!categoryId) return;
@@ -79,6 +82,7 @@ const CategoryFormPage = () => {
           navigate("/categories");
         },
         onError: (error) => {
+          addErrors(error);
           notify.error(
             error instanceof Error
               ? error.message
