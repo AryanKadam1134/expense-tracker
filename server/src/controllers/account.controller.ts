@@ -40,7 +40,7 @@ const addAccount = asynchandler(async (req, res) => {
   });
 
   if (accountWithSameName) {
-    throw new ApiError(400, "Account name already for this bank!", {
+    throw new ApiError(409, "Account name already for this bank!", {
       name: ["An account with this name already exists for this bank!"],
     });
   }
@@ -67,7 +67,7 @@ const addAccount = asynchandler(async (req, res) => {
     ...fields,
   });
 
-  return res.status(200).json(new ApiRes(200, createAccount, "Account added!"));
+  return res.status(201).json(new ApiRes(201, createAccount, "Account added!"));
 });
 
 const updateAccount = asynchandler(async (req, res) => {
@@ -88,7 +88,7 @@ const updateAccount = asynchandler(async (req, res) => {
     });
 
     if (accountWithSameName) {
-      throw new ApiError(400, "Account name already exists for this bank!", {
+      throw new ApiError(409, "Account name already exists for this bank!", {
         name: ["An account with this name already exists for this bank!"],
       });
     }

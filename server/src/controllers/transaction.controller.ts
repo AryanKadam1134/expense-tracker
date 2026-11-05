@@ -300,8 +300,8 @@ const addTransaction = asynchandler(async (req, res) => {
   }
 
   return res
-    .status(200)
-    .json(new ApiRes(200, createTransaction, "Transaction added!"));
+    .status(201)
+    .json(new ApiRes(201, createTransaction, "Transaction added!"));
 });
 
 const updateTransaction = asynchandler(async (req, res) => {
@@ -622,10 +622,10 @@ const addB2BTransaction = asynchandler(async (req, res) => {
   }
 
   return res
-    .status(200)
+    .status(201)
     .json(
       new ApiRes(
-        200,
+        201,
         { transferId, debitTransaction, creditTransaction },
         "Transaction completed!",
       ),

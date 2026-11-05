@@ -41,11 +41,22 @@ export const asynchandler = (func: RequestHandler): RequestHandler => {
 
       const errors = { ...duplicateErrors, ...validationErrors };
 
+      const errorName =
+        typeof errorRecord.name === "string" ? errorRecord.name : "";
       const statusCode =
         typeof errorRecord.statusCode === "number"
           ? errorRecord.statusCode
-          : 500;
-      const message = error instanceof Error ? error.message : "Something went wrong!";
+          : errorRecord.code === 11000
+            ? 409
+            : ["ValidationError", "CastError"].includes(errorName)
+              ? 400
+              : ["JsonWebTokenError", "TokenExpiredError", "NotBeforeError"].includes(
+                    errorName,
+                  )
+                ? 401
+                : 500;
+      const message =
+        error instanceof Error ? error.message : "Something went wrong!";
 
       res.status(statusCode).json({
         statusCode,

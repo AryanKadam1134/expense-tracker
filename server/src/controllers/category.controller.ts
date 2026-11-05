@@ -22,7 +22,7 @@ const addCategory = asynchandler(async (req, res) => {
   });
 
   if (categoryExists) {
-    throw new ApiError(400, "Category already exists!", {
+    throw new ApiError(409, "Category already exists!", {
       name: ["A category with this name already exists!"],
     });
   }
@@ -33,8 +33,8 @@ const addCategory = asynchandler(async (req, res) => {
   });
 
   return res
-    .status(200)
-    .json(new ApiRes(200, createCategory, "Category added!"));
+    .status(201)
+    .json(new ApiRes(201, createCategory, "Category added!"));
 });
 
 const updateCategory = asynchandler(async (req, res) => {
@@ -61,7 +61,7 @@ const updateCategory = asynchandler(async (req, res) => {
   });
 
   if (categoryExists) {
-    throw new ApiError(400, "Category already exists!", {
+    throw new ApiError(409, "Category already exists!", {
       name: ["A category with this name already exists!"],
     });
   }

@@ -338,10 +338,10 @@ const logoutUser = asynchandler(async (req, res) => {
   });
 
   return res
-    .status(204)
+    .status(200)
     .clearCookie("accessToken", SESSION_COOKIE_OPTIONS)
     .clearCookie("refreshToken", SESSION_COOKIE_OPTIONS)
-    .json(new ApiRes(204, {}, "user logged out successfully!"));
+    .json(new ApiRes(200, {}, "user logged out successfully!"));
 });
 
 const refreshSession = asynchandler(async (req, res) => {

@@ -28,7 +28,7 @@ const addBank = asynchandler(async (req, res) => {
   });
 
   if (bankExists) {
-    throw new ApiError(400, "Bank already exists!", {
+    throw new ApiError(409, "Bank already exists!", {
       name: ["A bank with this name already exists!"],
     });
   }
@@ -38,7 +38,7 @@ const addBank = asynchandler(async (req, res) => {
     ownerId: loggedUserId,
   });
 
-  return res.status(200).json(new ApiRes(200, createBank, "Bank added!"));
+  return res.status(201).json(new ApiRes(201, createBank, "Bank added!"));
 });
 
 const updateBank = asynchandler(async (req, res) => {
@@ -65,7 +65,7 @@ const updateBank = asynchandler(async (req, res) => {
   });
 
   if (bankExists) {
-    throw new ApiError(400, "Bank already exists!", {
+    throw new ApiError(409, "Bank already exists!", {
       name: ["A bank with this name already exists!"],
     });
   }

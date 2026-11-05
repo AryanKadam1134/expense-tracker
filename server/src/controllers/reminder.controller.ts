@@ -39,7 +39,7 @@ const addReminder = asynchandler(async (req, res) => {
   });
 
   if (reminderExists) {
-    throw new ApiError(400, "Title already exists!", {
+    throw new ApiError(409, "Title already exists!", {
       title: ["A reminder with this title already exists!"],
     });
   }
@@ -67,8 +67,8 @@ const addReminder = asynchandler(async (req, res) => {
   });
 
   return res
-    .status(200)
-    .json(new ApiRes(200, createReminder, "Reminder added!"));
+    .status(201)
+    .json(new ApiRes(201, createReminder, "Reminder added!"));
 });
 
 const updateReminder = asynchandler(async (req, res) => {
@@ -90,7 +90,7 @@ const updateReminder = asynchandler(async (req, res) => {
     });
 
     if (reminderTitleExists) {
-      throw new ApiError(400, "Reminder title already exists!", {
+      throw new ApiError(409, "Reminder title already exists!", {
         title: ["A reminder with this title already exists!"],
       });
     }
