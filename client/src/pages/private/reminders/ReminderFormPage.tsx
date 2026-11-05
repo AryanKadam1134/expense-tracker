@@ -3,6 +3,8 @@ import { useCallback, useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
+import PageHeader from "../../../components/common/PageHeader";
+
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -102,107 +104,103 @@ const ReminderFormPage = () => {
   }, [fetchReminder]);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
-    >
-      <div className="col-span-full mb-1 border-b border-light-border-primary pb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
-          Payment planning
-        </p>
-        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
-          {isEditing ? "Edit reminder" : "Add a reminder"}
-        </h1>
-        <p className="mt-1 text-sm text-light-text-secondary">
-          Keep track of a due amount and when it needs attention.
-        </p>
-      </div>
-      {/* Title */}
-      <FormField
-        id="title"
-        label="Title"
-        required
-        error={errors.title?.message}
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading={isEditing ? "Edit reminder" : "Add a reminder"}
+        subHeading="Keep track of a due amount and when it needs attention."
+      />
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full grid grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
       >
-        <CustomInput
+        {/* Title */}
+        <FormField
           id="title"
-          type="text"
-          placeholder="e.g. Rent"
-          {...register("title", { required: "Title is required!" })}
-        />
-      </FormField>
+          label="Title"
+          required
+          error={errors.title?.message}
+        >
+          <CustomInput
+            id="title"
+            type="text"
+            placeholder="e.g. Rent"
+            {...register("title", { required: "Title is required!" })}
+          />
+        </FormField>
 
-      {/* Opening due */}
-      <FormField
-        id="originalDue"
-        label="Opening due"
-        required={!isEditing}
-        error={errors.originalDue?.message}
-      >
-        <CustomInput
+        {/* Opening due */}
+        <FormField
           id="originalDue"
-          type="number"
-          min="0.01"
-          step="any"
-          {...register("originalDue", {
-            ...(isEditing
-              ? {}
-              : {
-                  required: "Opening due is required!",
-                  valueAsNumber: true,
-                  validate: (value) =>
-                    (Number.isFinite(value) && value > 0) ||
-                    "Opening due must be greater than 0!",
-                }),
-          })}
-          disabled={isEditing}
-        />
-      </FormField>
+          label="Opening due"
+          required={!isEditing}
+          error={errors.originalDue?.message}
+        >
+          <CustomInput
+            id="originalDue"
+            type="number"
+            min="0.01"
+            step="any"
+            {...register("originalDue", {
+              ...(isEditing
+                ? {}
+                : {
+                    required: "Opening due is required!",
+                    valueAsNumber: true,
+                    validate: (value) =>
+                      (Number.isFinite(value) && value > 0) ||
+                      "Opening due must be greater than 0!",
+                  }),
+            })}
+            disabled={isEditing}
+          />
+        </FormField>
 
-      {/* Due date */}
-      <FormField
-        id="dueDate"
-        label="Due date"
-        required
-        error={errors.dueDate?.message}
-      >
-        <CustomDatePicker
+        {/* Due date */}
+        <FormField
           id="dueDate"
-          {...register("dueDate", { required: "Due date is required!" })}
-        />
-      </FormField>
+          label="Due date"
+          required
+          error={errors.dueDate?.message}
+        >
+          <CustomDatePicker
+            id="dueDate"
+            {...register("dueDate", { required: "Due date is required!" })}
+          />
+        </FormField>
 
-      {/* Description */}
-      <FormField
-        id="description"
-        label="Description"
-        error={errors.description?.message}
-        className="col-span-full"
-      >
-        <CustomTextArea
+        {/* Description */}
+        <FormField
           id="description"
-          rows={4}
-          placeholder="Optional details"
-          {...register("description")}
-        />
-      </FormField>
+          label="Description"
+          error={errors.description?.message}
+          className="col-span-full"
+        >
+          <CustomTextArea
+            id="description"
+            rows={4}
+            placeholder="Optional details"
+            {...register("description")}
+          />
+        </FormField>
 
-      <div className="col-span-full flex justify-end gap-2">
-        <CustomButton
-          type="button"
-          name="Cancel"
-          variant="green"
-          onClick={() => navigate(-1)}
-          disabled={loading.saving}
-        />
+        <div className="col-span-full flex justify-end gap-2">
+          <CustomButton
+            type="button"
+            name="Cancel"
+            variant="green"
+            onClick={() => navigate(-1)}
+            disabled={loading.saving}
+          />
 
-        <CustomButton
-          type="submit"
-          name={loading.saving ? "Saving..." : "Save"}
-          loading={loading.saving}
-        />
-      </div>
-    </form>
+          <CustomButton
+            type="submit"
+            name={loading.saving ? "Saving..." : "Save"}
+            loading={loading.saving}
+          />
+        </div>
+      </form>
+    </div>
   );
 };
 

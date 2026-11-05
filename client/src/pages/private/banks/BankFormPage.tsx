@@ -3,6 +3,8 @@ import { useCallback, useEffect } from "react";
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
+import PageHeader from "../../../components/common/PageHeader";
+
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -95,56 +97,52 @@ const BankFormPage = () => {
   }, [fetchBank]);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto grid w-full max-w-2xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:p-8"
-    >
-      <div className="mb-1 border-b border-light-border-primary pb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
-          Bank setup
-        </p>
-        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
-          {isEditing ? "Edit bank" : "Add a bank"}
-        </h1>
-        <p className="mt-1 text-sm text-light-text-secondary">
-          Add a financial institution to organize its accounts.
-        </p>
-      </div>
-      {/* Bank name */}
-      <FormField
-        id="name"
-        label="Bank name"
-        required
-        error={errors.name?.message}
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading={isEditing ? "Edit bank" : "Add a bank"}
+        subHeading="Add a financial institution to organize its accounts."
+      />
+
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full grid grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:p-8"
       >
-        <CustomInput
+        {/* Bank name */}
+        <FormField
           id="name"
-          type="text"
-          placeholder="e.g. SBI"
-          {...register("name", {
-            required: "Bank name is required!",
-            validate: (value) =>
-              value.trim().length > 0 || "Bank name is required!",
-          })}
-        />
-      </FormField>
+          label="Bank name"
+          required
+          error={errors.name?.message}
+        >
+          <CustomInput
+            id="name"
+            type="text"
+            placeholder="e.g. SBI"
+            {...register("name", {
+              required: "Bank name is required!",
+              validate: (value) =>
+                value.trim().length > 0 || "Bank name is required!",
+            })}
+          />
+        </FormField>
 
-      <div className="flex justify-end gap-2">
-        <CustomButton
-          type="button"
-          name="Cancel"
-          variant="green"
-          onClick={() => navigate(-1)}
-          disabled={loading.saving}
-        />
+        <div className="flex justify-end gap-2">
+          <CustomButton
+            type="button"
+            name="Cancel"
+            variant="green"
+            onClick={() => navigate(-1)}
+            disabled={loading.saving}
+          />
 
-        <CustomButton
-          type="submit"
-          name={loading.saving ? "Saving..." : "Save"}
-          loading={loading.saving}
-        />
-      </div>
-    </form>
+          <CustomButton
+            type="submit"
+            name={loading.saving ? "Saving..." : "Save"}
+            loading={loading.saving}
+          />
+        </div>
+      </form>
+    </div>
   );
 };
 

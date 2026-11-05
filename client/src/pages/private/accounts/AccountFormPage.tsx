@@ -3,6 +3,8 @@ import { useCallback, useEffect } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
+import PageHeader from "../../../components/common/PageHeader";
+
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -100,131 +102,127 @@ const AccountFormPage = () => {
   }, [fetchAccount]);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
-    >
-      <div className="col-span-full mb-1 border-b border-light-border-primary pb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
-          Account setup
-        </p>
-        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
-          {isEditing ? "Update account details" : "Add an account"}
-        </h1>
-        <p className="mt-1 text-sm text-light-text-secondary">
-          Organize the accounts you use to manage your money.
-        </p>
-      </div>
-      {/* Bank Name */}
-      <FormField
-        id="bankId"
-        label="Bank Name"
-        required
-        error={errors?.bankId?.message}
-      >
-        <Controller
-          name="bankId"
-          control={control}
-          render={({ field }) => (
-            <CustomSelect
-              id="bankId"
-              placeholder="Select"
-              options={bankOptions}
-              value={field?.value}
-              onChange={field?.onChange}
-              disabled={loadingBankOptions}
-            />
-          )}
-        />
-      </FormField>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading={isEditing ? "Update account details" : "Add an account"}
+        subHeading="Organize the accounts you use to manage your money."
+      />
 
-      {/* Account Name */}
-      <FormField
-        id="name"
-        label="Account Name"
-        required
-        error={errors?.name?.message}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full grid grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
       >
-        <CustomInput
+        {/* Bank Name */}
+        <FormField
+          id="bankId"
+          label="Bank Name"
+          required
+          error={errors?.bankId?.message}
+        >
+          <Controller
+            name="bankId"
+            control={control}
+            render={({ field }) => (
+              <CustomSelect
+                id="bankId"
+                placeholder="Select"
+                options={bankOptions}
+                value={field?.value}
+                onChange={field?.onChange}
+                disabled={loadingBankOptions}
+              />
+            )}
+          />
+        </FormField>
+
+        {/* Account Name */}
+        <FormField
           id="name"
-          type="text"
-          placeholder="Trading Account"
-          {...register("name", {
-            required: "Account name is required!",
-          })}
-        />
-      </FormField>
+          label="Account Name"
+          required
+          error={errors?.name?.message}
+        >
+          <CustomInput
+            id="name"
+            type="text"
+            placeholder="Trading Account"
+            {...register("name", {
+              required: "Account name is required!",
+            })}
+          />
+        </FormField>
 
-      {/* Account Number */}
-      <FormField
-        id="accountNumber"
-        label="Account Number"
-        error={errors?.accountNumber?.message}
-      >
-        <CustomInput
+        {/* Account Number */}
+        <FormField
           id="accountNumber"
-          type="number"
-          placeholder="*****7887"
-          {...register("accountNumber")}
-        />
-      </FormField>
+          label="Account Number"
+          error={errors?.accountNumber?.message}
+        >
+          <CustomInput
+            id="accountNumber"
+            type="number"
+            placeholder="*****7887"
+            {...register("accountNumber")}
+          />
+        </FormField>
 
-      {/* Account Type */}
-      <FormField
-        id="accountType"
-        label="Account Type"
-        error={errors?.accountType?.message}
-      >
-        <Controller
-          name="accountType"
-          control={control}
-          render={({ field }) => (
-            <CustomSelect
-              id="accountType"
-              placeholder="Select"
-              options={accountTypes}
-              value={field?.value}
-              onChange={field?.onChange}
-              disabled={loadingAccountTypes}
-            />
-          )}
-        />
-      </FormField>
+        {/* Account Type */}
+        <FormField
+          id="accountType"
+          label="Account Type"
+          error={errors?.accountType?.message}
+        >
+          <Controller
+            name="accountType"
+            control={control}
+            render={({ field }) => (
+              <CustomSelect
+                id="accountType"
+                placeholder="Select"
+                options={accountTypes}
+                value={field?.value}
+                onChange={field?.onChange}
+                disabled={loadingAccountTypes}
+              />
+            )}
+          />
+        </FormField>
 
-      {/* Opening Balance */}
-      <FormField
-        id="openingBalance"
-        label="Opening Balance"
-        required
-        error={errors?.openingBalance?.message}
-      >
-        <CustomInput
+        {/* Opening Balance */}
+        <FormField
           id="openingBalance"
-          type="number"
-          placeholder="******"
-          {...register("openingBalance", {
-            required: "Opening balance is required!",
-          })}
-          disabled={isEditing}
-        />
-      </FormField>
+          label="Opening Balance"
+          required
+          error={errors?.openingBalance?.message}
+        >
+          <CustomInput
+            id="openingBalance"
+            type="number"
+            placeholder="******"
+            {...register("openingBalance", {
+              required: "Opening balance is required!",
+            })}
+            disabled={isEditing}
+          />
+        </FormField>
 
-      <div className="col-span-full flex justify-end gap-2">
-        <CustomButton
-          type="button"
-          name="Cancel"
-          variant="green"
-          onClick={() => navigate(-1)}
-          disabled={loading.saving}
-        />
+        <div className="col-span-full flex justify-end gap-2">
+          <CustomButton
+            type="button"
+            name="Cancel"
+            variant="green"
+            onClick={() => navigate(-1)}
+            disabled={loading.saving}
+          />
 
-        <CustomButton
-          type="submit"
-          name={loading.saving ? "Saving..." : "Save"}
-          loading={loading.saving}
-        />
-      </div>
-    </form>
+          <CustomButton
+            type="submit"
+            name={loading.saving ? "Saving..." : "Save"}
+            loading={loading.saving}
+          />
+        </div>
+      </form>
+    </div>
   );
 };
 

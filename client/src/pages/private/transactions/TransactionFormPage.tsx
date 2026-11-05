@@ -3,6 +3,8 @@ import { useCallback, useEffect, useState } from "react";
 import { Controller, useForm, type SubmitHandler } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
 
+import PageHeader from "../../../components/common/PageHeader";
+
 import FormField from "../../../components/ui/FormField";
 import CustomInput from "../../../components/ui/CustomInput";
 import CustomButton from "../../../components/ui/CustomButton";
@@ -142,246 +144,242 @@ const TransactionFormPage = () => {
   }, [fetchTransaction]);
 
   return (
-    <form
-      onSubmit={handleSubmit(onSubmit)}
-      className="mx-auto grid w-full max-w-5xl grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
-    >
-      <div className="col-span-full mb-1 border-b border-light-border-primary pb-5">
-        <p className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#6b8f76]">
-          Transaction entry
-        </p>
-        <h1 className="mt-1 text-xl font-semibold tracking-tight text-light-text-primary">
-          {isEditing ? "Edit transaction" : "Add a transaction"}
-        </h1>
-        <p className="mt-1 text-sm text-light-text-secondary">
-          Record money moving into or out of one of your accounts.
-        </p>
-      </div>
-      {/* Transaction Account */}
-      <FormField
-        id="accountId"
-        label="Transaction Account"
-        required
-        error={errors?.accountId?.message}
-      >
-        <Controller
-          name="accountId"
-          control={control}
-          rules={{ required: "Account is required!" }}
-          render={({ field }) => (
-            <CustomSelect
-              id="accountId"
-              placeholder="Select"
-              options={accountOptions}
-              value={field?.value}
-              onChange={field?.onChange}
-              disabled={isEditing || loadingAccountOptions}
-            />
-          )}
-        />
-      </FormField>
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        heading={isEditing ? "Edit transaction" : "Add a transaction"}
+        subHeading="Record money moving into or out of one of your accounts."
+      />
 
-      {/* Transaction Title */}
-      <FormField
-        id="title"
-        label="Transaction Title"
-        required
-        error={errors?.title?.message}
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="w-full grid grid-cols-1 gap-5 rounded-3xl border border-light-border-primary bg-light-bg-primary p-5 shadow-[0_10px_38px_rgba(23,43,36,0.05)] sm:grid-cols-2 sm:p-8"
       >
-        <CustomInput
-          id="title"
-          type="text"
-          placeholder=""
-          {...register("title", {
-            required: "Transaction title is required!",
-          })}
-        />
-      </FormField>
-
-      {/* Description */}
-      <FormField
-        id="description"
-        label="Description"
-        error={errors?.description?.message}
-      >
-        <CustomTextArea
-          id="description"
-          rows={4}
-          placeholder=""
-          {...register("description")}
-        />
-      </FormField>
-
-      {/* Transaction Date */}
-      <FormField
-        id="date"
-        label="Transaction Date"
-        required
-        error={errors?.date?.message}
-      >
-        <CustomDatePicker
-          id="date"
-          type="number"
-          placeholder="Select"
-          {...register("date", {
-            required: "Transaction date is required!",
-          })}
-        />
-      </FormField>
-
-      {/* Transaction Type */}
-      <FormField
-        id="type"
-        label="Transaction Type"
-        required
-        error={errors?.type?.message}
-      >
-        <Controller
-          name="type"
-          control={control}
-          rules={{ required: "Transaction type is required!" }}
-          render={({ field }) => (
-            <CustomSelect
-              id="type"
-              placeholder="Select"
-              options={transactionTypes}
-              value={field?.value}
-              onChange={(value) => {
-                field.onChange(value);
-                if (value === "credit") setValue("reminderId", null);
-              }}
-              disabled={isEditing || loadingTransactionTypes}
-            />
-          )}
-        />
-      </FormField>
-
-      {/* Reminder payment (debit only) */}
-      <FormField
-        id="reminderId"
-        label="Pay reminder"
-        error={errors?.reminderId?.message}
-      >
-        <Controller
-          name="reminderId"
-          control={control}
-          render={({ field }) => (
-            <CustomSelect
-              id="reminderId"
-              placeholder="No reminder"
-              options={reminderOptions}
-              value={field.value}
-              onChange={(value) => {
-                field.onChange(value || null);
-                if (value) {
-                  const selectedReminder = reminderOptions.find(
-                    (reminder) => reminder.value === value,
-                  );
-                  if (selectedReminder) {
-                    setValue("amount", selectedReminder.remainingDue, {
-                      shouldValidate: true,
-                      shouldDirty: true,
-                    });
-                  }
-                }
-              }}
-              disabled={isEditing || isCredit || loadingReminderOptions}
-            />
-          )}
-        />
-      </FormField>
-
-      {/* Custom Category Checkbox */}
-      <FormField id="checkbox" label="Enter a new category" type="checkbox">
-        <CustomCheckbox
-          id="checkbox"
-          checked={customCategory}
-          onChange={(event) => setCustomCategory(event.target.checked)}
-        />
-      </FormField>
-
-      {/* Transaction Category */}
-      <FormField
-        id="categoryId"
-        label={customCategory ? "New category" : "Category"}
-        error={errors?.categoryId?.message}
-      >
-        {customCategory ? (
-          <CustomInput
-            id="categoryId"
-            type="text"
-            placeholder=""
-            {...register("categoryId")}
-          />
-        ) : (
+        {/* Transaction Account */}
+        <FormField
+          id="accountId"
+          label="Transaction Account"
+          required
+          error={errors?.accountId?.message}
+        >
           <Controller
-            name="categoryId"
+            name="accountId"
             control={control}
+            rules={{ required: "Account is required!" }}
             render={({ field }) => (
               <CustomSelect
-                id="categoryId"
+                id="accountId"
                 placeholder="Select"
-                options={categoryOptions}
+                options={accountOptions}
                 value={field?.value}
                 onChange={field?.onChange}
-                disabled={loadingCategoryOptions}
+                disabled={isEditing || loadingAccountOptions}
               />
             )}
           />
-        )}
-      </FormField>
+        </FormField>
 
-      {/* Amount */}
-      <FormField
-        id="amount"
-        label={isReminderSelected ? "Amount (fixed by reminder)" : "Amount"}
-        required
-        error={errors?.amount?.message}
-      >
-        <CustomInput
+        {/* Transaction Title */}
+        <FormField
+          id="title"
+          label="Transaction Title"
+          required
+          error={errors?.title?.message}
+        >
+          <CustomInput
+            id="title"
+            type="text"
+            placeholder=""
+            {...register("title", {
+              required: "Transaction title is required!",
+            })}
+          />
+        </FormField>
+
+        {/* Description */}
+        <FormField
+          id="description"
+          label="Description"
+          error={errors?.description?.message}
+        >
+          <CustomTextArea
+            id="description"
+            rows={4}
+            placeholder=""
+            {...register("description")}
+          />
+        </FormField>
+
+        {/* Transaction Date */}
+        <FormField
+          id="date"
+          label="Transaction Date"
+          required
+          error={errors?.date?.message}
+        >
+          <CustomDatePicker
+            id="date"
+            type="number"
+            placeholder="Select"
+            {...register("date", {
+              required: "Transaction date is required!",
+            })}
+          />
+        </FormField>
+
+        {/* Transaction Type */}
+        <FormField
+          id="type"
+          label="Transaction Type"
+          required
+          error={errors?.type?.message}
+        >
+          <Controller
+            name="type"
+            control={control}
+            rules={{ required: "Transaction type is required!" }}
+            render={({ field }) => (
+              <CustomSelect
+                id="type"
+                placeholder="Select"
+                options={transactionTypes}
+                value={field?.value}
+                onChange={(value) => {
+                  field.onChange(value);
+                  if (value === "credit") setValue("reminderId", null);
+                }}
+                disabled={isEditing || loadingTransactionTypes}
+              />
+            )}
+          />
+        </FormField>
+
+        {/* Reminder payment (debit only) */}
+        <FormField
+          id="reminderId"
+          label="Pay reminder"
+          error={errors?.reminderId?.message}
+        >
+          <Controller
+            name="reminderId"
+            control={control}
+            render={({ field }) => (
+              <CustomSelect
+                id="reminderId"
+                placeholder="No reminder"
+                options={reminderOptions}
+                value={field.value}
+                onChange={(value) => {
+                  field.onChange(value || null);
+                  if (value) {
+                    const selectedReminder = reminderOptions.find(
+                      (reminder) => reminder.value === value,
+                    );
+                    if (selectedReminder) {
+                      setValue("amount", selectedReminder.remainingDue, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      });
+                    }
+                  }
+                }}
+                disabled={isEditing || isCredit || loadingReminderOptions}
+              />
+            )}
+          />
+        </FormField>
+
+        {/* Custom Category Checkbox */}
+        <FormField id="checkbox" label="Enter a new category" type="checkbox">
+          <CustomCheckbox
+            id="checkbox"
+            checked={customCategory}
+            onChange={(event) => setCustomCategory(event.target.checked)}
+          />
+        </FormField>
+
+        {/* Transaction Category */}
+        <FormField
+          id="categoryId"
+          label={customCategory ? "New category" : "Category"}
+          error={errors?.categoryId?.message}
+        >
+          {customCategory ? (
+            <CustomInput
+              id="categoryId"
+              type="text"
+              placeholder=""
+              {...register("categoryId")}
+            />
+          ) : (
+            <Controller
+              name="categoryId"
+              control={control}
+              render={({ field }) => (
+                <CustomSelect
+                  id="categoryId"
+                  placeholder="Select"
+                  options={categoryOptions}
+                  value={field?.value}
+                  onChange={field?.onChange}
+                  disabled={loadingCategoryOptions}
+                />
+              )}
+            />
+          )}
+        </FormField>
+
+        {/* Amount */}
+        <FormField
           id="amount"
-          type="number"
-          placeholder="3000"
-          {...register("amount", {
-            required: "Amount is required!",
-            valueAsNumber: true,
-          })}
-          disabled={isEditing}
-          readOnly={isReminderSelected}
-          className={
-            isReminderSelected
-              ? "cursor-not-allowed bg-light-input-bgDisabled"
-              : ""
-          }
-        />
-      </FormField>
+          label={isReminderSelected ? "Amount (fixed by reminder)" : "Amount"}
+          required
+          error={errors?.amount?.message}
+        >
+          <CustomInput
+            id="amount"
+            type="number"
+            placeholder="3000"
+            {...register("amount", {
+              required: "Amount is required!",
+              valueAsNumber: true,
+            })}
+            disabled={isEditing}
+            readOnly={isReminderSelected}
+            className={
+              isReminderSelected
+                ? "cursor-not-allowed bg-light-input-bgDisabled"
+                : ""
+            }
+          />
+        </FormField>
 
-      {/* Note */}
-      <FormField id="note" label="Note" error={errors?.note?.message}>
-        <CustomTextArea
-          id="note"
-          rows={4}
-          placeholder=""
-          {...register("note")}
-        />
-      </FormField>
+        {/* Note */}
+        <FormField id="note" label="Note" error={errors?.note?.message}>
+          <CustomTextArea
+            id="note"
+            rows={4}
+            placeholder=""
+            {...register("note")}
+          />
+        </FormField>
 
-      <div className="col-span-full flex justify-end gap-2">
-        <CustomButton
-          type="button"
-          name="Cancel"
-          variant="green"
-          onClick={() => navigate(-1)}
-          disabled={loading.saving}
-        />
+        <div className="col-span-full flex justify-end gap-2">
+          <CustomButton
+            type="button"
+            name="Cancel"
+            variant="green"
+            onClick={() => navigate(-1)}
+            disabled={loading.saving}
+          />
 
-        <CustomButton
-          type="submit"
-          name={loading.saving ? "Saving..." : "Save"}
-          loading={loading.saving}
-        />
-      </div>
-    </form>
+          <CustomButton
+            type="submit"
+            name={loading.saving ? "Saving..." : "Save"}
+            loading={loading.saving}
+          />
+        </div>
+      </form>
+    </div>
   );
 };
 
