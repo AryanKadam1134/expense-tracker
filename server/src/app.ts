@@ -11,6 +11,8 @@ app.use(
   }),
 );
 
+app.use(requestLogger);
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -21,6 +23,7 @@ import transactionRouter from "./routes/transaction.routes";
 import categoryRouter from "./routes/category.routes";
 import reminderRouter from "./routes/reminder.routes";
 import bankRouter from "./routes/bank.routes";
+import { requestLogger } from "./middlewares/requestLogger.middleware";
 
 app.use("/api/filters", filtersRoutes);
 app.use("/api/auth", authRouter);
