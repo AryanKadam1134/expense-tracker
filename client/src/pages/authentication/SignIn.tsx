@@ -11,6 +11,8 @@ import CustomButton from "../../components/ui/CustomButton";
 import CustomCheckbox from "../../components/ui/CustomCheckbox";
 import CustomInputPassword from "../../components/ui/CustomInputPassword";
 
+import { passwordValidation } from "../../utils/formValidations";
+
 import useFieldErrors from "../../hooks/useFieldErrors";
 
 import { useAuth } from "../../context/auth";
@@ -84,14 +86,7 @@ const SignIn = () => {
               placeholder="••••••••"
               {...register("password", {
                 required: "password is required!",
-                minLength: {
-                  value: 8,
-                  message: "Minimum 6 characters",
-                },
-                maxLength: {
-                  value: 16,
-                  message: "Maximum 16 characters",
-                },
+                ...passwordValidation(),
               })}
             />
           </FormField>

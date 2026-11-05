@@ -14,6 +14,12 @@ import CustomInputPassword from "../../components/ui/CustomInputPassword";
 
 import { authEndpoints } from "../../services/auth.service";
 
+import {
+  emailValidation,
+  passwordValidation,
+  usernameValidation,
+} from "../../utils/formValidations";
+
 import useApi from "../../hooks/useApi";
 import useFieldErrors from "../../hooks/useFieldErrors";
 
@@ -109,6 +115,7 @@ const SignUp = () => {
               placeholder="username"
               {...register("username", {
                 required: "username is required!",
+                ...usernameValidation(),
               })}
             />
           </FormField>
@@ -127,10 +134,7 @@ const SignUp = () => {
               placeholder="example@gmail.com"
               {...register("email", {
                 required: "email is required!",
-                pattern: {
-                  value: /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/,
-                  message: "Invalid email format",
-                },
+                ...emailValidation(),
               })}
             />
           </FormField>
@@ -148,14 +152,7 @@ const SignUp = () => {
               placeholder="••••••••"
               {...register("password", {
                 required: "password is required!",
-                minLength: {
-                  value: 8,
-                  message: "Minimum 6 characters",
-                },
-                maxLength: {
-                  value: 16,
-                  message: "Maximum 16 characters",
-                },
+                ...passwordValidation(),
               })}
             />
           </FormField>
