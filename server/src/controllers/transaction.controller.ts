@@ -452,6 +452,11 @@ const getTransactions = asynchandler(async (req, res) => {
           },
         },
       },
+      {
+        $sort: {
+          date: -1,
+        },
+      },
     ],
   });
 
@@ -842,6 +847,11 @@ const getB2BTransactions = asynchandler(async (req, res) => {
         $group: {
           _id: "$transferId",
           transactions: { $push: "$$ROOT" },
+        },
+      },
+      {
+        $sort: {
+          date: -1,
         },
       },
     ],
