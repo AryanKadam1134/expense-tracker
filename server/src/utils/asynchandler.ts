@@ -30,9 +30,7 @@ export const asynchandler = (func: RequestHandler): RequestHandler => {
         errorRecord.code === 11000
           ? Object.fromEntries(
               Object.entries(
-                isErrorRecord(errorRecord.keyValue)
-                  ? errorRecord.keyValue
-                  : {},
+                isErrorRecord(errorRecord.keyValue) ? errorRecord.keyValue : {},
               )
                 .filter(([field]) => field !== "owner")
                 .map(([field]) => [field, [`${field} is already in use.`]]),
@@ -50,9 +48,11 @@ export const asynchandler = (func: RequestHandler): RequestHandler => {
             ? 409
             : ["ValidationError", "CastError"].includes(errorName)
               ? 400
-              : ["JsonWebTokenError", "TokenExpiredError", "NotBeforeError"].includes(
-                    errorName,
-                  )
+              : [
+                    "JsonWebTokenError",
+                    "TokenExpiredError",
+                    "NotBeforeError",
+                  ].includes(errorName)
                 ? 401
                 : 500;
       const message =

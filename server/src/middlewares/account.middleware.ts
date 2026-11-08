@@ -1,7 +1,7 @@
-import { Account } from "../models/account.model";
+import { Account } from "../models/account.model.ts";
 
-import ApiError from "../utils/ApiError";
-import { asynchandler } from "../utils/asynchandler";
+import ApiError from "../utils/ApiError.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
 
 export const getAccountById = asynchandler(async (req, res, next) => {
   const { accountId } = req.params;

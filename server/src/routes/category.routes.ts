@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { verifyUser } from "../middlewares/auth.middleware";
-import { getCategoryById } from "../middlewares/category.middleware";
+import { verifyUser } from "../middlewares/auth.middleware.ts";
+import { getCategoryById } from "../middlewares/category.middleware.ts";
 
 import {
   addCategory,
@@ -9,7 +9,7 @@ import {
   getCategories,
   getCategory,
   updateCategory,
-} from "../controllers/category.controller";
+} from "../controllers/category.controller.ts";
 
 const categoryRouter = Router();
 

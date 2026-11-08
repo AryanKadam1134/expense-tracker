@@ -1,14 +1,14 @@
 import mongoose from "mongoose";
 
-import { Reminder } from "../models/reminder.model";
-import { Transaction } from "../models/transaction.model";
+import { Reminder } from "../models/reminder.model.ts";
+import { Transaction } from "../models/transaction.model.ts";
 
-import { revertAccountChangesAndDeleteTransaction } from "./transaction.controller";
+import { revertAccountChangesAndDeleteTransaction } from "./transaction.controller.ts";
 
-import ApiRes from "../utils/ApiRes";
-import ApiError from "../utils/ApiError";
-import { asynchandler } from "../utils/asynchandler";
-import { paginateQuery } from "../utils/pagination";
+import ApiRes from "../utils/ApiRes.ts";
+import ApiError from "../utils/ApiError.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
+import { paginateQuery } from "../utils/pagination.ts";
 
 const addReminder = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;

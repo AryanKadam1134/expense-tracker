@@ -1,10 +1,10 @@
 import { Router } from "express";
 
-import { verifyUser } from "../middlewares/auth.middleware";
+import { verifyUser } from "../middlewares/auth.middleware.ts";
 import {
   getTransactionById,
   getTransferById,
-} from "../middlewares/transaction.middleware";
+} from "../middlewares/transaction.middleware.ts";
 
 import {
   addTransaction,
@@ -17,7 +17,7 @@ import {
   getB2BTransactions,
   updateTransaction,
   updateB2BTransaction,
-} from "../controllers/transaction.controller";
+} from "../controllers/transaction.controller.ts";
 
 const transactionRouter = Router();
 

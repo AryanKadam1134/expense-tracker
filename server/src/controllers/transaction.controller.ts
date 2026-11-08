@@ -1,17 +1,20 @@
 import mongoose, { ClientSession, Types } from "mongoose";
 import { randomUUID } from "node:crypto";
 
-import { Account } from "../models/account.model";
-import { Category } from "../models/category.model";
-import { Reminder } from "../models/reminder.model";
-import { Transaction, TransactionDocument } from "../models/transaction.model";
+import { Account } from "../models/account.model.ts";
+import { Category } from "../models/category.model.ts";
+import { Reminder } from "../models/reminder.model.ts";
+import {
+  Transaction,
+  TransactionDocument,
+} from "../models/transaction.model.ts";
 
-import ApiRes from "../utils/ApiRes";
-import ApiError from "../utils/ApiError";
-import { asynchandler } from "../utils/asynchandler";
-import { paginateAggregate } from "../utils/pagination";
+import ApiRes from "../utils/ApiRes.ts";
+import ApiError from "../utils/ApiError.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
+import { paginateAggregate } from "../utils/pagination.ts";
 
-import { TRANSACTION_TYPES } from "../contants";
+import { TRANSACTION_TYPES } from "../contants.ts";
 
 const addCategory = async (
   category: Types.ObjectId | string,

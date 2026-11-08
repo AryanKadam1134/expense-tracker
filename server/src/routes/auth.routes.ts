@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { verifyUser } from "../middlewares/auth.middleware";
+import { verifyUser } from "../middlewares/auth.middleware.ts";
 
 import {
   googleAuth,
@@ -8,7 +8,7 @@ import {
   logoutUser,
   refreshSession,
   registerUser,
-} from "../controllers/auth.controller";
+} from "../controllers/auth.controller.ts";
 
 const authRouter = Router();
 

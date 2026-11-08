@@ -1,7 +1,7 @@
 import dns from "node:dns";
 import mongoose from "mongoose";
 
-import { isProduction } from "../contants";
+import { isProduction } from "../contants.ts";
 
 if (!isProduction) dns.setServers(["1.1.1.1", "8.8.8.8"]);
 

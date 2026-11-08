@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { verifyUser } from "../middlewares/auth.middleware";
-import { getReminderById } from "../middlewares/reminder.middleware";
+import { verifyUser } from "../middlewares/auth.middleware.ts";
+import { getReminderById } from "../middlewares/reminder.middleware.ts";
 
 import {
   addReminder,
@@ -9,7 +9,7 @@ import {
   getReminder,
   getReminders,
   updateReminder,
-} from "../controllers/reminder.controller";
+} from "../controllers/reminder.controller.ts";
 
 const reminderRouter = Router();
 

@@ -1,9 +1,9 @@
 import "dotenv/config";
-import app from "./app";
+import app from "./app.ts";
 
-import { getEnv } from "./utils/getEnv";
+import { getEnv } from "./utils/getEnv.ts";
 
-import { connectDB } from "./db/connectDB";
+import { connectDB } from "./db/connectDB.ts";
 
 const port = getEnv("PORT") || 3000;
 

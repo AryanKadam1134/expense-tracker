@@ -1,6 +1,6 @@
 import { Schema, model, Types, HydratedDocument } from "mongoose";
 
-import { TRANSACTION_TYPES } from "../contants";
+import { TRANSACTION_TYPES } from "../contants.ts";
 
 interface TransactionFields {
   ownerId: Types.ObjectId;

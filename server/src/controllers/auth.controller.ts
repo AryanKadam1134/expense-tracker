@@ -3,17 +3,17 @@ import { Types } from "mongoose";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { OAuth2Client } from "google-auth-library";
 
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.ts";
 
-import ApiRes from "../utils/ApiRes";
-import ApiError from "../utils/ApiError";
-import { getEnv } from "../utils/getEnv";
-import { asynchandler } from "../utils/asynchandler";
+import ApiRes from "../utils/ApiRes.ts";
+import ApiError from "../utils/ApiError.ts";
+import { getEnv } from "../utils/getEnv.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
 
 import {
   SESSION_COOKIE_OPTIONS,
   REFRESH_TOKEN_COOKIE_OPTIONS,
-} from "../contants";
+} from "../contants.ts";
 
 const generateAccessAndRefreshToken = async (
   userId: string | Types.ObjectId,

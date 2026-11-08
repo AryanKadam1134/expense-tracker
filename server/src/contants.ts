@@ -22,9 +22,9 @@ const REMINDERS = [
 ];
 
 const BASE_COOKIE_OPTIONS: CookieOptions = {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? "none" : "strict",
+  httpOnly: true, // To restrict FE from accessing the browser cookies
+  secure: isProduction, // true only for https requests
+  sameSite: isProduction ? "none" : "strict", // to avoid CSRF attacks
 };
 
 const SESSION_COOKIE_OPTIONS: CookieOptions = {

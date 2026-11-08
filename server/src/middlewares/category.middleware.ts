@@ -1,7 +1,7 @@
-import { Category } from "../models/category.model";
+import { Category } from "../models/category.model.ts";
 
-import ApiError from "../utils/ApiError";
-import { asynchandler } from "../utils/asynchandler";
+import ApiError from "../utils/ApiError.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
 
 export const getCategoryById = asynchandler(async (req, res, next) => {
   const { categoryId } = req.params;

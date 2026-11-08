@@ -1,7 +1,7 @@
 import { Router } from "express";
 
-import { verifyUser } from "../middlewares/auth.middleware";
-import { getBankById } from "../middlewares/bank.middleware";
+import { verifyUser } from "../middlewares/auth.middleware.ts";
+import { getBankById } from "../middlewares/bank.middleware.ts";
 
 import {
   addBank,
@@ -9,7 +9,7 @@ import {
   getBank,
   getBanks,
   updateBank,
-} from "../controllers/bank.controller";
+} from "../controllers/bank.controller.ts";
 
 const bankRouter = Router();
 

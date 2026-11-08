@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 
+import { requestLogger } from "./middlewares/requestLogger.middleware.ts";
+
 const app = express();
 
 app.use(
@@ -16,14 +18,13 @@ app.use(requestLogger);
 app.use(express.json());
 app.use(cookieParser());
 
-import authRouter from "./routes/auth.routes";
-import accountRouter from "./routes/account.routes";
-import filtersRoutes from "./routes/filter.routes";
-import transactionRouter from "./routes/transaction.routes";
-import categoryRouter from "./routes/category.routes";
-import reminderRouter from "./routes/reminder.routes";
-import bankRouter from "./routes/bank.routes";
-import { requestLogger } from "./middlewares/requestLogger.middleware";
+import authRouter from "./routes/auth.routes.ts";
+import accountRouter from "./routes/account.routes.ts";
+import filtersRoutes from "./routes/filter.routes.ts";
+import transactionRouter from "./routes/transaction.routes.ts";
+import categoryRouter from "./routes/category.routes.ts";
+import reminderRouter from "./routes/reminder.routes.ts";
+import bankRouter from "./routes/bank.routes.ts";
 
 app.use("/api/filters", filtersRoutes);
 app.use("/api/auth", authRouter);

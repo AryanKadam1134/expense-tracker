@@ -1,9 +1,9 @@
-import { Category } from "../models/category.model";
+import { Category } from "../models/category.model.ts";
 
-import ApiRes from "../utils/ApiRes";
-import ApiError from "../utils/ApiError";
-import { asynchandler } from "../utils/asynchandler";
-import { paginateQuery } from "../utils/pagination";
+import ApiRes from "../utils/ApiRes.ts";
+import ApiError from "../utils/ApiError.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
+import { paginateQuery } from "../utils/pagination.ts";
 
 const addCategory = asynchandler(async (req, res) => {
   const loggedUserId = req.user?._id;

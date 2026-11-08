@@ -1,10 +1,10 @@
 import jwt, { JwtPayload } from "jsonwebtoken";
 
-import { User } from "../models/user.model";
+import { User } from "../models/user.model.ts";
 
-import ApiError from "../utils/ApiError";
-import { getEnv } from "../utils/getEnv";
-import { asynchandler } from "../utils/asynchandler";
+import ApiError from "../utils/ApiError.ts";
+import { getEnv } from "../utils/getEnv.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
 
 export const verifyUser = asynchandler(async (req, res, next) => {
   const accessToken =

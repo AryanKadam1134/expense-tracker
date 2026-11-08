@@ -1,6 +1,6 @@
 import { Schema, model, Types, HydratedDocument } from "mongoose";
 
-import { REMINDERS } from "../contants";
+import { REMINDERS } from "../contants.ts";
 
 interface ReminderFields {
   ownerId: Types.ObjectId;

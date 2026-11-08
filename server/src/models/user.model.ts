@@ -3,7 +3,7 @@ import { Schema, model, Model, HydratedDocument } from "mongoose";
 import bcrypt from "bcrypt";
 import jwt, { SignOptions } from "jsonwebtoken";
 
-import { getEnv } from "../utils/getEnv";
+import { getEnv } from "../utils/getEnv.ts";
 
 interface UserMethods {
   isPasswordCorrect(password: string): Promise<boolean>;

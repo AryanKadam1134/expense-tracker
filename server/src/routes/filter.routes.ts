@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { verifyUser } from "../middlewares/auth.middleware";
+import { verifyUser } from "../middlewares/auth.middleware.ts";
 
 import {
   getAccountTypes,
@@ -10,7 +10,7 @@ import {
   getUserCategoriesAsOptions,
   getReminderOptions,
   getUserBanksAsOptions,
-} from "../controllers/filter.controller";
+} from "../controllers/filter.controller.ts";
 
 const filtersRoutes = Router();
 

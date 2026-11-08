@@ -1,12 +1,12 @@
-import { Bank } from "../models/bank.model";
-import { Account } from "../models/account.model";
-import { Category } from "../models/category.model";
-import { Reminder } from "../models/reminder.model";
+import { Bank } from "../models/bank.model.ts";
+import { Account } from "../models/account.model.ts";
+import { Category } from "../models/category.model.ts";
+import { Reminder } from "../models/reminder.model.ts";
 
-import ApiRes from "../utils/ApiRes";
-import { asynchandler } from "../utils/asynchandler";
+import ApiRes from "../utils/ApiRes.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
 
-import { ACCOUNT_TYPES, REMINDERS, TRANSACTION_TYPES } from "../contants";
+import { ACCOUNT_TYPES, REMINDERS, TRANSACTION_TYPES } from "../contants.ts";
 
 const getAccountTypes = asynchandler(async (req, res) => {
   return res

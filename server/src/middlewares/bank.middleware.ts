@@ -1,7 +1,7 @@
-import { Bank } from "../models/bank.model";
+import { Bank } from "../models/bank.model.ts";
 
-import ApiError from "../utils/ApiError";
-import { asynchandler } from "../utils/asynchandler";
+import ApiError from "../utils/ApiError.ts";
+import { asynchandler } from "../utils/asynchandler.ts";
 
 export const getBankById = asynchandler(async (req, res, next) => {
   const { bankId } = req.params;
