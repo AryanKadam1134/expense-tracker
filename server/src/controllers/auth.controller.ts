@@ -286,7 +286,7 @@ const loginUser = asynchandler(async (req, res) => {
   }
 
   const userExists = await User.findOne({
-    $or: [{ username: userCredential }, { password: userCredential }],
+    $or: [{ username: userCredential }, { email: userCredential }],
   });
 
   if (!userExists) {
