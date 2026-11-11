@@ -11,6 +11,7 @@ import useApi from "../hooks/useApi";
 import { useNotify } from "../context/notification";
 
 import type { Account } from "../types/api.types";
+import { Landmark } from "lucide-react";
 
 type AccountCardsProps = {
   account: Account;
@@ -71,10 +72,14 @@ const AccountCard = ({ account, onDelete }: AccountCardsProps) => {
                 </span>
               )}
             </div>
-            <p className="mt-1 text-sm text-light-text-secondary">
+
+            <p className="mt-1 flex items-center gap-2 text-sm text-light-text-secondary">
+              <Landmark size={14} />
+
               {bankName || "Bank not available"}
               {accountNumber ? ` ···· ${accountNumber.slice(-4)}` : ""}
             </p>
+
             <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.12em] text-light-text-tertiary">
               Current balance
             </p>
