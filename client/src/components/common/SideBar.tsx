@@ -109,7 +109,7 @@ const SideBar = ({ isOpen, onClose }: SideBarProps) => {
 
             <div>
               <p className="text-nowrap text-sm font-semibold tracking-tight text-light-text-primary">
-                Expense Tracker
+                Monetra
               </p>
               <p className="text-[11px] text-light-text-tertiary">
                 Personal finance

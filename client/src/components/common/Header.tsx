@@ -23,7 +23,7 @@ const Header = ({ onMenuClick }: { onMenuClick: () => void }) => {
         <div className="flex items-center gap-2 sm:hidden">
           <AppLogo className="size-8 rounded-lg" />
           <p className="text-sm font-semibold tracking-tight text-light-text-primary">
-            Expense Tracker
+            Monetra
           </p>
         </div>
 

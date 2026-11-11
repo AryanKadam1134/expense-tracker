@@ -44,7 +44,7 @@ const SignIn = () => {
 
   return (
     <Authentication
-      heading="Welcome to Expense Tracker"
+      heading="Welcome to Monetra"
       onSubmit={handleSubmit(onSubmit)}
       formContent={
         <>

@@ -34,7 +34,7 @@ const Authentication = ({
             <AppLogo className="size-11 bg-white/15 text-white shadow-none" />
 
             <div>
-              <p className="font-semibold tracking-tight">Expense Tracker</p>
+              <p className="font-semibold tracking-tight">Monetra</p>
               <p className="text-xs text-white/60">Personal finance</p>
             </div>
           </div>
@@ -64,7 +64,7 @@ const Authentication = ({
 
             <div>
               <p className="text-sm font-semibold text-light-text-primary">
-                Expense Tracker
+                Monetra
               </p>
 
               <p className="text-xs text-light-text-tertiary">
